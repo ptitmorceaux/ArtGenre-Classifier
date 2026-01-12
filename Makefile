@@ -22,18 +22,23 @@ endif
 # ===== Dossiers =====
 SRC_DIR := libc/src
 OUT_DIR := libc/build
+INC_DIR := libc/include
+
+# ===== Flags de compilation =====
+CFLAGS := -I$(INC_DIR)
 
 # ===== Fichiers =====
 C_FILES := $(wildcard $(SRC_DIR)/*.c)
+H_FILES := $(wildcard $(INC_DIR)/*.h)
 LIBS := $(patsubst $(SRC_DIR)/%.c,$(OUT_DIR)/%.$(SHARED_EXT),$(C_FILES))
 
 # ===== Règle par défaut =====
 all: info $(LIBS)
 
 # ===== Build lib dynamique =====
-$(OUT_DIR)/%.$(SHARED_EXT): $(SRC_DIR)/%.c
+$(OUT_DIR)/%.$(SHARED_EXT): $(SRC_DIR)/%.c $(H_FILES)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(SHARED_FLAG) -o $@ $<
+	$(CC) $(SHARED_FLAG) $(CFLAGS) -o $@ $<
 
 # ===== Infos =====
 info:

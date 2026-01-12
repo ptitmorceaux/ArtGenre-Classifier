@@ -1,10 +1,4 @@
-#include <stdint.h>
-
-#ifdef _WIN32
-    #define EXPORT __declspec(dllexport)
-#else
-    #define EXPORT
-#endif
+#include "../include/global.h"
 
 // Error codes
 
