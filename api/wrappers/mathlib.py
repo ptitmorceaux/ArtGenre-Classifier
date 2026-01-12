@@ -1,29 +1,16 @@
 import ctypes
-from api.wrappers.loader import load_library
+from api.wrappers.loader import init_library
 
 class MathLib:
     
-    def __init__(self, dll_folder="libc", dll_basename="mathlib"):
+    def __init__(self, lib_folder="libc", basename="mathlib"):
         """Charge la lib et configure les types ctypes pour chaque fonction"""
-        self._lib = load_library(dll_folder, dll_basename)
-        
-        functions = [
-            (self._lib.addition, ctypes.c_double, ctypes.c_double, ctypes.POINTER(ctypes.c_double)),
-            (self._lib.soustraction, ctypes.c_double, ctypes.c_double, ctypes.POINTER(ctypes.c_double)),
-            (self._lib.multiplication, ctypes.c_double, ctypes.c_double, ctypes.POINTER(ctypes.c_double)),
-            (self._lib.division, ctypes.c_double, ctypes.c_double, ctypes.POINTER(ctypes.c_double)),
-            (self._lib.power, ctypes.c_double, ctypes.c_int32, ctypes.POINTER(ctypes.c_double))
-        ]
+        try:
+            self._lib = init_library(lib_folder, basename)
+        except Exception as e:
+            raise RuntimeError(f"mathlib: lib_folder='{lib_folder}', basename='{basename}': {e}")
 
-        for func, type_a, type_b, type_result in functions:
-            func.argtypes = [type_a, type_b, type_result]
-            func.restype = ctypes.c_int32
-
-        # Configuration de strerror
-        self._lib.strerror.argtypes = [ctypes.c_int32]
-        self._lib.strerror.restype = ctypes.c_char_p
-
-    # --- Méthode privée ---
+    #====== Méthode privée ======#
 
     def _call(self, func, a, b):
         """Exécute l'appel C et gère les erreurs de manière générique"""
@@ -37,29 +24,19 @@ class MathLib:
         
         return result.value
 
-    # --- Méthodes publiques ---
+    #====== Méthodes publiques ======#
 
     def addition(self, a: float, b: float) -> float:
-        return self._call(self._lib.addition, a, b)
+        return self._call(self._lib.add, a, b)
 
-    def soustraction(self, a: float, b: float) -> float:
-        return self._call(self._lib.soustraction, a, b)
+    def subtraction(self, a: float, b: float) -> float:
+        return self._call(self._lib.sub, a, b)
     
     def multiplication(self, a: float, b: float) -> float:
-        return self._call(self._lib.multiplication, a, b)
+        return self._call(self._lib.mult, a, b)
 
     def division(self, a: float, b: float) -> float:
-        return self._call(self._lib.division, a, b)
+        return self._call(self._lib.div, a, b)
 
     def power(self, base: float, exp: int) -> float:
         return self._call(self._lib.power, base, exp)
-
-
-if __name__ == "__main__":
-    try:
-        mathlib = MathLib()
-        print(f"10 + 5 = {mathlib.addition(10, 5)}") # 15.0
-        print(f"10 / 2 = {mathlib.division(10, 2)}") # 5.0
-        print(f"0 / 0 = {mathlib.division(0, 0)}") # error
-    except Exception as e:
-        print(f"Erreur : {e}") # Division by Zero
