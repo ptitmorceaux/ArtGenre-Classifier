@@ -1,33 +1,56 @@
-# Compilateur
-CC = gcc
+# ===== Compilateur =====
+CC ?= gcc
 
-# Dossiers
-SRC_DIR = libc
-DLL_DIR = libc/dll
+# ===== Détection OS / Arch =====
+ifeq ($(OS),Windows_NT)
+    UNAME_S := Windows
+    UNAME_M := $(PROCESSOR_ARCHITECTURE)
+    SHARED_EXT := dll
+    SHARED_FLAG := -shared
+else
+    UNAME_S := $(shell uname -s)
+    UNAME_M := $(shell uname -m)
+    ifeq ($(UNAME_S),Darwin)
+        SHARED_EXT := dylib
+        SHARED_FLAG := -dynamiclib -fPIC
+    else
+        SHARED_EXT := so
+        SHARED_FLAG := -shared -fPIC
+    endif
+endif
 
-# Trouver tous les fichiers .c dans le dossier c/
-C_FILES = $(wildcard $(SRC_DIR)/*.c)
+# ===== Dossiers =====
+SRC_DIR := libc/src
+OUT_DIR := libc/$(SHARED_EXT)
 
-# Générer les noms des DLL correspondantes
-DLLS = $(patsubst $(SRC_DIR)/%.c,$(DLL_DIR)/%.dll,$(C_FILES))
+# ===== Fichiers =====
+C_FILES := $(wildcard $(SRC_DIR)/*.c)
+LIBS := $(patsubst $(SRC_DIR)/%.c,$(OUT_DIR)/lib%.$(SHARED_EXT),$(C_FILES))
 
-# Règle par défaut : construire toutes les DLL
-all: $(DLLS)
+# ===== Règle par défaut =====
+all: info $(LIBS)
 
-# Règle pour créer une DLL à partir d'un fichier .c
-$(DLL_DIR)/%.dll: $(SRC_DIR)/%.c
-	@mkdir -p $(DLL_DIR)
-	$(CC) -shared -o $@ $<
+# ===== Build lib dynamique =====
+$(OUT_DIR)/lib%.$(SHARED_EXT): $(SRC_DIR)/%.c
+	@mkdir -p $(OUT_DIR)
+	$(CC) $(SHARED_FLAG) -o $@ $<
 
-# Nettoyer les DLL générées
+# ===== Infos =====
+info:
+	@echo "OS        : $(UNAME_S)"
+	@echo "Arch      : $(UNAME_M)"
+	@echo "Extension : .$(SHARED_EXT)"
+	@echo "Compiler  : $(CC)"
+
+# ===== Nettoyage =====
 clean:
-	rm -f $(DLL_DIR)/*.dll
+	@rm -rf $(OUT_DIR)
 
-# Afficher la liste des DLL qui seront générées
+# ===== Listing =====
 list:
-	@echo "Fichiers C trouvés:"
+	@echo "Sources:"
 	@echo $(C_FILES)
-	@echo "DLLs qui seront générées:"
-	@echo $(DLLS)
+	@echo "Libs:"
+	@echo $(LIBS)
 
-.PHONY: all clean list
+.PHONY: all clean list info
