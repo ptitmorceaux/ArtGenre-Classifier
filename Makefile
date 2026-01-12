@@ -25,13 +25,13 @@ OUT_DIR := libc/$(SHARED_EXT)
 
 # ===== Fichiers =====
 C_FILES := $(wildcard $(SRC_DIR)/*.c)
-LIBS := $(patsubst $(SRC_DIR)/%.c,$(OUT_DIR)/lib%.$(SHARED_EXT),$(C_FILES))
+LIBS := $(patsubst $(SRC_DIR)/%.c,$(OUT_DIR)/%.$(SHARED_EXT),$(C_FILES))
 
 # ===== Règle par défaut =====
 all: info $(LIBS)
 
 # ===== Build lib dynamique =====
-$(OUT_DIR)/lib%.$(SHARED_EXT): $(SRC_DIR)/%.c
+$(OUT_DIR)/%.$(SHARED_EXT): $(SRC_DIR)/%.c
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(SHARED_FLAG) -o $@ $<
 
