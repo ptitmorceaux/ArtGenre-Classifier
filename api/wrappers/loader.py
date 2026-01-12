@@ -3,7 +3,7 @@ import os
 import sys
 import json
 
-def load_library(lib_folder: str, basename: str) -> ctypes.CDLL:
+def load_library(lib_folder: str, build_folder: str, basename: str) -> ctypes.CDLL:
     """
     Charge une bibliothèque partagée (.dll, .so, .dylib)
     de manière transparente selon l'OS.
@@ -17,7 +17,7 @@ def load_library(lib_folder: str, basename: str) -> ctypes.CDLL:
     else:
         ext = "so"
     
-    lib_path = os.path.join(lib_folder, ext, f"{basename}.{ext}")
+    lib_path = os.path.join(lib_folder, build_folder, f"{basename}.{ext}")
     print(f"Chargement de la bibliothèque: {lib_path}")
     
     if not os.path.exists(lib_path):
@@ -26,19 +26,19 @@ def load_library(lib_folder: str, basename: str) -> ctypes.CDLL:
     return ctypes.CDLL(lib_path)
 
 
-def load_lib_json_specs(lib_folder: str, basename: str) -> dict:
+def load_lib_json_specs(lib_folder: str, specs_folder: str, basename: str) -> dict:
     """Charge le fichier json décrivant les fonctions de la lib"""
-    info_path = os.path.join(lib_folder, "specs", f"{basename}.json")
+    info_path = os.path.join(lib_folder, specs_folder, f"{basename}.json")
     if not os.path.exists(info_path):
         raise FileNotFoundError(f"Impossible de trouver le json: {info_path}")
     with open(info_path, "r") as f:
         return json.load(f)
 
 
-def init_library(lib_folder: str, basename: str) -> ctypes.CDLL:
+def init_library(lib_folder: str, build_folder: str, specs_folder: str, basename: str) -> ctypes.CDLL:
     """Charge la lib et configure les types ctypes pour chaque fonction"""
-    lib = load_library(lib_folder, basename)
-    functions = load_lib_json_specs(lib_folder, basename)
+    lib = load_library(lib_folder, build_folder, basename)
+    functions = load_lib_json_specs(lib_folder, specs_folder, basename)
     for name, info in functions.items():
         func = getattr(lib, name)
         

@@ -21,7 +21,7 @@ endif
 
 # ===== Dossiers =====
 SRC_DIR := libc/src
-OUT_DIR := libc/$(SHARED_EXT)
+OUT_DIR := libc/build
 
 # ===== Fichiers =====
 C_FILES := $(wildcard $(SRC_DIR)/*.c)

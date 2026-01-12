@@ -3,12 +3,12 @@ from api.wrappers.loader import init_library
 
 class MathLib:
     
-    def __init__(self, lib_folder="libc", basename="mathlib"):
+    def __init__(self, lib_folder="libc", build_folder="build", specs_folder="specs", basename="mathlib"):
         """Charge la lib et configure les types ctypes pour chaque fonction"""
         try:
-            self._lib = init_library(lib_folder, basename)
+            self._lib = init_library(lib_folder, build_folder, specs_folder, basename)
         except Exception as e:
-            raise RuntimeError(f"mathlib: lib_folder='{lib_folder}', basename='{basename}': {e}")
+            raise RuntimeError(f"mathlib: lib_folder='{lib_folder}', build_folder='{build_folder}', specs_folder='{specs_folder}', basename='{basename}': {e}")
 
     #====== Méthode privée ======#
 

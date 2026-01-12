@@ -24,13 +24,13 @@ Contient les fichiers de spécification JSON (`.json`) qui décrivent les signat
 
 Ces spécifications permettent au wrapper Python de charger correctement les fonctions C via `ctypes` en connaissant les types d'arguments et de retour.
 
-### 📁 `dll/` (ou `so/` ou `dylib/`)
+### 📁 `build/`
 Contient les bibliothèques dynamiques compilées à partir des sources.
 
 **Extension selon l'OS:**
-- **Windows:** `.dll` → dossier `dll/`
-- **Linux:** `.so` → dossier `so/`
-- **macOS:** `.dylib` → dossier `dylib/`
+- **Windows:** `.dll`
+- **Linux:** `.so`
+- **macOS:** `.dylib`
 
 ## Processus de compilation
 
@@ -38,11 +38,10 @@ Le [Makefile](../Makefile) à la racine du projet gère la compilation:
 
 1. **Détection de l'OS** pour choisir l'extension appropriée
 2. **Compilation** des fichiers `.c` de `src/` en bibliothèques dynamiques
-3. **Placement** des bibliothèques compilées dans le dossier correspondant (`dll/`, `so/`, ou `dylib/`)
+3. **Placement** des bibliothèques compilées dans le dossier `build`
 
 ```bash
 # Compiler toutes les bibliothèques
-make
 
 # Nettoyer les bibliothèques compilées
 make clean
@@ -54,9 +53,9 @@ make clean
 src/mathlib.c  ──────────────┐
                              │ (Makefile)
                              ↓
-                  dll/mathlib.dll   (Windows)
-                  so/mathlib.so     (Linux)
-                  dylib/mathlib.dylib (macOS)
+                 build/mathlib.dll   (Windows)
+                 build/mathlib.so     (Linux)
+                 build/mathlib.dylib (macOS)
                              │
                              │ (loader.py)
                              ↓
@@ -65,6 +64,6 @@ specs/mathlib.json ─────→ wrapper Python
 
 1. **src/** : Code source C
 2. **Makefile** : Compile en bibliothèque dynamique
-3. **dll/so/dylib/** : Bibliothèque compilée
+3. **build/dll||so||dylib** : Bibliothèque compilée
 4. **specs/** : Spécifications pour le chargement Python
-5. **api/wrappers/** : Wrapper Python qui utilise specs + dll
+5. **api/wrappers/** : Wrapper Python qui utilise specs + dll||so||dylib
