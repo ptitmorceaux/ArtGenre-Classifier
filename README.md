@@ -1,4 +1,4 @@
-## Installation
+## Installation en local
 
 ### Installer les dépendances Python
 
@@ -11,3 +11,7 @@ pip install -r requirements.txt
 ```sh
 make
 ```
+
+## Tests
+
+Il ne reste plus qu'à faire vos test dans [`notebooks/`](./notebooks/main.ipynb)
