@@ -1,9 +1,9 @@
 import ctypes
 from engine.bindings.loader import Loader
 
-class PredictLib(Loader):
+class ModelLib(Loader):
     
-    def __init__(self, basename="predict", lib_folder="libc", build_folder="build", specs_folder="specs"):
+    def __init__(self, basename="model", lib_folder="libc", build_folder="build", specs_folder="specs"):
         try:
             super().__init__(basename=basename, lib_folder=lib_folder, build_folder=build_folder, specs_folder=specs_folder)
         except Exception as e:

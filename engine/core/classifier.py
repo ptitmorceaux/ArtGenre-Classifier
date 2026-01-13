@@ -1,3 +1,3 @@
-from engine.core.classifier import PredictLib
+from engine.core.classifier import ModelLib
 
 pass

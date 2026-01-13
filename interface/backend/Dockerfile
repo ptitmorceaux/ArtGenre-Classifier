@@ -15,8 +15,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY libc/include/global.h      libc/include/
-COPY libc/src/predict.c         libc/src/
-COPY libc/specs/predict.json    libc/specs/
+COPY libc/src/model.c         libc/src/
+COPY libc/specs/model.json    libc/specs/
 COPY Makefile .
 RUN make
 
@@ -24,7 +24,7 @@ COPY api/ api/
 
 COPY bindings/utils.py      bindings/
 COPY bindings/loader.py     bindings/
-COPY bindings/predict.py    bindings/
+COPY bindings/model.py    bindings/
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
