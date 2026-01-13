@@ -1,0 +1,10 @@
+{
+    "strerror" : {
+        "argtypes": ["int32_t"],
+        "restype": "char*"
+    },
+    "factorial" : {
+        "argtypes": ["uint32_t", "uint32_t*"],
+        "restype": "int32_t"
+    }
+}
