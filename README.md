@@ -1,10 +1,10 @@
-# 🎨 Projet de Classification d'Art
+# Projet de Classification d'Art
 
 Système de classification de genres artistiques combinant **machine learning en Python** et **calculs optimisés en C** pour des performances maximales.
 
 ---
 
-## 📋 Prérequis
+## Prérequis
 
 - **Python 3.8+**
 - **GCC**
@@ -13,7 +13,7 @@ Système de classification de genres artistiques combinant **machine learning en
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### 1. Installer les dépendances Python
 
@@ -43,7 +43,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ---
 
-## 🏗️ Architecture du Projet
+## Architecture du Projet
 
 ### Vue d'ensemble
 
@@ -79,29 +79,29 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ### Composants
 
-#### 🔧 **Engine** (`engine/`)
+#### **Engine** (`engine/`)
 - **Prétraitement** : redimensionnement, normalisation des images
 - **Bindings Python** : interface entre Python et les fonctions C
 - **Classification** : logique de prédiction
 
-#### 📚 **Librairie C** (`libc/`)
+#### **Librairie C** (`libc/`)
 - **mathlib.c** : opérations matricielles optimisées
 - **model.c** : algorithmes de ML (forward pass, backpropagation)
 - **Compilation** : génère des `.dll`/`.so` pour performances maximales
 
-#### 🌐 **Backend** (`interface/backend/`)
+#### **Backend** (`interface/backend/`)
 - **API REST** : endpoints pour upload et prédiction
 - **Traitement** : gestion des requêtes, appel au moteur de prédiction
 - **Persistance** : sauvegarde des modèles et historique
 
-#### 💻 **Frontend** (`interface/frontend/`)
+#### **Frontend** (`interface/frontend/`)
 - **Interface utilisateur** : drag & drop d'images
 - **Dashboard** : visualisation des résultats et statistiques
 - **Communication** : consommation de l'API backend
 
 ---
 
-## 🔄 Flow Fonctionnel
+## Flow Fonctionnel
 
 ### Phase 1 : Entraînement (Training)
 
@@ -143,7 +143,7 @@ USER <── Affichage Résultat <── Frontend <── JSON Response <── 
 
 ---
 
-## 📓 Utilisation
+## Utilisation
 
 ### 1. Training d'un Modèle
 
@@ -185,7 +185,7 @@ Accéder à l'interface : **http://localhost:3000**
 
 ---
 
-## 📁 Structure du Projet
+## Structure du Projet
 
 ```
 ├── engine/               # Moteur de ML Python
@@ -205,7 +205,7 @@ Accéder à l'interface : **http://localhost:3000**
 
 ---
 
-## 🐳 Déploiement Docker
+## Déploiement Docker
 
 ```sh
 # Développement
@@ -217,7 +217,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ---
 
-## 📚 Documentation Additionnelle
+## Documentation Additionnelle
 
 - [Configuration Windows/MSYS2](docs/setup_windows_msys2.md)
 - [Spécifications des fonctions C](libc/specs/)
