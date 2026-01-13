@@ -1,0 +1,37 @@
+networks:
+  cloudflared_proxy:
+    external: true
+
+services:
+
+  backend:
+    container_name: PA3-backend-dev
+    restart: unless-stopped
+    build:
+      context: api/Dockerfile
+      dockerfile: Dockerfile
+    image: PA3-backend:dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    # environment:
+    #   - PYTHONUNBUFFERED=1
+    networks:
+      - default
+      - cloudflared_proxy
+
+  frontend:
+    container_name: PA3-frontend-dev
+    restart: unless-stopped
+    build:
+      context: app/Dockerfile
+      dockerfile: Dockerfile-frontend
+    image: PA3-frontend:dev
+    environment:
+      - VITE_API_URL=http://localhost:8000/PA3
+    ports:
+      - "5173:5173"
+    networks:
+      - default
+      - cloudflared_proxy

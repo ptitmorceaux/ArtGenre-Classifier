@@ -1,0 +1,14 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #212529;
+  color: #f8f9fa;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #212529; }
+::-webkit-scrollbar-thumb { background: #495057; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #6c757d; }
