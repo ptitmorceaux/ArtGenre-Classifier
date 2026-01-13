@@ -101,9 +101,9 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ---
 
-## Flow Fonctionnel
+## Flow Fonctionnel (comme ça que je le vois ???)
 
-### Phase 1 : Entraînement (Training)
+### Phase 1 : Training
 
 ```
 DATASET D'IMAGES ──┐
@@ -120,7 +120,7 @@ LABELS (genres) ───┘                             Vecteur Y ──┤
                                                     Fichier POIDS.bin
 ```
 
-### Phase 2 : Prédiction (Interface)
+### Phase 2 : Interface (uniquement prédiction)
 
 ```
 USER ──> Upload Image ──> Frontend ──> API Backend ──> Python (Resize/Numpy)
@@ -209,17 +209,15 @@ Accéder à l'interface : **http://localhost:3000**
 
 ```sh
 # Développement
-docker-compose up
+docker compose up -d --build
 
 # Production
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 ---
 
-## Documentation Additionnelle
+## Documentation
 
 - [Configuration Windows/MSYS2](docs/setup_windows_msys2.md)
 - [Spécifications des fonctions C](libc/specs/)
-- [Documentation backend](interface/backend/README.md)
-- [Documentation frontend](interface/frontend/README.md)
