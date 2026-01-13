@@ -1,5 +1,5 @@
 import ctypes
-from bindings.loader import Loader
+from engine.bindings.loader import Loader
 
 class MathLib(Loader):
     

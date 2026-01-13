@@ -42,6 +42,7 @@ Le [Makefile](../Makefile) à la racine du projet gère la compilation:
 
 ```bash
 # Compiler toutes les bibliothèques
+make
 
 # Nettoyer les bibliothèques compilées
 make clean
