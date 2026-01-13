@@ -17,7 +17,7 @@ class MathLib(Loader):
             error_msg = self._lib.strerror(err_code).decode("utf-8")
             raise RuntimeError(f"mathlib._get_error(): {error_msg}")
 
-    # Fonctionne UNIQUEMENT pcque ttes les fcts ont 2 args et un retour en double
+    # Fonctionne UNIQUEMENT pcque ttes les fcts ont 2 args et un retour de type double
     def _call(self, func, a, b):
         """Exécute l'appel C et gère les erreurs de manière générique"""
         result = ctypes.c_double()
