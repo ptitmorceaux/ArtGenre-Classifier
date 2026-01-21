@@ -8,7 +8,7 @@ DLLEXPORT unsigned char sum_float32_array(const float* array, int32_t array_leng
         sum += array[i];
     }
     *result = sum;
-    return EXIT_SUCCESS;
+    return RES_EXIT_SUCCESS;
 }
 
 DLLEXPORT unsigned char get_float32_array_of_incrementing_numbers(int32_t num_elements, float** res_array) {
@@ -18,11 +18,11 @@ DLLEXPORT unsigned char get_float32_array_of_incrementing_numbers(int32_t num_el
         array[i] = (float) i;
     }
     *res_array = array;
-    return EXIT_SUCCESS;
+    return RES_EXIT_SUCCESS;
 }
 
 DLLEXPORT unsigned char delete_array(void* array) {
     if (!array) return ERR_INVALID_PTR;
     free(array);
-    return EXIT_SUCCESS;
+    return RES_EXIT_SUCCESS;
 }

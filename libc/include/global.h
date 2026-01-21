@@ -2,6 +2,7 @@
 #define __GLOBAL_H__
 
 
+#include <stdlib.h>
 #include <stdint.h>
 
 
@@ -12,13 +13,13 @@
 #endif
 
 
-// Error codes
-// -> unsigned char -> entre 0 et 255 erreurs possibles pour le moment
+// Status codes
+// -> unsigned char -> entre 0 et 255 status possibles pour le moment
 typedef enum {
-    EXIT_SUCCESS,
+    RES_EXIT_SUCCESS,
     ERR_INVALID_PTR,
     ERR_MATH_DIV_BY_ZERO,
-} ErrorCode;
+} StatusCode;
 
 const char* get_status_message(unsigned char code);
 

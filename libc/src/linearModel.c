@@ -15,17 +15,17 @@ DLLEXPORT unsigned char create_linear_model(float a, float b, LinearModel** res_
     model->a = a;
     model->b = b;
     *res_model = model;
-    return EXIT_SUCCESS;
+    return RES_EXIT_SUCCESS;
 }
 
 DLLEXPORT unsigned char predict_linear_model(LinearModel* model, float* result) {
     if (!model || !result) return ERR_INVALID_PTR;
     *result = model->a + model->b;
-    return EXIT_SUCCESS;
+    return RES_EXIT_SUCCESS;
 }
 
 DLLEXPORT unsigned char release_linear_model(LinearModel* model) {
     if (!model) return ERR_INVALID_PTR;
     free(model);
-    return EXIT_SUCCESS;
+    return RES_EXIT_SUCCESS;
 }
