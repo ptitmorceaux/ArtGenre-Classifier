@@ -1,22 +1,22 @@
 {
-    "add" : {
+    "my_add" : {
         "argtypes": ["float", "float", "float*"],
-        "restype": "int32_t"
+        "restype": "unsigned char"
     },
-    "sub" : {
+    "my_sub" : {
         "argtypes": ["float", "float", "float*"],
-        "restype": "int32_t"
+        "restype": "unsigned char"
     },
-    "mult" : {
+    "my_mult" : {
         "argtypes": ["float", "float", "float*"],
-        "restype": "int32_t"
+        "restype": "unsigned char"
     },
-    "div" : {
+    "my_div" : {
         "argtypes": ["float", "float", "float*"],
-        "restype": "int32_t"
+        "restype": "unsigned char"
     },
-    "pow" : {
+    "my_pow" : {
         "argtypes": ["float", "int32_t", "float*"],
-        "restype": "int32_t"
+        "restype": "unsigned char"
     }
 }
