@@ -1,0 +1,14 @@
+{
+    "create_linear_model" : {
+        "argtypes": ["float", "float", "LinearModel**"],
+        "restype": "unsigned char"
+    },
+    "predict_linear_model" : {
+        "argtypes": ["LinearModel*", "float*"],
+        "restype": "unsigned char"
+    },
+    "release_linear_model" : {
+        "argtypes": ["LinearModel*"],
+        "restype": "unsigned char"
+    }
+}

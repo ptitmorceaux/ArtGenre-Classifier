@@ -1,0 +1,22 @@
+{
+    "add" : {
+        "argtypes": ["float", "float", "float*"],
+        "restype": "int32_t"
+    },
+    "sub" : {
+        "argtypes": ["float", "float", "float*"],
+        "restype": "int32_t"
+    },
+    "mult" : {
+        "argtypes": ["float", "float", "float*"],
+        "restype": "int32_t"
+    },
+    "div" : {
+        "argtypes": ["float", "float", "float*"],
+        "restype": "int32_t"
+    },
+    "pow" : {
+        "argtypes": ["float", "int32_t", "float*"],
+        "restype": "int32_t"
+    }
+}
