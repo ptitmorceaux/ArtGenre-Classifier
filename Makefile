@@ -1,61 +1,71 @@
-# ===== Compilateur =====
-CC ?= gcc
+# ===== Configuration =====
+CC       := gcc
+LIB_NAME := libc
+SRC_DIR  := libc/src
+INC_DIR  := libc/include
+OUT_DIR  := libc/build
+OBJ_DIR  := $(OUT_DIR)/objects
+
 
 # ===== Détection OS / Arch =====
 ifeq ($(OS),Windows_NT)
-    UNAME_S := Windows
-    UNAME_M := $(PROCESSOR_ARCHITECTURE)
-    SHARED_EXT := dll
-    SHARED_FLAG := -shared
+    UNAME_S     := Windows
+    UNAME_M     := $(PROCESSOR_ARCHITECTURE)
+    EXT  := dll
+    FLAG := -shared
 else
     UNAME_S := $(shell uname -s)
     UNAME_M := $(shell uname -m)
     ifeq ($(UNAME_S),Darwin)
-        SHARED_EXT := dylib
-        SHARED_FLAG := -dynamiclib -fPIC
+        EXT  := dylib
+        FLAG := -dynamiclib -fPIC
     else
-        SHARED_EXT := so
-        SHARED_FLAG := -shared -fPIC
+        EXT  := so
+        FLAG := -shared -fPIC
     endif
 endif
 
-# ===== Dossiers =====
-SRC_DIR := libc/src
-OUT_DIR := libc/build
-INC_DIR := libc/include
-
-# ===== Flags de compilation =====
-CFLAGS := -I$(INC_DIR)
 
 # ===== Fichiers =====
-C_FILES := $(wildcard $(SRC_DIR)/*.c)
-H_FILES := $(wildcard $(INC_DIR)/*.h)
-LIBS := $(patsubst $(SRC_DIR)/%.c,$(OUT_DIR)/%.$(SHARED_EXT),$(C_FILES))
+C_FILES   := $(wildcard $(SRC_DIR)/*.c)
+H_FILES   := $(wildcard $(INC_DIR)/*.h)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
+TARGET    := $(OUT_DIR)/$(LIB_NAME).$(EXT)
+
+# ===== Flags =====
+CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2
+
 
 # ===== Règle par défaut =====
-all: info $(LIBS)
+all: info $(TARGET)
 
-# ===== Build lib dynamique =====
-$(OUT_DIR)/%.$(SHARED_EXT): $(SRC_DIR)/%.c $(H_FILES)
-	@mkdir -p $(OUT_DIR)
-	$(CC) $(SHARED_FLAG) $(CFLAGS) -o $@ $<
+# Compilation : chaque .c devient un .o
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(H_FILES)
+	@mkdir -p $(OBJ_DIR)
+	@echo "  CC      $<"
+	@$(CC) $(CFLAGS) -fPIC -c -o $@ $<
 
-# ===== Infos =====
-info:
-	@echo "OS        : $(UNAME_S)"
-	@echo "Arch      : $(UNAME_M)"
-	@echo "Extension : .$(SHARED_EXT)"
-	@echo "Compiler  : $(CC)"
+# Linkage final : on rassemble tous les .o pour créer la DLL
+$(TARGET): $(OBJ_FILES)
+	@echo "  LINK    $@"
+	@$(CC) $(FLAG) -o $@ $^
 
-# ===== Nettoyage =====
+
+# ===== Utils =====
 clean:
 	@rm -rf $(OUT_DIR)
 
-# ===== Listing =====
-list:
-	@echo "Sources:"
-	@echo $(C_FILES)
-	@echo "Libs:"
-	@echo $(LIBS)
+info:
+	@echo "================================"
+	@echo "OS        : $(UNAME_S)"
+	@echo "Arch      : $(UNAME_M)"
+	@echo "Extension : .$(EXT)"
+	@echo "Compiler  : $(CC)"
+	@echo "================================"
 
-.PHONY: all clean list info
+list:
+	@echo "Sources : $(C_FILES)"
+	@echo "Objects : $(OBJ_FILES)"
+
+
+.PHONY: all clean info list
