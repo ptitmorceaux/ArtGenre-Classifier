@@ -81,7 +81,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 #### **Engine** (`engine/`)
 - **Prétraitement** : redimensionnement, normalisation des images
-- **Bindings Python** : interface entre Python et les fonctions C
+- **Interop Python** : interface entre Python et les fonctions C
 - **Classification** : logique de prédiction
 
 #### **Librairie C** (`libc/`)
@@ -189,7 +189,7 @@ Accéder à l'interface : **http://localhost:3000**
 
 ```
 ├── engine/               # Moteur de ML Python
-│   ├── bindings/         # Interfaces Python-C
+│   ├── interop/         # Interfaces Python-C
 │   └── core/             # Logique de classification
 ├── libc/                 # Bibliothèques C optimisées
 │   ├── src/              # Code source C

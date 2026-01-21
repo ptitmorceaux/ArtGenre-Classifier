@@ -22,9 +22,9 @@ RUN make
 
 COPY api/ api/
 
-COPY bindings/utils.py      bindings/
-COPY bindings/loader.py     bindings/
-COPY bindings/model.py    bindings/
+COPY interop/utils.py      interop/
+COPY interop/loader.py     interop/
+COPY interop/model.py    interop/
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
