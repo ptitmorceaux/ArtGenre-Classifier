@@ -1,14 +1,10 @@
 {
+    "ALLOCATE_float32_array_of_incrementing_numbers" : {
+        "argtypes": ["uint32_t", "float**"],
+        "restype": "unsigned char"
+    },
     "sum_float32_array" : {
-        "argtypes": ["const float*", "int32_t", "float*"],
-        "restype": "unsigned char"
-    },
-    "get_float32_array_of_incrementing_numbers" : {
-        "argtypes": ["int32_t", "float**"],
-        "restype": "unsigned char"
-    },
-    "delete_array" : {
-        "argtypes": ["void*"],
+        "argtypes": ["const float*", "uint32_t", "float*"],
         "restype": "unsigned char"
     }
 }

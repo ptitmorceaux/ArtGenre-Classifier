@@ -19,6 +19,7 @@ typedef enum {
     RES_EXIT_SUCCESS,
     ERR_INVALID_PTR,
     ERR_MATH_DIV_BY_ZERO,
+    ERR_LENGTH_ZERO,
 } StatusCode;
 
 

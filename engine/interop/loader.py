@@ -81,7 +81,7 @@ class Loader:
         """Return le type ctypes correspondant à une string"""
         type = type.replace("const ", "").strip()
         
-        structs_ptr = ["LinearModel"]
+        structs_ptr = ("LinearModel",)
         for struct in structs_ptr:
             type = type.replace(f"{struct}*", "void*")
 
@@ -127,7 +127,7 @@ class Loader:
                 raise TypeError(f"Loader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
 
 
-    #====== Méthode public - Utils ======#    
+    #====== Méthode public - Utils ======#
 
     def is_int32(self, n: int) -> bool:
         return -2147483648 <= n <= 2147483647
@@ -180,3 +180,17 @@ class Loader:
         if status_code != 0:
             errmsg = str(self._lib.get_status_message(status_code).decode('utf-8'))
             raise RuntimeError(f"{prefix}: {errmsg}")
+    
+
+    def call(self, func_name: str, *args, prefix_errmsg: str = ""):
+        """Appelle une fonction C et vérifie automatiquement son status code"""
+        prefix = f"{prefix_errmsg}: Loader.call({func_name})" if prefix_errmsg else f"Loader.call({func_name})"
+        try:
+            func = getattr(self._lib, func_name)
+        except AttributeError:
+            raise AttributeError(f"{prefix}: Function `{func_name}` not found in the library")
+        status = func(*args)
+        self.check_status(status, prefix)
+        return status
+    
+    

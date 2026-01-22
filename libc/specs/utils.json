@@ -2,5 +2,9 @@
     "get_status_message" : {
         "argtypes": ["int32_t"],
         "restype": "char*"
+    },
+    "_c_free" : {
+        "argtypes": ["void*"],
+        "restype": "unsigned char"
     }
 }

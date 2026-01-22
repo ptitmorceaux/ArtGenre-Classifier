@@ -27,3 +27,25 @@ GROS PBL ALED : mtn on dirait que le cargs ne s'est plus mis dcp 10 + 5 ça fait
 print(math.addition(10, 5)) = 2.1019476964872256e-44
 ```
 Ok je suis fou c'est pcque je suis passé de double à float en C.... dcp ba les float en py sont des float64.... Il faut les cast en float32 sinon ca fonctionne pas (ca fait 1 je bug sur ca ptn)...
+
+/////////
+
+--> rangement: Makefile dans ./libc/ mtn
+
+Ok dcp mtn on a tt les types de base qui fonctionnent bien.
+Mtn faut voir la gestion de tableau entre le C et le python (moins trivial).
+
+Je vais tenter de manipuler le script LinearModel du prof (en c et non en cpp dcp).
+
+- Deja pour la structure LinearModel on va dire qu'on passe en paramettre un ptr void (voir loader.py: def _get_ctype(self, type: str) -> structs_ptr)
+
+Pour la gestion des tableaux je vais tout centraliser dans un file array.c / array.json / array.py
+
+J'ai divisé le .c en 2 parties : la gestion mémoire (alloc et free) et les operations (aucun alloc/free)
+
+OK ALORS:
+Pour le moment je suis parti du principe que on fait les allocations en python -> AUCUNE ALLOC NI FREE EN C: gestion de ptr de tab venant de Python (qui gere les siens).
+
+Bon j'en ai marre d'appeler tt le temps Loader.check_status(status_code, prefix_errmsg) avant chaque appel de fct de la lib c donc je vais juste faire un bon vieux wrapper -> Loader.call(self, func_name: str, *args, prefix_errmsg: str = "")
+
+reglage de qq pbl + mise en place de c_uint32 pour les length des array.
