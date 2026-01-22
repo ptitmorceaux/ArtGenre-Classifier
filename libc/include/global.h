@@ -21,7 +21,5 @@ typedef enum {
     ERR_MATH_DIV_BY_ZERO,
 } StatusCode;
 
-const char* get_status_message(unsigned char code);
-
 
 #endif
