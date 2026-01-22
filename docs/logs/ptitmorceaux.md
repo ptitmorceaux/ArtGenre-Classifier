@@ -49,3 +49,7 @@ Pour le moment je suis parti du principe que on fait les allocations en python -
 Bon j'en ai marre d'appeler tt le temps Loader.check_status(status_code, prefix_errmsg) avant chaque appel de fct de la lib c donc je vais juste faire un bon vieux wrapper -> Loader.call(self, func_name: str, *args, prefix_errmsg: str = "")
 
 reglage de qq pbl + mise en place de c_uint32 pour les length des array.
+
+////////
+
+Jusqu'a mtn je faisais tout plein de test pour voir si l'implémentation fonctionnait bien sur des ipynb mais ca devient bcp trop long a voir, donc je vais passer a pytest.
