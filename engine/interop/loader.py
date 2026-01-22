@@ -10,7 +10,7 @@ class Loader:
     def __new__(cls, lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs"):
         if cls._instance is not None:
             return cls._instance
-        
+
         cls._instance = super(Loader, cls).__new__(cls)
         inst = cls._instance
 
@@ -45,6 +45,7 @@ class Loader:
         path = path.replace("\\", "/").strip()
         path = path.split("/")
         path = os.path.join(*path)
+        path = os.path.abspath(path)
         if not os.path.exists(path):
             raise FileNotFoundError(f"Loader._set_path(): Unable to find the path: `{path}`")
         return path
@@ -55,7 +56,7 @@ class Loader:
         lib_path = os.path.join(*self._build_folder.split("/"), f"{self._lib_name}.{self.ext}")
         
         if not os.path.exists(lib_path):
-            raise FileNotFoundError(f"Unable to find the library: `{lib_path}`")
+            raise FileNotFoundError(f"Loader._load_library(): Unable to find the library: `{lib_path}`")
         
         self._lib = ctypes.cdll.LoadLibrary(lib_path)
     

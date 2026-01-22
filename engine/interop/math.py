@@ -9,29 +9,29 @@ _loader = Loader()
 def _call(func, a, b, prefix_errmsg: str = "") -> float:
     """Exécute l'appel C et gère les erreurs de manière générique"""
     prefix = f"{prefix_errmsg}: _call()" if prefix_errmsg else "_call()"
-    _loader._check_ctype(a, ctypes.c_float, prefix)
-    _loader._check_ctype(b, ctypes.c_float, prefix)
+    _loader.check_ctype(a, ctypes.c_float, prefix)
+    _loader.check_ctype(b, ctypes.c_float, prefix)
     result = ctypes.c_float()
-    _loader._check_error(func(a, b, ctypes.byref(result)), prefix)
+    _loader.check_status(func(a, b, ctypes.byref(result)), prefix)
     return result.value
 
 #====== Publique ======#
 
 def addition(a: float, b: float) -> float:
-    return _call(_loader._lib.add, a, b, "Math.addition()")
+    return _call(_loader._lib.my_add, a, b, "math.addition()")
 
 def subtraction(a: float, b: float) -> float:
-    return _call(_loader._lib.sub, a, b, "Math.subtraction()")
+    return _call(_loader._lib.my_sub, a, b, "math.subtraction()")
     
 def multiplication(a: float, b: float) -> float:
-    return _call(_loader._lib.mult, a, b, "Math.multiplication()")
+    return _call(_loader._lib.my_mult, a, b, "math.multiplication()")
 
 def division(a: float, b: float) -> float:
-    return _call(_loader._lib.div, a, b, "Math.division()")
+    return _call(_loader._lib.my_div, a, b, "math.division()")
 
 def power(base: float, exp: int) -> float:
-    _loader._check_ctype(base, ctypes.c_float, "Math.power()")
-    _loader._check_ctype(exp, ctypes.c_int32, "Math.power()")
+    _loader.check_ctype(base, ctypes.c_float, "math.power()")
+    _loader.check_ctype(exp, ctypes.c_int32, "math.power()")
     result = ctypes.c_float()
-    _loader._check_error(_loader._lib.pow(base, exp, ctypes.byref(result)), "Math.power()")
+    _loader.check_status(_loader._lib.my_pow(base, exp, ctypes.byref(result)), "math.power()")
     return result.value
