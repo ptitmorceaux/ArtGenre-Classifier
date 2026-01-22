@@ -12,7 +12,7 @@ def _call(func, a, b, prefix_errmsg: str = "") -> float:
     _loader.check_ctype(a, ctypes.c_float, prefix)
     _loader.check_ctype(b, ctypes.c_float, prefix)
     result = ctypes.c_float()
-    _loader.check_status(func(a, b, ctypes.byref(result)), prefix)
+    _loader.check_status(func(ctypes.c_float(a), ctypes.c_float(b), ctypes.byref(result)), prefix)
     return result.value
 
 #====== Publique ======#
@@ -33,5 +33,5 @@ def power(base: float, exp: int) -> float:
     _loader.check_ctype(base, ctypes.c_float, "math.power()")
     _loader.check_ctype(exp, ctypes.c_int32, "math.power()")
     result = ctypes.c_float()
-    _loader.check_status(_loader._lib.my_pow(base, exp, ctypes.byref(result)), "math.power()")
+    _loader.check_status(_loader._lib.my_pow(ctypes.c_float(base), ctypes.c_int32(exp), ctypes.byref(result)), "math.power()")
     return result.value

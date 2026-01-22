@@ -10,6 +10,8 @@ class Loader:
     def __new__(cls, lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs"):
         if cls._instance is not None:
             return cls._instance
+        
+        # print("Loader: Creating new instance") # debug
 
         cls._instance = super(Loader, cls).__new__(cls)
         inst = cls._instance
@@ -27,6 +29,11 @@ class Loader:
         inst._load_library()
         inst._load_all_json_specs()
         inst._attribute_types()
+
+        # print("Loader: Instance created successfully") # debug
+        # print(f"specs loaded:\n{inst._specs}") # debug
+        
+        return cls._instance
 
 
     #====== Méthode privée - Init ======#
