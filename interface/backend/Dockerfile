@@ -14,17 +14,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-COPY libc/include/global.h      libc/include/
-COPY libc/src/model.c         libc/src/
-COPY libc/specs/model.json    libc/specs/
-COPY Makefile .
-RUN make
+COPY ../../libc/ libc/
+RUN make -C libc clean && make -C libc all
 
-COPY api/ api/
-
-COPY interop/utils.py      interop/
-COPY interop/loader.py     interop/
-COPY interop/model.py    interop/
+COPY ../../engine/ engine/
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
