@@ -42,10 +42,10 @@ Le [Makefile](../Makefile) à la racine du projet gère la compilation:
 
 ```bash
 # Compiler toutes les bibliothèques
-make
+make -C libc/
 
 # Nettoyer les bibliothèques compilées
-make clean
+make -C libc/ clean
 ```
 
 ## Workflow

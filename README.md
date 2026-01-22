@@ -26,7 +26,7 @@ pip install -r requirements.txt
 *Pas besoin de le faire, c'est géré dans les notebooks*
 
 ```sh
-make clean && make
+make -C libc clean && make -C libc all
 ```
 
 Cela va compiler les fonctions C dans `libc/src/` et générer les bibliothèques partagées utilisables depuis Python.

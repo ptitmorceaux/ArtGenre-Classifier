@@ -1,9 +1,9 @@
 # ===== Configuration =====
 CC       := gcc
 LIB_NAME := libc
-SRC_DIR  := libc/src
-INC_DIR  := libc/include
-OUT_DIR  := libc/build
+SRC_DIR  := src
+INC_DIR  := include
+OUT_DIR  := build
 OBJ_DIR  := $(OUT_DIR)/objects
 
 
