@@ -1,0 +1,79 @@
+name: CI – Build & Pytest (Linux/macOS/Windows)
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  build-and-test:
+    name: Build + Pytest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest        # Linux x86_64
+          - 
+          - windows-latest       # Windows x86_64
+          - macos-15-intel       # macOS x86_64
+          - macos-latest         # macOS arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------- BUILD DEPS ----------
+      - name: Install build deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential make
+
+      - name: Install build deps (macOS)
+        if: runner.os == 'macOS'
+        run: brew install make
+
+      - name: Install build deps (Windows / MSYS2)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-binutils
+            make
+
+      # ---------- BUILD ----------
+      - name: Build libc (Unix)
+        if: runner.os != 'Windows'
+        run: make -C libc
+
+      - name: Build libc (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: make -C libc
+
+      # ---------- PYTHON ----------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8
+
+      - name: Lint (flake8)
+        run: |
+          flake8 engine pytest --count --select=E9,F63,F7,F82 --statistics
+          flake8 engine pytest --count --exit-zero --max-line-length=127 --statistics
+
+      # ---------- TESTS ----------
+      - name: Run pytest
+        env:
+          PATH: ${{ github.workspace }}/libc/build:${{ env.PATH }}
+          LD_LIBRARY_PATH: ${{ github.workspace }}/libc/build
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/libc/build
+        run: pytest pytest -v
