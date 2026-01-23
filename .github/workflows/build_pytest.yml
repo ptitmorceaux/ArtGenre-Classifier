@@ -64,6 +64,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Python dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install pytest flake8
@@ -75,10 +76,26 @@ jobs:
           flake8 engine pytest --count --select=E9,F63,F7,F82 --statistics
           flake8 engine pytest --count --exit-zero --max-line-length=127 --statistics
 
+      # -------- Environment Setup for Tests --------
+      - name: Setup Library Paths
+        shell: bash
+        run: |
+          BUILD_DIR="${{ github.workspace }}/libc/build"
+          
+          # Ajoute le dossier build au PATH (Pour Windows DLL et executables)
+          echo "$BUILD_DIR" >> $GITHUB_PATH
+          
+          # Pour Linux
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
+          fi
+          
+          # Pour macOS
+          if [ "${{ runner.os }}" == "macOS" ]; then
+            echo "DYLD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
+          fi
+
       # -------- Tests --------
       - name: Run pytest
-        env:
-          PATH: ${{ github.workspace }}/libc/build:${{ env.PATH }}
-          LD_LIBRARY_PATH: ${{ github.workspace }}/libc/build
-          DYLD_LIBRARY_PATH: ${{ github.workspace }}/libc/build
         run: pytest pytest -v
