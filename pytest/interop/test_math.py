@@ -49,11 +49,9 @@ class TestMathEdgeCases:
         assert abs(result - 0.003) < 1e-6
     
     def test_power_with_base_zero(self):
-        """Cas spécial : 0^n"""
         result = Math.power(0, 5)
         assert result == 0.0
     
     def test_power_with_base_one(self):
-        """Cas spécial : 1^n"""
         result = Math.power(1, 100)
         assert result == 1.0

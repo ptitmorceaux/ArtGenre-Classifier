@@ -7,13 +7,13 @@ class ArrayFloat32Ptr:
     _loader = Loader()
 
     def __init__(self, data: list[float, int]):
-        self.array = data
+        self._set_array(data)
     
 
     #====== Constructeurs alternatifs ======#
 
     @classmethod
-    def init_from_incrementing_numbers(cls, length: int) -> "ArrayFloat32Ptr":
+    def init_from_incrementing_numbers(cls, length: int):
         cls._loader.check_ctype(length, ctypes.c_uint32, "ArrayFloat32Ptr.init_from_incrementing_numbers()")
         
         ptr_result = ctypes.POINTER(ctypes.c_float)()

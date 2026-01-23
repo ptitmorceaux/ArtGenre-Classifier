@@ -16,7 +16,7 @@
         "restype": "unsigned char"
     },
     "my_pow" : {
-        "argtypes": ["float", "int32_t", "float*"],
+        "argtypes": ["float", "uint32_t", "float*"],
         "restype": "unsigned char"
     }
 }
