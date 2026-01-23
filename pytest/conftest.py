@@ -9,7 +9,7 @@ def pytest_configure(config):
     """Compile la librairie C avant de lancer les tests"""
     print("\nCompilation de libc...")
     result = subprocess.run(
-        "make -C ../libc clean && make -C ../libc all",
+        "make -C ../libc",
         shell=True,
         capture_output=True,
         text=True,
