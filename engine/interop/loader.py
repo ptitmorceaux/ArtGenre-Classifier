@@ -49,10 +49,9 @@ class Loader:
         return lib_name
 
     def _set_path(self, path: str):
-        path = path.replace("\\", "/").strip()
-        path = path.split("/")
-        path = os.path.join(*path)
+        path = path.strip()
         path = os.path.abspath(path)
+        
         if not os.path.exists(path):
             raise FileNotFoundError(f"Loader._set_path(): Unable to find the path: `{path}`")
         return path
@@ -60,12 +59,15 @@ class Loader:
 
     def _load_library(self):
         """Charge la lib partagée en fct de l'os (.dll, .so, .dylib)"""
-        lib_path = os.path.join(*self._build_folder.split("/"), f"{self._lib_name}.{self.ext}")
+        lib_path = os.path.join(self._build_folder, f"{self._lib_name}.{self.ext}")
         
         if not os.path.exists(lib_path):
             raise FileNotFoundError(f"Loader._load_library(): Unable to find the library: `{lib_path}`")
         
-        self._lib = ctypes.cdll.LoadLibrary(lib_path)
+        try:
+            self._lib = ctypes.cdll.LoadLibrary(lib_path)
+        except OSError as e:
+            raise OSError(f"Loader: Failed to load library at `{lib_path}` ==> {e}")
     
 
     def _load_all_json_specs(self):
