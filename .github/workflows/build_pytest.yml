@@ -13,10 +13,10 @@ jobs:
         include:
           - os: linux_x86_64
             runner: ubuntu-latest
-          # - os: macos_x86_64
-          #   runner: macos-15-intel
-          # - os: macos_arm64
-          #   runner: macos-latest
+          - os: macos_x86_64
+            runner: macos-15-intel
+          - os: macos_arm64
+            runner: macos-latest
           - os: windows_x86_64
             runner: windows-latest
 
