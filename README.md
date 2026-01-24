@@ -15,10 +15,17 @@ Système de classification de genres artistiques combinant **machine learning en
 
 ## Installation
 
-### 1. Installer les dépendances Python
+### 1 Installer les dépendances Python
 
 ```sh
 pip install -r requirements.txt
+```
+
+#### UNIQUEMENT sur Windows :
+
+> Forcer Python à utiliser l'encodage UTF-8 (*il faut **redémarrer** le terminal après*)
+```
+setx PYTHONUTF8 "1"
 ```
 
 ### 2. Compiler les bibliothèques C
