@@ -1,5 +1,12 @@
 import sys
 import os
+# ============================================================
+if sys.platform.startswith("win"):
+    # fix encodage UTF-8 on windows
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+# ============================================================
 import subprocess
 
 # Ajouter le répertoire parent au path
@@ -25,4 +32,4 @@ def pytest_configure(config):
     # Réinitialiser le Loader
     from engine.interop.loader import Loader
     Loader._instance = None
-    Loader()
+    Loader(lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs")
