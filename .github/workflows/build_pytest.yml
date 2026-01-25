@@ -2,6 +2,10 @@ name: CI - Build & Pytest
 
 on: [pull_request, workflow_dispatch]
 
+# forcer l'encodage utf-8 pour win
+env:
+  PYTHONUTF8: 1
+
 jobs:
   build-and-test:
     name: Build + Pytest (${{ matrix.os }})
