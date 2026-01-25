@@ -129,3 +129,34 @@ class TestArrayMemoryManagement:
         arr = ArrayFloat32Ptr([1.0, 2.0])
         for i in range(100):
             arr.array = [float(i), float(i+1), float(i+2)]
+
+class TestArrayLengthProperty:
+    """Tests de la propriété length"""
+    
+    def test_length_property(self):
+        data = [1.0, 2.0, 3.0, 4.0, 5.0]
+        arr = ArrayFloat32Ptr(data)
+        assert arr.length == len(data)
+    
+    def test_length_after_init_from_incrementing_numbers(self):
+        length = 10
+        arr = ArrayFloat32Ptr.init_from_incrementing_numbers(length)
+        assert arr.length == length
+    
+    def test_length_after_array_setter(self):
+        arr = ArrayFloat32Ptr([1.0, 2.0])
+        assert arr.length == 2
+        
+        new_data = [10.0, 20.0, 30.0, 40.0]
+        arr.array = new_data
+        assert arr.length == len(new_data)
+    
+    def test_length_with_empty_array_raises_error(self):
+        arr = ArrayFloat32Ptr([1.0])
+        with pytest.raises(TypeError):
+            arr.array = []
+
+    def test_length_setter_raises_error(self):
+        arr = ArrayFloat32Ptr([1.0])
+        with pytest.raises(AttributeError):
+            arr.length = 42

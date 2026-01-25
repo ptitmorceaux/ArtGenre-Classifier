@@ -48,15 +48,18 @@ class ArrayFloat32Ptr:
         length = len(data)
         self._loader.check_ctype(length, ctypes.c_uint32, "ArrayFloat32Ptr.__init__()")
         
-        self._length = length
+        self._c_length = ctypes.c_uint32(length)
         self._py_list = data
         
         # On crée un tableau ctypes
-        ArrayType = ctypes.c_float * self._length
+        ArrayType = ctypes.c_float * length
         self._c_array = ArrayType(*[ctypes.c_float(x) for x in data])
-        self._c_length = ctypes.c_uint32(self._length)
+    
+    def _get_length(self):
+        return self._c_length.value
 
     array = property(_get_array, _set_array)
+    length = property(_get_length)
 
 
     #====== Public ======#
