@@ -53,3 +53,8 @@ reglage de qq pbl + mise en place de c_uint32 pour les length des array.
 ////////
 
 Jusqu'a mtn je faisais tout plein de test pour voir si l'implémentation fonctionnait bien sur des ipynb mais ca devient bcp trop long a voir, donc je vais passer a pytest.
+
+
+///////
+
+creation d'un script/parser py pour automatiser la création des json
