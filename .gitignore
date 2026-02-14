@@ -4,6 +4,8 @@ ArtGenre-Classifier.wiki/
 
 dataset/
 
+libc/specs/*.json
+
 ########################
 
 # Prerequisites
