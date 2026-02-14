@@ -12,7 +12,7 @@ J'ai mis au moins 2h a tenter de tout renommer / ranger dans des folders pour av
 
 Ajout de la compilation de la `libc` au début des notebooks (permet d'être sur d'avoir les bons dll/dylib/so)
 
-///////
+////////////////////////////////////////////////////////
 
 Réorganisation de la libc : les erreurs sont traités dans un fichier distinc et mtn on ne génére plus qu'une seule lib (avant 1 par file c)
 
@@ -28,7 +28,7 @@ print(math.addition(10, 5)) = 2.1019476964872256e-44
 ```
 Ok je suis fou c'est pcque je suis passé de double à float en C.... dcp ba les float en py sont des float64.... Il faut les cast en float32 sinon ca fonctionne pas (ca fait 1 je bug sur ca ptn)...
 
-/////////
+////////////////////////////////////////////////////////
 
 --> rangement: Makefile dans ./libc/ mtn
 
@@ -50,11 +50,18 @@ Bon j'en ai marre d'appeler tt le temps Loader.check_status(status_code, prefix_
 
 reglage de qq pbl + mise en place de c_uint32 pour les length des array.
 
-////////
+////////////////////////////////////////////////////////
 
 Jusqu'a mtn je faisais tout plein de test pour voir si l'implémentation fonctionnait bien sur des ipynb mais ca devient bcp trop long a voir, donc je vais passer a pytest.
 
 
-///////
+////////////////////////////////////////////////////////
 
 creation d'un script/parser py pour automatiser la création des json
+
+////////////////////////////////////////////////////////
+
+J'ai intégré les argtypes au parser c to json (py) puis je l'ai intégré dans le Makefile.
+(donc mtn quand on make, ça génère automatiquement les json dans specs)
+
+////////////////////////////////////////////////////////
