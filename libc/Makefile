@@ -5,6 +5,16 @@ SRC_DIR  := src
 INC_DIR  := include
 OUT_DIR  := build
 OBJ_DIR  := $(OUT_DIR)/objects
+SPEC_DIR := specs
+
+
+# ===== Détection Python =====
+PYTHON := $(shell which python3 2>/dev/null || which python 2>/dev/null || which py 2>/dev/null || echo "")
+ifeq ($(PYTHON),)
+    PYTHON_AVAILABLE := 0
+else
+    PYTHON_AVAILABLE := 1
+endif
 
 
 # ===== Détection OS / Arch =====
@@ -37,7 +47,7 @@ CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2
 
 
 # ===== Règle par défaut =====
-all: info $(TARGET)
+all: info $(TARGET) generate-json
 
 # Compilation : chaque .c devient un .o
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(H_FILES)
@@ -51,9 +61,21 @@ $(TARGET): $(OBJ_FILES)
 	@$(CC) $(FLAG) -o $@ $^
 
 
+# ===== Génération des JSON specs =====
+generate-json:
+ifeq ($(PYTHON_AVAILABLE),1)
+	@echo "  GEN     JSON specs"
+	@$(PYTHON) $(SPEC_DIR)/parser_c_to_json.py -i $(SRC_DIR) -o $(SPEC_DIR) -s DLLEXPORT || \
+		(echo "Error: Failed to generate JSON specs. Check that the parser script is correct." && exit 1)
+else
+	@echo "Warning: Python not found. Skipping JSON generation."
+	@echo "         Install Python to enable automatic JSON spec generation."
+endif
+
+
 # ===== Utils =====
 clean:
-	@rm -rf $(OUT_DIR)
+	@rm -rf $(OUT_DIR) && rm -rf $(SPEC_DIR)/*.json
 
 info:
 	@echo "================================"
@@ -61,6 +83,11 @@ info:
 	@echo "Arch      : $(UNAME_M)"
 	@echo "Extension : .$(EXT)"
 	@echo "Compiler  : $(CC)"
+ifeq ($(PYTHON_AVAILABLE),1)
+	@echo "Python    : $(PYTHON)"
+else
+	@echo "Python    : NOT FOUND"
+endif
 	@echo "================================"
 
 list:
@@ -68,4 +95,4 @@ list:
 	@echo "Objects : $(OBJ_FILES)"
 
 
-.PHONY: all clean info list
+.PHONY: all clean info list generate-json

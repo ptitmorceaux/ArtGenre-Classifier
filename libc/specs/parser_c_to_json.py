@@ -134,7 +134,7 @@ if __name__ == "__main__":
             output_file_name = os.path.splitext(filename)[0] + '.json'
             output_file_path = os.path.join(args.output, output_file_name)
             
-            print(f"Processing: {input_file} -> {output_file_path}")
+            print(f"Processing: {input_file}")
             parse_file(input_file, output_file_path, args.start_line)
         
         n = len(c_files_to_process)
