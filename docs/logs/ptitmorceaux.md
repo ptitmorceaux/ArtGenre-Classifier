@@ -64,4 +64,6 @@ creation d'un script/parser py pour automatiser la création des json
 J'ai intégré les argtypes au parser c to json (py) puis je l'ai intégré dans le Makefile.
 (donc mtn quand on make, ça génère automatiquement les json dans specs)
 
+--> update du README.md dans libc/
+
 ////////////////////////////////////////////////////////
