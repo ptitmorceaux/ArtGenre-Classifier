@@ -2,6 +2,8 @@ import ctypes
 import os
 import sys
 import json
+from typing import List
+import re
 
 class Loader:
     """Load une lib partagée en singleton"""
@@ -79,21 +81,27 @@ class Loader:
                     self._specs.update(json.load(f))
 
 
+    def _normalize_str_type(self, type: str, structs_types_list: List[str]) -> str:
+        """Normalize a C type string by removing 'const' and normalizing spaces."""
+        type = re.sub(r'\s+', ' ', type).strip()
+        type = type.replace("const ", "")
+        type = re.sub(r'\s*\*\s*', '*', type)
+        for struct in tuple(structs_types_list):
+            type = type.replace(f"{struct}*", "void*")
+        return type
+
     def _get_ctype(self, type: str):
         """Return le type ctypes correspondant à une string"""
-        type = type.replace("const ", "").strip()
-        
-        structs_ptr = ("LinearModel",)
-        for struct in structs_ptr:
-            type = type.replace(f"{struct}*", "void*")
-
+        type = self._normalize_str_type(type, structs_types_list=[
+            "LinearModel",
+        ])
         match type:
             case "int32_t":         return ctypes.c_int32
             case "uint32_t":        return ctypes.c_uint32
             case "float":           return ctypes.c_float
             case "char":            return ctypes.c_byte
             case "unsigned char":   return ctypes.c_ubyte
-            
+                
             case "void*":           return ctypes.c_void_p
             case "int32_t*":        return ctypes.POINTER(ctypes.c_int32)
             case "uint32_t*":       return ctypes.POINTER(ctypes.c_uint32)
@@ -104,7 +112,7 @@ class Loader:
             case "void**":          return ctypes.POINTER(ctypes.c_void_p)
             case "float**":         return ctypes.POINTER(ctypes.POINTER(ctypes.c_float))
 
-            case _: raise TypeError(f"Loader._get_ctype(): Unknow ctype: {type}")
+            case _: raise TypeError(f"Loader._get_ctype(): Unknown ctype: {type}")
 
 
     def _attribute_types(self):
