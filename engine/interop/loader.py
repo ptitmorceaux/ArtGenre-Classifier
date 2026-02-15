@@ -112,7 +112,7 @@ class Loader:
             case "void**":          return ctypes.POINTER(ctypes.c_void_p)
             case "float**":         return ctypes.POINTER(ctypes.POINTER(ctypes.c_float))
 
-            case _: raise TypeError(f"Loader._get_ctype(): Unknown ctype: {type}")
+            case _: raise TypeError(f"Loader._get_ctype(): Unknown ctype '{type}'")
 
 
     def _attribute_types(self):
