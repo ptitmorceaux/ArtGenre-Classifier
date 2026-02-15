@@ -185,7 +185,7 @@ class Loader:
     
 
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
-        """Appelle une fonction C et vérifie automatiquement son status code"""
+        """Appel une fonction C et vérifie automatiquement son status code"""
         prefix = f"{prefix_errmsg}: Loader.call({func_name})" if prefix_errmsg else f"Loader.call({func_name})"
         try:
             func = getattr(self._lib, func_name)
@@ -194,5 +194,3 @@ class Loader:
         status = func(*args)
         self.check_status(status, prefix)
         return status
-    
-    
