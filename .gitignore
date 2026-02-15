@@ -6,6 +6,8 @@ dataset/
 
 libc/specs/*.json
 
+drawio/
+
 ########################
 
 # Prerequisites
