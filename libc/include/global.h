@@ -20,6 +20,7 @@ typedef enum {
     ERR_INVALID_PTR,
     ERR_MATH_DIV_BY_ZERO,
     ERR_LENGTH_ZERO,
+    ERR_ALLOCATION_FAILED
 } StatusCode;
 
 

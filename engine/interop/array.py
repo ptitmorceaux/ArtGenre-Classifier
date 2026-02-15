@@ -6,7 +6,7 @@ class ArrayFloat32Ptr:
     # On charge le loader une seule fois pour la classe
     _loader = Loader()
 
-    def __init__(self, data: list[float, int]):
+    def __init__(self, data: list[float | int]):
         self._set_array(data)
     
 

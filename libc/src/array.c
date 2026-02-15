@@ -9,6 +9,7 @@ DLLEXPORT unsigned char ALLOCATE_float32_array_of_incrementing_numbers(uint32_t 
     if (array_length == 0) return ERR_LENGTH_ZERO;
 
     float* array = (float*) malloc(array_length * sizeof(float));
+    if (!array) return ERR_ALLOCATION_FAILED;
     for (uint32_t i = 0; i < array_length; i++) {
         array[i] = (float) i;
     }
@@ -28,3 +29,5 @@ DLLEXPORT unsigned char sum_float32_array(const float* array, uint32_t array_len
     *result = sum;
     return RES_EXIT_SUCCESS;
 }
+
+
