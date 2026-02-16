@@ -5,17 +5,23 @@ import json
 from typing import List
 import re
 
-class Loader:
+
+class _LibLoader: # Singleton Pattern Design
     """Load une lib partagée en singleton"""
     _instance = None
+
+    @classmethod
+    def reinitialize(cls, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
+        cls._instance = None
+        return cls(lib_name, lib_folder, build_folder, specs_folder)
 
     def __new__(cls, lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs"):
         if cls._instance is not None:
             return cls._instance
         
-        # print("Loader: Creating new instance") # debug
+        # print("_LibLoader: Creating new instance") # debug
 
-        cls._instance = super(Loader, cls).__new__(cls)
+        cls._instance = super(_LibLoader, cls).__new__(cls)
         inst = cls._instance
 
         inst._lib = None
@@ -32,7 +38,7 @@ class Loader:
         inst._load_all_json_specs()
         inst._attribute_types()
 
-        # print("Loader: Instance created successfully") # debug
+        # print("_LibLoader: Instance created successfully") # debug
         # print(f"specs loaded:\n{inst._specs}") # debug
         
         return cls._instance
@@ -55,7 +61,7 @@ class Loader:
         path = os.path.abspath(path)
         
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Loader._set_path(): Unable to find the path: `{path}`")
+            raise FileNotFoundError(f"_LibLoader._set_path(): Unable to find the path: `{path}`")
         return path
 
 
@@ -64,12 +70,12 @@ class Loader:
         lib_path = os.path.join(self._build_folder, f"{self._lib_name}.{self.ext}")
         
         if not os.path.exists(lib_path):
-            raise FileNotFoundError(f"Loader._load_library(): Unable to find the library: `{lib_path}`")
+            raise FileNotFoundError(f"_LibLoader._load_library(): Unable to find the library: `{lib_path}`")
         
         try:
             self._lib = ctypes.cdll.LoadLibrary(lib_path)
         except OSError as e:
-            raise OSError(f"Loader: Failed to load library at `{lib_path}` ==> {e}")
+            raise OSError(f"_LibLoader: Failed to load library at `{lib_path}` ==> {e}")
     
 
     def _load_all_json_specs(self):
@@ -112,7 +118,7 @@ class Loader:
             case "void**":          return ctypes.POINTER(ctypes.c_void_p)
             case "float**":         return ctypes.POINTER(ctypes.POINTER(ctypes.c_float))
 
-            case _: raise TypeError(f"Loader._get_ctype(): Unknown ctype '{type}'")
+            case _: raise TypeError(f"_LibLoader._get_ctype(): Unknown ctype '{type}'")
 
 
     def _attribute_types(self):
@@ -121,40 +127,44 @@ class Loader:
             try:
                 func = getattr(self._lib, name)
             except AttributeError:
-                raise AttributeError(f"Loader.attribute_types(): Function `{name}` not found in the library")
+                raise AttributeError(f"_LibLoader.attribute_types(): Function `{name}` not found in the library")
             
             # Configuration des types d'arguments
             func.argtypes = []
             for arg_type in info["argtypes"]:
                 ctype = self._get_ctype(arg_type)
                 if ctype is None:
-                    raise TypeError(f"Loader.attribute_types(): Unknow argtype for `{name}` : {arg_type}")
+                    raise TypeError(f"_LibLoader.attribute_types(): Unknow argtype for `{name}` : {arg_type}")
                 func.argtypes.append(ctype)
             
             # Configuration du type de retour
             func.restype = self._get_ctype(info["restype"])
             if func.restype is None:
-                raise TypeError(f"Loader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
+                raise TypeError(f"_LibLoader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
 
 
     #====== Méthode public - Utils ======#
 
-    def is_int32(self, n: int) -> bool:
+    @staticmethod
+    def is_int32(n: int) -> bool:
         return -2147483648 <= n <= 2147483647
     
-    def is_uint32(self, n: int) -> bool:
+    @staticmethod
+    def is_uint32(n: int) -> bool:
         return 0 <= n <= 4294967295
 
-    def is_byte(self, n: int) -> bool:
+    @staticmethod
+    def is_byte(n: int) -> bool:
         return -128 <= n <= 127
 
-    def is_ubyte(self, n: int) -> bool:
+    @staticmethod
+    def is_ubyte(n: int) -> bool:
         return 0 <= n <= 255
 
 
     def check_ctype(self, value, ctype, prefix_errmsg: str = ""):
         """Vérifie qu'une valeur correspond au type ctypes attendu"""
-        prefix = f"{prefix_errmsg}: Loader.check_ctype()" if prefix_errmsg else "Loader.check_ctype()"
+        prefix = f"{prefix_errmsg}: _LibLoader.check_ctype()" if prefix_errmsg else "_LibLoader.check_ctype()"
         errmsg = None
         
         if ctype in (ctypes.c_byte, ctypes.c_ubyte, ctypes.c_int32, ctypes.c_uint32):
@@ -185,7 +195,7 @@ class Loader:
 
     def check_status(self, status_code: int, prefix_errmsg: str = ""):
         """Teste le status code et lève une exception si besoin"""
-        prefix = f"{prefix_errmsg}: Loader.check_status()" if prefix_errmsg else "Loader.check_status()"
+        prefix = f"{prefix_errmsg}: _LibLoader.check_status()" if prefix_errmsg else "_LibLoader.check_status()"
         self.check_ctype(status_code, ctypes.c_ubyte, prefix)
         if status_code != 0:
             errmsg = str(self._lib.get_status_message(status_code).decode('utf-8'))
@@ -194,7 +204,7 @@ class Loader:
 
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
         """Appel une fonction C et vérifie automatiquement son status code"""
-        prefix = f"{prefix_errmsg}: Loader.call({func_name})" if prefix_errmsg else f"Loader.call({func_name})"
+        prefix = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
         try:
             func = getattr(self._lib, func_name)
         except AttributeError:
@@ -202,3 +212,17 @@ class Loader:
         status = func(*args)
         self.check_status(status, prefix)
         return status
+
+
+
+class _LoaderProxy: # Proxy Pattern Design
+    """
+    Proxy qui redirige tous les appels vers le singleton actuel de _LibLoader
+    Permet de rester à jour même après _LibLoader.reinitialize()
+    """
+    def __getattr__(self, name):
+        return getattr(_LibLoader(), name)
+
+
+# ====== Singleton instance ======#
+Loader = _LoaderProxy()

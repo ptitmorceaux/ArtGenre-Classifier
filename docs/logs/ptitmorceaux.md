@@ -67,3 +67,51 @@ J'ai intégré les argtypes au parser c to json (py) puis je l'ai intégré dans
 --> update du README.md dans libc/
 
 ////////////////////////////////////////////////////////
+
+                    UPDATE DE FOU
+
+Avant on devait instancier la lib avec le constructeur Loader()
+dans chaque fichier au cas ou il ne l'avait pas déjà été (chiant)
+
+Mais mtn je l'ai instancié directement à la fin du fichier loader.py :
+```py
+# ====== Singleton instance ======#
+Loader = _LibLoader()
+```
+
+Donc mtn quand on l'inclu on fait juste :
+```py
+from engine.interop.loader import Loader
+```
+
+////////////////////////////////////////////////////////
+
+                    PLOT TWIST
+
+Rajout de la @classmethod Loader.reinitialize()
+-> On change l'instance en cours du singleton
+
+IMPLICATION:
+Comme la variable Loader ne s'initialise que lors de la premiere
+importation (ça fonctionne comme ça en py), elle ne pointe pas
+vers la nouvelle instance en cours du singleton mais vers l'ancienne...
+
+UPDATE:
+J'ai créé une classe qui sert de proxy entre la variable Loader et la classe
+`_LibLoader()` (singleton) :
+```py
+class _LoaderProxy: # Proxy Pattern Design
+    """
+    Proxy qui redirige tous les appels vers le singleton actuel de _LibLoader
+    Permet de rester à jour même après _LibLoader.reinitialize()
+    """
+    def __getattr__(self, name):
+        return getattr(_LibLoader(), name)
+
+# ====== Singleton instance ======#
+Loader = _LoaderProxy()
+```
+
+Comme ça `Loader` contient toujours l'instance en cours du singleton _LibLoader()
+
+////////////////////////////////////////////////////////
