@@ -115,3 +115,31 @@ Loader = _LoaderProxy()
 Comme ça `Loader` contient toujours l'instance en cours du singleton _LibLoader()
 
 ////////////////////////////////////////////////////////
+
+Maintenant quand on import Loader ça ne tente plus de load la lib par défaut.
+(ca pouvait crash tt seul, chiant.)
+
+Donc j'ai isoler le constructeur de `_LibLoader()` du chargement d'une lib :
+- création de la méthode `_LibLoader.loadLibrary()`
+
+Pour savoir si la méthode `_LibLoader.loadLibrary()` à été appelé j'utilise la
+variable : `_isLoaded = False`
+
+Pour empécher l'appel de méthode manipulant la lib dans `_LibLoader.loadLibrary()`
+j'ai créé un décorateur qui utilise la var `_isLoaded` :
+```py
+def require_loaded(func):
+    """Décorateur qui vérifie que la lib est bien load avant d'ecxuter une func"""
+    def wrapper(*args, **kwargs):
+        if not _LibLoader._isLoaded:
+            # ...
+
+def _LibLoader:
+    # ...
+    
+    @require_loaded
+    def call(self, func_name: str, *args, prefix_errmsg: str = ""):
+        # ...
+```
+
+////////////////////////////////////////////////////////

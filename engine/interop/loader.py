@@ -6,23 +6,35 @@ from typing import List
 import re
 
 
+
+def require_loaded(func):
+    """Décorateur qui vérifie que la lib est bien load avant d'ecxuter une func"""
+    def wrapper(*args, **kwargs):
+        if not _LibLoader._isLoaded:
+            raise RuntimeError(f"{func.__name__}(): Library not loaded. Please call _LibLoader.loadLibrary() first.")
+        return func(*args, **kwargs)
+    return wrapper
+
+
+
 class _LibLoader: # Singleton Pattern Design
     """Load une lib partagée en singleton"""
     _instance = None
+    _isLoaded = False
 
-    @classmethod
-    def reinitialize(cls, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
-        cls._instance = None
-        return cls(lib_name, lib_folder, build_folder, specs_folder)
 
     def __new__(cls, lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs"):
         if cls._instance is not None:
             return cls._instance
-        
-        # print("_LibLoader: Creating new instance") # debug
-
         cls._instance = super(_LibLoader, cls).__new__(cls)
-        inst = cls._instance
+        return cls._instance
+
+
+    @classmethod
+    def loadLibrary(cls, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
+        cls._instance = None
+        inst = cls(lib_name, lib_folder, build_folder, specs_folder)
+        inst._isLoaded = False
 
         inst._lib = None
         inst._specs = dict()
@@ -33,15 +45,12 @@ class _LibLoader: # Singleton Pattern Design
         inst._specs_folder = inst._set_path(specs_folder)
         
         inst.ext = "dll" if sys.platform.startswith("win") else "dylib" if sys.platform.startswith("darwin") else "so"
-        
+
         inst._load_library()
         inst._load_all_json_specs()
         inst._attribute_types()
-
-        # print("_LibLoader: Instance created successfully") # debug
-        # print(f"specs loaded:\n{inst._specs}") # debug
         
-        return cls._instance
+        cls._isLoaded = True
 
 
     #====== Méthode privée - Init ======#
@@ -162,6 +171,7 @@ class _LibLoader: # Singleton Pattern Design
         return 0 <= n <= 255
 
 
+    @require_loaded
     def check_ctype(self, value, ctype, prefix_errmsg: str = ""):
         """Vérifie qu'une valeur correspond au type ctypes attendu"""
         prefix = f"{prefix_errmsg}: _LibLoader.check_ctype()" if prefix_errmsg else "_LibLoader.check_ctype()"
@@ -193,6 +203,7 @@ class _LibLoader: # Singleton Pattern Design
                 raise ValueError(f"{prefix}: {errmsg}")
 
 
+    @require_loaded
     def check_status(self, status_code: int, prefix_errmsg: str = ""):
         """Teste le status code et lève une exception si besoin"""
         prefix = f"{prefix_errmsg}: _LibLoader.check_status()" if prefix_errmsg else "_LibLoader.check_status()"
@@ -202,6 +213,7 @@ class _LibLoader: # Singleton Pattern Design
             raise RuntimeError(f"{prefix}: {errmsg}")
     
 
+    @require_loaded
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
         """Appel une fonction C et vérifie automatiquement son status code"""
         prefix = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
