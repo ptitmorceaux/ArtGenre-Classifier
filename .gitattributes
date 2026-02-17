@@ -1,0 +1,5 @@
+*.ipynb linguist-detectable=false
+
+docs/ linguist-documentation=true
+*.md linguist-documentation=true
+*.yml linguist-documentation=true

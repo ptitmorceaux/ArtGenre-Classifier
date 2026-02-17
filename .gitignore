@@ -8,6 +8,8 @@ libc/specs/*.json
 
 drawio/
 
+.vscode/
+
 ########################
 
 # Prerequisites
