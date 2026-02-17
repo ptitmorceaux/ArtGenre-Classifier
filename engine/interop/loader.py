@@ -23,34 +23,10 @@ class _LibLoader: # Singleton Pattern Design
     _isLoaded = False
 
 
-    def __new__(cls, lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs"):
-        if cls._instance is not None:
-            return cls._instance
-        cls._instance = super(_LibLoader, cls).__new__(cls)
+    def __new__(cls, lib_name: str="libc", lib_folder: str="libc", build_folder: str="libc/build", specs_folder: str="libc/specs"):
+        if cls._instance is None:
+            cls._instance = super(_LibLoader, cls).__new__(cls)
         return cls._instance
-
-
-    @classmethod
-    def loadLibrary(cls, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
-        cls._instance = None
-        inst = cls(lib_name, lib_folder, build_folder, specs_folder)
-        inst._isLoaded = False
-
-        inst._lib = None
-        inst._specs = dict()
-
-        inst._lib_name = inst._set_lib_name(lib_name)
-        inst._lib_folder = inst._set_path(lib_folder)
-        inst._build_folder = inst._set_path(build_folder)
-        inst._specs_folder = inst._set_path(specs_folder)
-        
-        inst.ext = "dll" if sys.platform.startswith("win") else "dylib" if sys.platform.startswith("darwin") else "so"
-
-        inst._load_library()
-        inst._load_all_json_specs()
-        inst._attribute_types()
-        
-        cls._isLoaded = True
 
 
     #====== Méthode privée - Init ======#
@@ -152,6 +128,32 @@ class _LibLoader: # Singleton Pattern Design
                 raise TypeError(f"_LibLoader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
 
 
+
+    #====== Méthode public - Init ======#
+
+    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
+        if self._isLoaded:
+            raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
+        self._lib = None
+        self._specs = dict()
+
+        self._lib_name = self._set_lib_name(lib_name)
+        self._lib_folder = self._set_path(lib_folder)
+        self._build_folder = self._set_path(build_folder)
+        self._specs_folder = self._set_path(specs_folder)
+        
+        if sys.platform.startswith("win"):
+            self.ext = "dll"
+        elif sys.platform.startswith("darwin"):
+            self.ext = "dylib"
+        else:
+            self.ext = "so"
+
+        self._load_library()
+        self._load_all_json_specs()
+        self._attribute_types()
+        self._isLoaded = True
+
     #====== Méthode public - Utils ======#
 
     @staticmethod
@@ -227,14 +229,5 @@ class _LibLoader: # Singleton Pattern Design
 
 
 
-class _LoaderProxy: # Proxy Pattern Design
-    """
-    Proxy qui redirige tous les appels vers le singleton actuel de _LibLoader
-    Permet de rester à jour même après _LibLoader.reinitialize()
-    """
-    def __getattr__(self, name):
-        return getattr(_LibLoader(), name)
-
-
 # ====== Singleton instance ======#
-Loader = _LoaderProxy()
+Loader = _LibLoader()

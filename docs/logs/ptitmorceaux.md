@@ -86,36 +86,6 @@ from engine.interop.loader import Loader
 
 ////////////////////////////////////////////////////////
 
-                    PLOT TWIST
-
-Rajout de la @classmethod Loader.reinitialize()
--> On change l'instance en cours du singleton
-
-IMPLICATION:
-Comme la variable Loader ne s'initialise que lors de la premiere
-importation (ça fonctionne comme ça en py), elle ne pointe pas
-vers la nouvelle instance en cours du singleton mais vers l'ancienne...
-
-UPDATE:
-J'ai créé une classe qui sert de proxy entre la variable Loader et la classe
-`_LibLoader()` (singleton) :
-```py
-class _LoaderProxy: # Proxy Pattern Design
-    """
-    Proxy qui redirige tous les appels vers le singleton actuel de _LibLoader
-    Permet de rester à jour même après _LibLoader.reinitialize()
-    """
-    def __getattr__(self, name):
-        return getattr(_LibLoader(), name)
-
-# ====== Singleton instance ======#
-Loader = _LoaderProxy()
-```
-
-Comme ça `Loader` contient toujours l'instance en cours du singleton _LibLoader()
-
-////////////////////////////////////////////////////////
-
 Maintenant quand on import Loader ça ne tente plus de load la lib par défaut.
 (ca pouvait crash tt seul, chiant.)
 
@@ -141,5 +111,7 @@ def _LibLoader:
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
         # ...
 ```
+
+NOTE: On ne peut charger qu'une seule fois la lib.
 
 ////////////////////////////////////////////////////////
