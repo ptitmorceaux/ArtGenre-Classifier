@@ -1,232 +1,59 @@
-# Projet de Classification d'Art
+# ArtGenre-Classifier 🎨
 
-Système de classification de genres artistiques combinant **machine learning en Python** et **calculs optimisés en C** pour des performances maximales.
+[![C Python Interop](https://img.shields.io/badge/Interop-C%20%2F%20Python-blue.svg)](https://docs.python.org/3/library/ctypes.html)
+[![Project Status](https://img.shields.io/badge/Status-En%20D%C3%A9veloppement-orange.svg)]()
+[![CI - Build & Pytest](https://github.com/ptitmorceaux/ArtGenre-Classifier/actions/workflows/build_pytest.yml/badge.svg)](https://github.com/ptitmorceaux/ArtGenre-Classifier/actions/workflows/build_pytest.yml)
 
----
+## 📌 Présentation
+ArtGenre-Classifier est un projet de classification d'œuvres d'art conçu pour identifier trois mouvements majeurs : le **Cubisme**, la **Renaissance** et le **Surréalisme**. 
 
-## Prérequis
+La particularité de ce projet réside dans l'implémentation "from scratch" d'un moteur de Machine Learning en **C**, interfacé avec **Python** pour le traitement de données et une interface **Web** pour l'utilisateur final.
 
-- **Python 3.8+**
-- **GCC**
-- **Make**
-- **Docker** (optionnel, pour déploiement)
+## ⚙️ Architecture Technique
+Le projet est divisé en trois couches principales :
 
----
+1.  **Core Engine (C)** : Implémentation bas niveau des algorithmes sans bibliothèques externes (uniquement `<math.h>`).
+    * Modèles : Linéaire, Perceptron Multicouche (PMC/MLP), et Radial Basis Function (RBF).
+2.  **Bridge (Python/ctypes)** : Wrapper assurant l'interopérabilité. Il gère la conversion des données Python vers les pointeurs C.
+3.  **Application (Django & Vue.js)** : Une API REST et un frontend moderne permettant l'upload d'images et la visualisation des scores de confiance en temps réel.
 
-## Installation
+## 🚀 Fonctionnalités
+* **Calcul Matriciel Optimisé** : Fonctions C dédiées pour les opérations mathématiques.
+* **Multi-modèles** : Entraînement et prédiction via Modèle Linéaire et PMC.
+* **Persistance** : Sauvegarde et chargement des poids du modèle au format `.bin`.
+* **Dockerisé** : Déploiement simplifié avec Docker Compose (Backend & Frontend).
 
-### 1 Installer les dépendances Python
+## 🛠️ Installation & Compilation
 
-```sh
-pip install -r requirements.txt
-```
+### Prérequis
+* GCC & Make: [Setup via MSYS2 sous Windows](./docs/setup_windows_msys2.md)
+* Python 3.8+
+* Docker & Docker Compose
 
-#### UNIQUEMENT sur Windows :
-
-> Forcer Python à utiliser l'encodage UTF-8 (*il faut **redémarrer** le terminal après*)
-```
-setx PYTHONUTF8 "1"
-```
-
-### 2. Compiler les bibliothèques C
-
-*Pas besoin de le faire, c'est géré dans les notebooks*
-
-```sh
+### Compilation de la bibliothèque C
+```bash
 make -C libc clean && make -C libc all
 ```
 
-Cela va compiler les fonctions C dans `libc/src/` et générer les bibliothèques partagées utilisables depuis Python.
+### Lancement de l'application (Docker)
 
-### 3.1 Lancer avec Docker (Dev)
-```sh
-docker compose -f docker-compose.yml up -d --build
+```bash
+docker-compose up --build
 ```
 
-### 3.2 Lancer avec Docker (Production)
-```sh
-docker compose -f docker-compose.prod.yml up -d --build
-```
+## 📈 État d'avancement
 
----
+* [ **x** ] Structure globale et interopérabilité (ctypes)
+* [ **-** ] Implémentation du Modèle Linéaire
+* [ **-** ] Finalisation du Perceptron Multicouche (PMC)
+* [ **-** ] Implémentation des fonctions RBF
+* [ **-** ] Dataset complet et évaluation des performances
 
-## Architecture du Projet
+Légende:
+* [ **-** ] : pas commencé
+* [ **e** ] : en cours
+* [ **x** ] : fini
 
-### Vue d'ensemble
+## 👥 Équipe (Groupe 3)
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         UTILISATEUR                             │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                    ┌────▼────┐
-                    │ Frontend│ (Vue.js)
-                    │  :3000  │
-                    └────┬────┘
-                         │ HTTP/REST
-                    ┌────▼────┐
-                    │ Backend │ (Django)
-                    │  :8000  │
-                    └────┬────┘
-                         │
-            ┌────────────┴─────────────┐
-            │                          │
-       ┌────▼───────┐            ┌─────▼─────┐
-       │---Python---│            │ Librairie │
-       │   Engine   │◄───────────┤     C     │
-       | classifier |            |           |
-       └────────────┘            └───────────┘
-            ▲
-            │
-       ┌────▼─────┐
-       │  Modèle  │
-       │ (.bin)   │
-       └──────────┘
-```
-
-### Composants
-
-#### **Engine** (`engine/`)
-- **Prétraitement** : redimensionnement, normalisation des images
-- **Interop Python** : interface entre Python et les fonctions C
-- **Classification** : logique de prédiction
-
-#### **Librairie C** (`libc/`)
-- **mathlib.c** : opérations matricielles optimisées
-- **model.c** : algorithmes de ML (forward pass, backpropagation)
-- **Compilation** : génère des `.dll`/`.so` pour performances maximales
-
-#### **Backend** (`interface/backend/`)
-- **API REST** : endpoints pour upload et prédiction
-- **Traitement** : gestion des requêtes, appel au moteur de prédiction
-- **Persistance** : sauvegarde des modèles et historique
-
-#### **Frontend** (`interface/frontend/`)
-- **Interface utilisateur** : drag & drop d'images
-- **Dashboard** : visualisation des résultats et statistiques
-- **Communication** : consommation de l'API backend
-
----
-
-## Flow Fonctionnel
-
-### Phase 1 : Entraînement (Training)
-
-```
-DATASET D'IMAGES ──┐
-                   ├─> Prétraitement (Python) ──> Vecteur X ──┐
-LABELS (genres) ───┘                             Vecteur Y ──┤
-                                                              │
-                                                              ▼
-                                                    ┌──────────────────┐
-                                                    │  Fonction C      │
-                                                    │  train_model()   │
-                                                    └────────┬─────────┘
-                                                             │
-                                                             ▼
-                                                    Fichier POIDS.bin
-```
-
-### Phase 2 : Prédiction (Interface)
-
-```
-USER ──> Upload Image ──> Frontend ──> API Backend ──> Python (Resize/Numpy)
-                                                              │
-                                                              ▼
-                                                       Vecteur X ──┐
-                                                                   │
-                                            POIDS.bin ────────────┤
-                                                                   │
-                                                                   ▼
-                                                         ┌──────────────────┐
-                                                         │  Fonction C      │
-                                                         │  predict()       │
-                                                         └────────┬─────────┘
-                                                                  │
-                                                                  ▼
-USER <── Affichage Résultat <── Frontend <── JSON Response <── Genre + Score
-                                                            (ex: "Cubisme" 87%)
-```
-
----
-
-## Utilisation
-
-### 1. Training d'un Modèle
-
-Ouvrir et exécuter le notebook Jupyter :
-
-```sh
-jupyter notebook notebooks/main.ipynb
-```
-
-Le notebook permet de :
-- Charger et prétraiter le dataset
-- Entraîner le modèle avec les fonctions C
-- Sauvegarder les poids dans `models/`
-- Évaluer les performances
-
-### 2. Lancer l'Interface
-
-#### Backend :
-```sh
-cd interface/backend
-python manage.py runserver
-```
-
-#### Frontend :
-```sh
-cd interface/frontend
-npm install
-npm run dev
-```
-
-Accéder à l'interface : **http://localhost:3000**
-
-### 3. Faire une Prédiction
-
-1. Uploader une image via l'interface
-2. Le système prétraite l'image
-3. Le modèle C prédit le genre artistique
-4. Résultat affiché avec le score de confiance
-
----
-
-## Structure du Projet
-
-```
-├── engine/               # Moteur de ML Python
-│   ├── interop/         # Interfaces Python-C
-│   └── core/             # Logique de classification
-├── libc/                 # Bibliothèques C optimisées
-│   ├── src/              # Code source C
-│   └── include/          # Headers
-├── interface/
-│   ├── backend/          # API Django/FastAPI
-│   └── frontend/         # Application Vue.js
-├── models/               # Modèles entraînés (.bin)
-├── notebooks/            # Jupyter notebooks (training)
-├── dataset/              # Données d'entraînement
-└── Makefile              # Compilation des lib C
-```
-
----
-
-## Déploiement Docker
-
-```sh
-# Développement
-docker-compose up
-
-# Production
-docker-compose -f docker-compose.prod.yml up -d
-```
-
----
-
-## Documentation Additionnelle
-
-- [Configuration Windows/MSYS2](docs/setup_windows_msys2.md)
-- [Spécifications des fonctions C](libc/specs/)
-- [Documentation backend](interface/backend/README.md)
-- [Documentation frontend](interface/frontend/README.md)
+Projet Annuel réalisé dans le cadre du cursus **ESGI 3IABD 2026**
