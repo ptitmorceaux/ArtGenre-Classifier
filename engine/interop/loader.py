@@ -202,7 +202,6 @@ class _LibLoader: # Singleton Pattern Design
             if check_func and not check_func(value):
                 errmsg = f"value {value} out of bounds ({range})"
                 raise ValueError(f"{prefix}: {errmsg}")
-    """Vérifie qu'une valeur correspond au type ctypes attendu"""
 
 
     @require_loaded
@@ -213,21 +212,22 @@ class _LibLoader: # Singleton Pattern Design
         if status_code != 0:
             errmsg = str(self._lib.get_status_message(status_code).decode('utf-8'))
             raise RuntimeError(f"{prefix}: {errmsg}")
-    """Vérifie le status code d'une fonction C et lève une exception si besoin"""
 
 
     @require_loaded
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
         """Appel une fonction C et vérifie automatiquement son status code"""
         prefix = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
+        if not self._specs.get(func_name):
+            raise AttributeError(f"{prefix}: Function `{func_name}` not found in the JSON specs (missing or incorrect)")
         try:
             func = getattr(self._lib, func_name)
-        except AttributeError:
-            raise AttributeError(f"{prefix}: Function `{func_name}` not found in the library")
+        except AttributeError as e:
+            raise AttributeError(f"{prefix}: Function `{func_name}` not found in the library: {e}")
         status = func(*args)
         self.check_status(status, prefix)
         return status
-    """Appel une fonction C et vérifie automatiquement son status code"""
+
 
 
 # ====== Singleton instance ======#
