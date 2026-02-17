@@ -8,7 +8,7 @@ import re
 
 
 def require_loaded(func):
-    """Décorateur qui vérifie que la lib est bien load avant d'ecxuter une func"""
+    """Décorateur qui vérifie que la lib est bien load avant d'executer une func"""
     def wrapper(*args, **kwargs):
         if not _LibLoader._isLoaded:
             raise RuntimeError(f"{func.__name__}(): Library not loaded. Please call _LibLoader.loadLibrary() first.")
@@ -202,17 +202,19 @@ class _LibLoader: # Singleton Pattern Design
             if check_func and not check_func(value):
                 errmsg = f"value {value} out of bounds ({range})"
                 raise ValueError(f"{prefix}: {errmsg}")
+    """Vérifie qu'une valeur correspond au type ctypes attendu"""
 
 
     @require_loaded
     def check_status(self, status_code: int, prefix_errmsg: str = ""):
-        """Teste le status code et lève une exception si besoin"""
+        """Vérifie le status code d'une fonction C et lève une exception si besoin"""
         prefix = f"{prefix_errmsg}: _LibLoader.check_status()" if prefix_errmsg else "_LibLoader.check_status()"
         self.check_ctype(status_code, ctypes.c_ubyte, prefix)
         if status_code != 0:
             errmsg = str(self._lib.get_status_message(status_code).decode('utf-8'))
             raise RuntimeError(f"{prefix}: {errmsg}")
-    
+    """Vérifie le status code d'une fonction C et lève une exception si besoin"""
+
 
     @require_loaded
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
@@ -225,7 +227,7 @@ class _LibLoader: # Singleton Pattern Design
         status = func(*args)
         self.check_status(status, prefix)
         return status
-
+    """Appel une fonction C et vérifie automatiquement son status code"""
 
 
 # ====== Singleton instance ======#
