@@ -22,7 +22,12 @@ def pytest_configure(config):
     
     print("✅ Compilation réussie")
     
-    # Réinitialiser le Loader
+    # Charger la bibliothèque avec les bons chemins
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     from engine.interop.loader import Loader
-    Loader._instance = None
-    Loader(lib_name="libc", lib_folder="libc", build_folder="libc/build", specs_folder="libc/specs")
+    Loader.loadLibrary(
+        lib_name="libc",
+        lib_folder=os.path.join(project_root, "libc"),
+        build_folder=os.path.join(project_root, "libc/build"),
+        specs_folder=os.path.join(project_root, "libc/specs")
+    )
