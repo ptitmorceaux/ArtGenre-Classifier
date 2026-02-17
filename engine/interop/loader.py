@@ -23,9 +23,9 @@ class _LibLoader: # Singleton Pattern Design
     _isLoaded = False
 
     def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(_LibLoader, cls).__new__(cls)
-        return cls._instance
+        if _LibLoader._instance is None:
+            _LibLoader._instance = super(_LibLoader, cls).__new__(cls)
+        return _LibLoader._instance
 
 
     #====== Méthode privée - Init ======#
