@@ -22,8 +22,7 @@ class _LibLoader: # Singleton Pattern Design
     _instance = None
     _isLoaded = False
 
-
-    def __new__(cls, lib_name: str="libc", lib_folder: str="libc", build_folder: str="libc/build", specs_folder: str="libc/specs"):
+    def __new__(cls):
         if cls._instance is None:
             cls._instance = super(_LibLoader, cls).__new__(cls)
         return cls._instance
