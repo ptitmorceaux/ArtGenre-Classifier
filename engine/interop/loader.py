@@ -132,7 +132,7 @@ class _LibLoader: # Singleton Pattern Design
     #====== Méthode public - Init ======#
 
     def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
-        if self._isLoaded:
+        if _LibLoader._isLoaded:
             raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
         self._lib = None
         self._specs = dict()
@@ -152,7 +152,7 @@ class _LibLoader: # Singleton Pattern Design
         self._load_library()
         self._load_all_json_specs()
         self._attribute_types()
-        self._isLoaded = True
+        _LibLoader._isLoaded = True
 
     #====== Méthode public - Utils ======#
 
