@@ -156,76 +156,77 @@ class _LibLoader: # Singleton Pattern Design
     #====== Méthode public - Utils ======#
 
     @staticmethod
+    def is_integer(n) -> bool:
+        return isinstance(n, int) and not isinstance(n, bool)
+
+    @staticmethod
     def is_int32(n: int) -> bool:
-        return -2147483648 <= n <= 2147483647
+        return _LibLoader.is_integer(n) and -2147483648 <= n <= 2147483647
     
     @staticmethod
     def is_uint32(n: int) -> bool:
-        return 0 <= n <= 4294967295
+        return _LibLoader.is_integer(n) and 0 <= n <= 4294967295
 
     @staticmethod
     def is_byte(n: int) -> bool:
-        return -128 <= n <= 127
+        return _LibLoader.is_integer(n) and -128 <= n <= 127
 
     @staticmethod
     def is_ubyte(n: int) -> bool:
-        return 0 <= n <= 255
+        return _LibLoader.is_integer(n) and 0 <= n <= 255
+    
+    @staticmethod
+    def is_float(n) -> bool:
+        return isinstance(n, (int, float)) and not isinstance(n, bool)
 
 
-    @require_loaded
-    def check_ctype(self, value, ctype, prefix_errmsg: str = ""):
+    @staticmethod
+    def check_ctype(value, ctype, prefix_errmsg: str = ""):
         """Vérifie qu'une valeur correspond au type ctypes attendu"""
-        prefix = f"{prefix_errmsg}: _LibLoader.check_ctype()" if prefix_errmsg else "_LibLoader.check_ctype()"
-        errmsg = None
-        
-        if ctype in (ctypes.c_byte, ctypes.c_ubyte, ctypes.c_int32, ctypes.c_uint32):
-            if not isinstance(value, int):
-                errmsg = f"must be of type int, got {type(value)}"
-        
-        elif ctype == ctypes.c_float:
-            if not isinstance(value, (int, float)):
-                errmsg = f"must be of type float, got {type(value)}"
-        
-        if errmsg:
-            raise TypeError(f"{prefix}: {errmsg}")
+        prefix_err = f"{prefix_errmsg}: _LibLoader.check_ctype()" if prefix_errmsg else "_LibLoader.check_ctype()"
 
         check_map = {
-            ctypes.c_byte:   (self.is_byte, f"-128 to 127 (byte)"),
-            ctypes.c_ubyte:  (self.is_ubyte, f"0 to 255 (ubyte)"),
-            ctypes.c_int32:  (self.is_int32, f"-2147483648 to 2147483647 (int32)"),
-            ctypes.c_uint32: (self.is_uint32, f"0 to 4294967295 (uint32)"),
+            ctypes.c_byte:   {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_byte, "range": f"-128 to 127 (byte)"},
+            ctypes.c_ubyte:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_ubyte, "range": f"0 to 255 (ubyte)"},
+            ctypes.c_int32:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_int32, "range": f"-2147483648 to 2147483647 (int32)"},
+            ctypes.c_uint32: {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_uint32, "range": f"0 to 4294967295 (uint32)"},
+            ctypes.c_float:  {"type_check": _LibLoader.is_float, "type": "float"},
         }
 
-        check_data = check_map.get(ctype)
-        if check_data:
-            check_func, range = check_data
-            if check_func and not check_func(value):
-                errmsg = f"value {value} out of bounds ({range})"
-                raise ValueError(f"{prefix}: {errmsg}")
+        if ctype not in check_map:
+            raise TypeError(f"{prefix_err}: Unsupported ctype for check: {ctype}")
+        
+        if not check_map[ctype]["type_check"](value):
+            raise TypeError(f"{prefix_err}: must be of type {check_map[ctype]['type']}, got {type(value)}")
+        
+        if "range_check" in check_map[ctype].keys() and not check_map[ctype]["range_check"](value):
+            if "range" in check_map[ctype]:
+                range_err = f" ({check_map[ctype]['range']})"
+            raise ValueError(f"{prefix_err}: value {value} out of bounds{range_err} for ctype {ctype}")
 
 
     @require_loaded
     def check_status(self, status_code: int, prefix_errmsg: str = ""):
         """Vérifie le status code d'une fonction C et lève une exception si besoin"""
-        prefix = f"{prefix_errmsg}: _LibLoader.check_status()" if prefix_errmsg else "_LibLoader.check_status()"
-        self.check_ctype(status_code, ctypes.c_ubyte, prefix)
+        prefix_err = f"{prefix_errmsg}: _LibLoader.check_status()" if prefix_errmsg else "_LibLoader.check_status()"
+        _LibLoader.check_ctype(status_code, ctypes.c_ubyte, prefix_err)
         if status_code != 0:
             errmsg = str(self._lib.get_status_message(status_code).decode('utf-8'))
-            raise RuntimeError(f"{prefix}: {errmsg}")
+            raise RuntimeError(f"{prefix_err}: {errmsg}")
 
 
     @require_loaded
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
         """Appel une fonction C et vérifie automatiquement son status code"""
-        prefix = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
-        if not self._specs.get(func_name):
-            raise AttributeError(f"{prefix}: Function `{func_name}` not found in the JSON specs (missing or incorrect)")
+        prefix_err = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
+        if func_name not in self._specs.keys():
+            raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the JSON specs (missing or incorrect)")
         try:
             func = getattr(self._lib, func_name)
         except AttributeError as e:
-            raise AttributeError(f"{prefix}: Function `{func_name}` not found in the library: {e}")
+            raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the library: {e}")
         status = func(*args)
-        self.check_status(status, prefix)
+        self.check_status(status, prefix_err)
         return status
 
 
