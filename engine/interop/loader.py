@@ -201,8 +201,8 @@ class _LibLoader: # Singleton Pattern Design
         
         if "range_check" in check_map[ctype].keys() and not check_map[ctype]["range_check"](value):
             if "range" in check_map[ctype]:
-                range_err = f" ({check_map[ctype]['range']})"
-            raise ValueError(f"{prefix_err}: value {value} out of bounds{range_err} for ctype {ctype}")
+                range_err = f": {check_map[ctype]['range']}"
+            raise ValueError(f"{prefix_err}: value {value} out of bounds{range_err}")
 
 
     @require_loaded
