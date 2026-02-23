@@ -5,7 +5,7 @@ import os
 def run():
     # import lib
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    lib_path = os.path.join(script_dir, "lib", "library.dll")
+    lib_path = os.path.join(script_dir, "library.dll")
     lib = ctypes.cdll.LoadLibrary(lib_path)
 
     lib.my_add.argtypes = [ctypes.c_int32, ctypes.c_int32]
