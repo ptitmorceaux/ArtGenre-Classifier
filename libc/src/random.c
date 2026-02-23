@@ -45,7 +45,7 @@ DLLEXPORT unsigned char set_seed(uint32_t seed) {
 }
 
 
-DLLEXPORT unsigned char random_float(float min, float max, float* res) {
+unsigned char random_float(float min, float max, float* res) {
     if (!res) return ERR_INVALID_PTR;
     
     if (min == max) {
