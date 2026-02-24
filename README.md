@@ -2,7 +2,7 @@
 
 [![C Python Interop](https://img.shields.io/badge/Interop-C%20%2F%20Python-blue.svg)](https://docs.python.org/3/library/ctypes.html)
 [![Project Status](https://img.shields.io/badge/Status-En%20D%C3%A9veloppement-orange.svg)]()
-[![CI - Build & Pytest](https://github.com/ptitmorceaux/ArtGenre-Classifier/actions/workflows/build_pytest.yml/badge.svg)](https://github.com/ptitmorceaux/ArtGenre-Classifier/actions/workflows/build_pytest.yml)
+[![CI](https://github.com/ptitmorceaux/ArtGenre-Classifier/actions/workflows/ci.yml/badge.svg)](https://github.com/ptitmorceaux/ArtGenre-Classifier/actions/workflows/ci.yml)
 
 ## 📌 Présentation
 ArtGenre-Classifier est un projet de classification d'œuvres d'art conçu pour identifier trois mouvements majeurs : le **Cubisme**, la **Renaissance** et le **Surréalisme**. 
