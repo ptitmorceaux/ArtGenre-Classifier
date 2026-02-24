@@ -1,4 +1,4 @@
-name: CI - Build & Pytest
+name: CI
 
 on: [pull_request, workflow_dispatch]
 
@@ -7,8 +7,21 @@ env:
   PYTHONUTF8: 1
 
 jobs:
+  lint:
+    name: Lint (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install ruff
+      - run: ruff check --output-format=github .
+
   build-and-test:
     name: Build + Pytest (${{ matrix.os }})
+    needs: lint
     runs-on: ${{ matrix.runner }}
 
     strategy:
