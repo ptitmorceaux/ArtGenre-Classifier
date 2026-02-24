@@ -115,3 +115,10 @@ def _LibLoader:
 NOTE: On ne peut charger qu'une seule fois la lib.
 
 ////////////////////////////////////////////////////////
+
+            Réarangement de la lib C
+        et du script py qui parse les specs
+
+Mtn on déclare les fonctions que l'on export (DLLEXPORT) dans les header.
+
+////////////////////////////////////////////////////////

@@ -4,13 +4,15 @@ from typing import List, Tuple
 import argparse
 
 
-def save_to_json(data: List[dict], output_file_path: str):
+def save_to_json(data: List[dict], output_file_path: str) -> bool:
+    if not data: return False # No data to save -> skip file creation
     with open(output_file_path, 'w') as f:
         json.dump({
             item['function_name']: {
                 'restype': item['return_type'],
                 'argtypes': item['argtypes']
         } for item in data}, f, indent=4)
+    return True
 
 
 def split_type_and_name(segment: str) -> Tuple[str, str]:
@@ -25,6 +27,8 @@ def split_type_and_name(segment: str) -> Tuple[str, str]:
 
 
 def get_argtypes(params: str) -> List[str]:
+    if not params.strip() or params.strip() == 'void':
+        return []
     return [split_type_and_name(segment)[0].replace('const ', '') for segment in params.split(',')]
 
 
@@ -65,19 +69,20 @@ def parse_input_file(input_file_path: str, start_line: str) -> List[str]:
     return data_list
 
 
-def parse_file(input_file_path: str, output_file_path: str, start_line: str):
+def parse_file(input_file_path: str, output_file_path: str, start_line: str) -> bool:
     try:
         if output_file_path[-5:] != '.json':
             output_file_path += '.json'
         data_list = parse_input_file(input_file_path, start_line)
-        save_to_json(data_list, output_file_path)
+        return save_to_json(data_list, output_file_path)
     except Exception as e:
         print(f"An error occurred: {e}")
+        return False
 
 
 def parse_all_files(folder_path: str, output_folder_path: str, start_line: str):
     for filename in os.listdir(folder_path):
-        if filename.endswith('.c'):
+        if filename.endswith('.h'):
             input_file_path = os.path.join(folder_path, filename)
             os.makedirs(output_folder_path, exist_ok=True)
             output_file_name = os.path.splitext(filename)[0] + '.json'
@@ -86,13 +91,13 @@ def parse_all_files(folder_path: str, output_folder_path: str, start_line: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Parse C files to extract function signatures and generate JSON specs.'
+        description='Parse header files to extract function signatures and generate JSON specs.'
     )
     parser.add_argument(
         '--input', '-i',
         nargs='+',
         required=True,
-        help='Input C file(s) or directory to parse'
+        help='Input header file(s) or directory to parse'
     )
     parser.add_argument(
         '--output', '-o',
@@ -109,7 +114,7 @@ if __name__ == "__main__":
     
     try:
         os.makedirs(args.output, exist_ok=True)
-        c_files_to_process = []
+        files_to_process = []
 
         for path in args.input:
             
@@ -117,28 +122,38 @@ if __name__ == "__main__":
             
             if os.path.isdir(path):
                 for filename in os.listdir(path):
-                    if filename.endswith('.c'):
-                        c_files_to_process.append(os.path.join(path, filename))
+                    if filename.endswith('.h'):
+                        files_to_process.append(os.path.join(path, filename))
             
-            elif os.path.isfile(path) and path.endswith('.c'):
-                c_files_to_process.append(path)
+            elif os.path.isfile(path) and path.endswith('.h'):
+                files_to_process.append(path)
 
             else:
-                raise ValueError(f"'{path}' is not a valid C file or directory.")
+                raise ValueError(f"'{path}' is not a valid header file or directory.")
         
-        if not c_files_to_process:
-            raise ValueError("No C files found to process.")
+        if not files_to_process:
+            raise ValueError("No header files found to process.")
         
-        for input_file in c_files_to_process:
+        processed_files_count = 0
+        empty_files_count = 0
+
+        for input_file in files_to_process:
             filename = os.path.basename(input_file)
             output_file_name = os.path.splitext(filename)[0] + '.json'
             output_file_path = os.path.join(args.output, output_file_name)
             
             print(f"Processing: {input_file}")
-            parse_file(input_file, output_file_path, args.start_line)
+            if parse_file(input_file, output_file_path, args.start_line):
+                processed_files_count += 1
+            else:
+                empty_files_count += 1
+                print(f"WARNING: No valid function signatures found in '{input_file}'. Skipping file creation.")
         
-        n = len(c_files_to_process)
-        print(f"Successfully generated {n} JSON file{('s' if n > 1 else '')} in '{args.output}'")
+        print(f"Processing completed. {processed_files_count} file{'s' if processed_files_count > 1 else ''} generated, {empty_files_count} file{'s' if empty_files_count > 1 else ''} skipped due to no valid signatures.")
+        
+        error_files_count = len(files_to_process) - processed_files_count - empty_files_count
+        if error_files_count > 0:
+            print(f"WARNING: {error_files_count} file{'s' if error_files_count > 1 else ''} were not processed due to errors. Check the logs for details.")
         
     except Exception as e:
         print(f"Error: {e}")

@@ -1,4 +1,4 @@
-// #include "../include/global.h"
+// #include "../include/linearModel.h"
 
 // // Struct
 
@@ -10,7 +10,7 @@
 
 // // Linear Model functions
 
-// DLLEXPORT unsigned char create_linear_model(float a, float b, LinearModel** res_model) {
+// unsigned char create_linear_model(float a, float b, LinearModel** res_model) {
 //     if (!res_model) return ERR_INVALID_PTR;
 //     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
 //     model->coef = a;
@@ -19,13 +19,13 @@
 //     return RES_EXIT_SUCCESS;
 // }
 
-// DLLEXPORT unsigned char predict_linear_model(LinearModel* model, float* result) {
+// unsigned char predict_linear_model(LinearModel* model, float* result) {
 //     if (!model || !result) return ERR_INVALID_PTR;
 //     *result = model->a + model->b;
 //     return RES_EXIT_SUCCESS;
 // }
 
-// DLLEXPORT unsigned char release_linear_model(LinearModel* model) {
+// unsigned char release_linear_model(LinearModel* model) {
 //     if (!model) return ERR_INVALID_PTR;
 //     free(model);
 //     return RES_EXIT_SUCCESS;

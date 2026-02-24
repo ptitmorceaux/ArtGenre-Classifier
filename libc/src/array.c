@@ -1,9 +1,9 @@
-#include "../include/global.h"
+#include "../include/array.h"
 
 
 /// ALLOCATION ///
 
-DLLEXPORT unsigned char ALLOCATE_float32_array_of_incrementing_numbers(uint32_t array_length, float** res_array) {
+unsigned char ALLOCATE_float32_array_of_incrementing_numbers(uint32_t array_length, float** res_array) {
     if (!res_array) return ERR_INVALID_PTR;
     *res_array = NULL; // init
     if (array_length == 0) return ERR_LENGTH_ZERO;
@@ -20,7 +20,7 @@ DLLEXPORT unsigned char ALLOCATE_float32_array_of_incrementing_numbers(uint32_t 
 
 // ARRAY OPERATIONS ///
 
-DLLEXPORT unsigned char sum_float32_array(const float* array, uint32_t array_length, float* result) {
+unsigned char sum_float32_array(const float* array, uint32_t array_length, float* result) {
     if (!array || !result) return ERR_INVALID_PTR;
     float sum = 0.0;
     for (uint32_t i = 0; i < array_length; i++) {
