@@ -130,9 +130,14 @@ class _LibLoader: # Singleton Pattern Design
 
     #====== Méthode public - Init ======#
 
-    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str):
+    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int = None):
+        
         if _LibLoader._isLoaded:
             raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
+        
+        if seed is not None:
+            self.check_ctype(seed, ctypes.c_uint32, "_LibLoader.loadLibrary(): `seed` must be a uint32 integer when `set_seed_randomly` is False")
+        
         self._lib = None
         self._specs = dict()
 
@@ -152,6 +157,11 @@ class _LibLoader: # Singleton Pattern Design
         self._load_all_json_specs()
         self._attribute_types()
         _LibLoader._isLoaded = True
+
+        if seed is None:
+            self.set_randomly_seed()
+        else:
+            self.set_seed(seed)
 
     #====== Méthode public - Utils ======#
 
@@ -229,6 +239,17 @@ class _LibLoader: # Singleton Pattern Design
         self.check_status(status, prefix_err)
         return status
 
+
+    @require_loaded
+    def set_seed(self, seed: int):
+        """Set the random seed in the C library"""
+        _LibLoader.check_ctype(seed, ctypes.c_uint32, "_LibLoader.set_seed()")
+        self.call("set_random_seed", seed, prefix_errmsg="_LibLoader.set_seed()")
+    
+    @require_loaded
+    def set_randomly_seed(self):
+        """Seed the random generator in the C library with a random seed"""
+        self.call("set_randomly_seed", prefix_errmsg="_LibLoader.set_randomly_seed()")
 
 
 # ====== Singleton instance ======#
