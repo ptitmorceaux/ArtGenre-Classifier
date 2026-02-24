@@ -5,7 +5,8 @@ import argparse
 
 
 def save_to_json(data: List[dict], output_file_path: str) -> bool:
-    if not data: return False # No data to save -> skip file creation
+    # No data to save -> skip file creation
+    if not data: return False #noqa:E701
     with open(output_file_path, 'w') as f:
         json.dump({
             item['function_name']: {
@@ -58,9 +59,9 @@ def parse_input_file(input_file_path: str, start_line: str) -> List[str]:
     start_line_len = len(start_line)
     
     for line in lines:
-        if not line.startswith(start_line): continue
+        if not line.startswith(start_line): continue #noqa:E701
         line = line[start_line_len:].strip()
-        if not line: continue
+        if not line: continue #noqa:E701
 
         data = parse_line(line)
         if data:

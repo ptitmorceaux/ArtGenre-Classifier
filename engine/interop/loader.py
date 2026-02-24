@@ -21,6 +21,24 @@ class _LibLoader: # Singleton Pattern Design
     """Load une lib partagée en singleton"""
     _instance = None
     _isLoaded = False
+    
+    _CTYPE_MAP = {
+        "int32_t":         ctypes.c_int32,
+        "uint32_t":        ctypes.c_uint32,
+        "float":           ctypes.c_float,
+        "char":            ctypes.c_byte,
+        "unsigned char":   ctypes.c_ubyte,
+        
+        "void*":           ctypes.c_void_p,
+        "int32_t*":        ctypes.POINTER(ctypes.c_int32),
+        "uint32_t*":       ctypes.POINTER(ctypes.c_uint32),
+        "float*":          ctypes.POINTER(ctypes.c_float),
+        "char*":           ctypes.c_char_p,
+        "unsigned char*":  ctypes.POINTER(ctypes.c_ubyte),
+        
+        "void**":          ctypes.POINTER(ctypes.c_void_p),
+        "float**":         ctypes.POINTER(ctypes.POINTER(ctypes.c_float)),
+    }
 
     def __new__(cls):
         if _LibLoader._instance is None:
@@ -85,25 +103,10 @@ class _LibLoader: # Singleton Pattern Design
         type = self._normalize_str_type(type, structs_types_list=[
             "LinearModel",
         ])
-        match type:
-            case "int32_t":         return ctypes.c_int32
-            case "uint32_t":        return ctypes.c_uint32
-            case "float":           return ctypes.c_float
-            case "char":            return ctypes.c_byte
-            case "unsigned char":   return ctypes.c_ubyte
-                
-            case "void*":           return ctypes.c_void_p
-            case "int32_t*":        return ctypes.POINTER(ctypes.c_int32)
-            case "uint32_t*":       return ctypes.POINTER(ctypes.c_uint32)
-            case "float*":          return ctypes.POINTER(ctypes.c_float)
-            case "char*":           return ctypes.c_char_p
-            case "unsigned char*":  return ctypes.POINTER(ctypes.c_ubyte)
-
-            case "void**":          return ctypes.POINTER(ctypes.c_void_p)
-            case "float**":         return ctypes.POINTER(ctypes.POINTER(ctypes.c_float))
-
-            case _: raise TypeError(f"_LibLoader._get_ctype(): Unknown ctype '{type}'")
-
+        res = _LibLoader._CTYPE_MAP.get(type)
+        if res is None:
+            raise TypeError(f"_LibLoader._get_ctype(): Unknown ctype '{type}'")
+        return res
 
     def _attribute_types(self):
         """Configure les types ctypes pour chaque fonction"""
@@ -193,10 +196,10 @@ class _LibLoader: # Singleton Pattern Design
         prefix_err = f"{prefix_errmsg}: _LibLoader.check_ctype()" if prefix_errmsg else "_LibLoader.check_ctype()"
 
         check_map = {
-            ctypes.c_byte:   {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_byte, "range": f"-128 to 127 (byte)"},
-            ctypes.c_ubyte:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_ubyte, "range": f"0 to 255 (ubyte)"},
-            ctypes.c_int32:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_int32, "range": f"-2147483648 to 2147483647 (int32)"},
-            ctypes.c_uint32: {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_uint32, "range": f"0 to 4294967295 (uint32)"},
+            ctypes.c_byte:   {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_byte, "range": "-128 to 127 (byte)"},
+            ctypes.c_ubyte:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_ubyte, "range": "0 to 255 (ubyte)"},
+            ctypes.c_int32:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_int32, "range": "-2147483648 to 2147483647 (int32)"},
+            ctypes.c_uint32: {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_uint32, "range": "0 to 4294967295 (uint32)"},
             ctypes.c_float:  {"type_check": _LibLoader.is_float, "type": "float"},
         }
 
