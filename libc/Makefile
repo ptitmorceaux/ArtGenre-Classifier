@@ -65,7 +65,7 @@ $(TARGET): $(OBJ_FILES)
 generate-json:
 ifeq ($(PYTHON_AVAILABLE),1)
 	@echo "  GEN     JSON specs"
-	@$(PYTHON) $(SPEC_DIR)/parser_c_to_json.py -i $(SRC_DIR) -o $(SPEC_DIR) -s DLLEXPORT || \
+	@$(PYTHON) $(SPEC_DIR)/parser_c_to_json.py -i $(INC_DIR) -o $(SPEC_DIR) -s DLLEXPORT || \
 		(echo "Error: Failed to generate JSON specs. Check that the parser script is correct." && exit 1)
 else
 	@echo "Warning: Python not found. Skipping JSON generation."
