@@ -1,4 +1,4 @@
-#include "../include/global.h"
+#include "../include/math.h"
 
 
 unsigned char my_add(float a, float b, float* result) {

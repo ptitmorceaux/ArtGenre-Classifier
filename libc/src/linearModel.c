@@ -1,4 +1,4 @@
-// #include "../include/global.h"
+// #include "../include/linearModel.h"
 
 // // Struct
 
