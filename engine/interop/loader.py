@@ -158,10 +158,7 @@ class _LibLoader: # Singleton Pattern Design
         self._attribute_types()
         _LibLoader._isLoaded = True
 
-        if seed is None:
-            self.set_randomly_seed()
-        else:
-            self.set_seed(seed)
+        self.set_seed(seed)
 
     #====== Méthode public - Utils ======#
 
@@ -241,15 +238,21 @@ class _LibLoader: # Singleton Pattern Design
 
 
     @require_loaded
-    def set_seed(self, seed: int):
-        """Set the random seed in the C library"""
-        _LibLoader.check_ctype(seed, ctypes.c_uint32, "_LibLoader.set_seed()")
-        self.call("set_random_seed", seed, prefix_errmsg="_LibLoader.set_seed()")
-    
-    @require_loaded
-    def set_randomly_seed(self):
-        """Seed the random generator in the C library with a random seed"""
-        self.call("set_randomly_seed", prefix_errmsg="_LibLoader.set_randomly_seed()")
+    def set_seed(self, seed: int = None):
+        """
+        Set the random seed in the C library :
+        if `seed` is None, a random seed will be set
+        """
+        if seed is None:
+            prefix_errmsg = "_LibLoader.set_seed() -> call `set_randomly_seed` to set a random seed"
+            func = ["set_randomly_seed"]
+        else:
+            prefix_errmsg = "_LibLoader.set_seed() -> call `set_seed` to set a specific seed"
+            _LibLoader.check_ctype(seed, ctypes.c_uint32, prefix_errmsg)
+            func = ["set_seed", seed]
+        
+        self.call(*func, prefix_errmsg=prefix_errmsg)
+
 
 
 # ====== Singleton instance ======#
