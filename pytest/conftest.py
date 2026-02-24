@@ -30,5 +30,6 @@ def pytest_configure(config):
         lib_name="libc",
         lib_folder=os.path.join(project_root, "libc"),
         build_folder=os.path.join(project_root, "libc/build"),
-        specs_folder=os.path.join(project_root, "libc/specs")
+        specs_folder=os.path.join(project_root, "libc/specs"),
+        seed=None
     )
