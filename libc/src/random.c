@@ -33,13 +33,13 @@ uint32_t getRandomSeed() {
 }
 
 
-DLLEXPORT unsigned char set_randomly_seed() {
+unsigned char set_randomly_seed() {
     uint32_t seed = getRandomSeed();
     srand(seed);
     return RES_EXIT_SUCCESS;
 }
 
-DLLEXPORT unsigned char set_seed(uint32_t seed) {
+unsigned char set_seed(uint32_t seed) {
     srand(seed);
     return RES_EXIT_SUCCESS;
 }
