@@ -4,15 +4,27 @@ from typing import List, Tuple
 import argparse
 
 
-def save_to_json(data: List[dict], output_file_path: str) -> bool:
+def save_to_json(data: dict, output_file_path: str) -> bool:
     # No data to save -> skip file creation
-    if not data: return False #noqa:E701
+    if not data['__function__'] and not data['__typedef__']: return False #noqa:E701
+    
+    result = dict()
+
+    if data['__typedef__']:
+        result['__typedef__'] = sorted(list(data['__typedef__']))
+
+    if data['__function__']:
+        result['__function__'] = dict()
+
+    for item in data['__function__']:
+        result['__function__'][item['function_name']] = {
+            'restype': item['return_type'],
+            'argtypes': item['argtypes']
+        }
+    
     with open(output_file_path, 'w') as f:
-        json.dump({
-            item['function_name']: {
-                'restype': item['return_type'],
-                'argtypes': item['argtypes']
-        } for item in data}, f, indent=4)
+        json.dump(result, f, indent=4)
+    
     return True
 
 
@@ -33,10 +45,10 @@ def get_argtypes(params: str) -> List[str]:
     return [split_type_and_name(segment)[0].replace('const ', '') for segment in params.split(',')]
 
 
-def parse_line(line: str) -> dict:
+def parse_line_function(line: str) -> dict:
     parts = line.split('(')
     if len(parts) != 2 or not parts[0].strip() or not parts[1].strip():
-        raise ValueError(f"parse_line: Line does not contain a valid function declaration: {line}")
+        raise ValueError(f"parse_line_function: Line does not contain a valid function declaration: {line}")
 
     argtypes_end_index = parts[1].index(')')
     argtypes = parts[1][:argtypes_end_index]
@@ -50,32 +62,52 @@ def parse_line(line: str) -> dict:
     }
 
 
-def parse_input_file(input_file_path: str, start_line: str) -> List[str]:
+def parse_line_typedef(line: str) -> str:
+    return line.split(';')[0].split('}')[-1].strip()
+
+
+def parse_input_file(input_file_path: str, start_line: str) -> dict:
     with open(input_file_path, 'r') as f:
         lines = f.readlines()
 
-    data_list = []
-
+    data = {"__function__": [], "__typedef__": set()}
     start_line_len = len(start_line)
+    typedef_step = 0
     
     for line in lines:
-        if not line.startswith(start_line): continue #noqa:E701
-        line = line[start_line_len:].strip()
-        if not line: continue #noqa:E701
+        line = line.strip()
+        
+        if line.startswith('typedef'):
+            typedef_step = 1
 
-        data = parse_line(line)
-        if data:
-            data_list.append(data)
+        if typedef_step and line.startswith(start_line):
+            raise ValueError(f"parse_input_file: Found a function declaration starting with '{start_line}' inside a typedef block, which is not supported: {line}")
+
+        if line.startswith(start_line):
+            line = line[start_line_len:]
+            if not line: continue #noqa:E701
+            parsed_data = parse_line_function(line)
+            if parsed_data:
+                data['__function__'].append(parsed_data)
+        
+        if typedef_step == 1 and '}' in line:
+            typedef_step = 2
+
+        if typedef_step == 2 and line.endswith(';'):
+            typedef_step = 0
+            parsed_data = parse_line_typedef(line)
+            if parsed_data:
+                data['__typedef__'].add(parsed_data)
     
-    return data_list
+    return data
 
 
 def parse_file(input_file_path: str, output_file_path: str, start_line: str) -> bool:
     try:
         if output_file_path[-5:] != '.json':
             output_file_path += '.json'
-        data_list = parse_input_file(input_file_path, start_line)
-        return save_to_json(data_list, output_file_path)
+        data = parse_input_file(input_file_path, start_line)
+        return save_to_json(data, output_file_path)
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
@@ -148,7 +180,7 @@ if __name__ == "__main__":
                 processed_files_count += 1
             else:
                 empty_files_count += 1
-                print(f"WARNING: No valid function signatures found in '{input_file}'. Skipping file creation.")
+                print(f"WARNING: No valid function signatures or typedefs found in '{input_file}'. Skipping file creation.")
         
         print(f"Processing completed. {processed_files_count} file{'s' if processed_files_count > 1 else ''} generated, {empty_files_count} file{'s' if empty_files_count > 1 else ''} skipped due to no valid signatures.")
         
