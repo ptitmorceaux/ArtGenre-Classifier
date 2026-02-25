@@ -30,6 +30,18 @@ Le projet est divisé en trois couches principales :
 * Python 3.8+
 * Docker & Docker Compose
 
+### Installation des dépendances Python
+
+#### Dépendances de l'application
+```bash
+pip install -r requirements.txt
+```
+
+#### Dépendances de test locaux (ruff, pytest)
+```bash
+pip install -r requirements.test.txt
+```
+
 ### Compilation de la bibliothèque C
 ```bash
 make -C libc clean && make -C libc all
@@ -39,6 +51,30 @@ make -C libc clean && make -C libc all
 
 ```bash
 docker-compose up --build
+```
+
+## 🧪 Tests & Qualité du Code
+
+
+
+### Vérification du code avec Ruff
+```bash
+python -m ruff check
+```
+
+Pour appliquer les corrections automatiques :
+```bash
+python -m ruff check --fix
+```
+
+### Lancement des tests unitaires
+```bash
+python -m pytest
+```
+
+Pour un affichage détaillé :
+```bash
+python -m pytest -v
 ```
 
 ## 📈 État d'avancement
