@@ -26,14 +26,24 @@ Structure commit messages to clarify scope and action:
 * `fix(parser): handle empty JSON files`
 * `refactor(json): optimize type normalization`
 
-## 3. Merge Workflow
+## 3. Pull Requests
+
+Le titre de la PR doit résumer l'objectif global de la branche. Contrairement aux commits, la première lettre est en majuscule.
+
+**Format :** `Type: Description concise`
+
+* `Refactor: Enhance JSON specification logic`
+* `Feat: Add OAuth2 authentication`
+* `Fix: Resolve memory leak in parser`
+
+## 4. Merge Workflow
 
 1. **Clean history**: Use `git rebase -i` to rename or squash intermediate commits before merging.
 2. **Update branch**: Use `git pull --rebase origin main` to integrate the latest changes from `main`.
 3. **Update PR**: Use `git push --force-with-lease` after a rebase.
 4. **Merge**: Select the **Rebase and merge** option on GitHub.
 
-## 4. Conflict Resolution (Rebase)
+## 5. Conflict Resolution (Rebase)
 
 In case of conflict during a rebase:
 
