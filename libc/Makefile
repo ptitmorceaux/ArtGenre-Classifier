@@ -43,7 +43,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 TARGET    := $(OUT_DIR)/$(LIB_NAME).$(EXT)
 
 # ===== Flags =====
-CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2
+CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2 -std=c17 -pedantic
 
 
 # ===== Règle par défaut =====
@@ -68,7 +68,7 @@ ifeq ($(PYTHON_AVAILABLE),1)
 	@$(PYTHON) $(SPEC_DIR)/parser_c_to_json.py -i $(INC_DIR) -o $(SPEC_DIR) -s DLLEXPORT || \
 		(echo "Error: Failed to generate JSON specs. Check that the parser script is correct." && exit 1)
 else
-	@echo "Warning: Python not found. Skipping JSON generation."
+	@echo "WARNING: Python not found. Skipping JSON generation."
 	@echo "         Install Python to enable automatic JSON spec generation."
 endif
 
