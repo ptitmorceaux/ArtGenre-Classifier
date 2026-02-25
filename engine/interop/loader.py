@@ -2,7 +2,6 @@ import ctypes
 import os
 import sys
 import json
-from typing import List
 import re
 
 
@@ -86,31 +85,48 @@ class _LibLoader: # Singleton Pattern Design
             if filename.endswith(".json"):
                 info_path = os.path.join(self._specs_folder, filename)
                 with open(info_path, "r") as f:
-                    self._specs.update(json.load(f))
+                    data = json.load(f)
+                    for key in data.keys():
+                        if key not in self._specs.keys():
+                            raise KeyError(f"_LibLoader._load_all_json_specs(): Invalid key `{key}` found in `{filename}`. Expected keys are {self._specs.keys()}")
+
+                        # only check typedef names, so duplicates are not an issue
+                        if key == "__typedef__":
+                            self._specs[key].update(data[key])
+                            continue
+
+                        # for functions, check that there are no duplicates across all files,
+                        # as it would cause conflicts when setting attributes
+                        for subkey in data[key].keys():
+                            if subkey in self._specs[key].keys():
+                                raise KeyError(f"_LibLoader._load_all_json_specs(): Duplicate name `{subkey}` found in `{key}`. Names must be unique across all JSON spec files.")
+                            self._specs[key][subkey] = data[key][subkey]
 
 
-    def _normalize_str_type(self, type: str, structs_types_list: List[str]) -> str:
+    def _normalize_str_type(self, type: str) -> str:
         """Normalize a C type string by removing 'const' and normalizing spaces."""
         type = re.sub(r'\s+', ' ', type).strip()
         type = type.replace("const ", "")
         type = re.sub(r'\s*\*\s*', '*', type)
-        for struct in tuple(structs_types_list):
-            type = type.replace(f"{struct}*", "void*")
+        # if type in self._specs["__typedef__"]:
+        #     return "void*"
+        for typename in self._specs["__typedef__"]:
+            type = type.replace(f"{typename}*", "void*")
         return type
+
 
     def _get_ctype(self, type: str):
         """Return le type ctypes correspondant à une string"""
-        type = self._normalize_str_type(type, structs_types_list=[
-            "LinearModel",
-        ])
+        type = self._normalize_str_type(type)
         res = _LibLoader._CTYPE_MAP.get(type)
         if res is None:
             raise TypeError(f"_LibLoader._get_ctype(): Unknown ctype '{type}'")
         return res
 
+
     def _attribute_types(self):
         """Configure les types ctypes pour chaque fonction"""
-        for name, info in self._specs.items():
+        for name, info in self._specs["__function__"].items():
             try:
                 func = getattr(self._lib, name)
             except AttributeError:
@@ -143,6 +159,9 @@ class _LibLoader: # Singleton Pattern Design
         
         self._lib = None
         self._specs = dict()
+        
+        self._specs["__function__"] = dict()
+        self._specs["__typedef__"] = set()
 
         self._lib_name = self._set_lib_name(lib_name)
         self._lib_folder = self._set_path(lib_folder)
@@ -210,8 +229,7 @@ class _LibLoader: # Singleton Pattern Design
             raise TypeError(f"{prefix_err}: must be of type {check_map[ctype]['type']}, got {type(value)}")
         
         if "range_check" in check_map[ctype].keys() and not check_map[ctype]["range_check"](value):
-            if "range" in check_map[ctype]:
-                range_err = f": {check_map[ctype]['range']}"
+            range_err = f": {check_map[ctype]['range']}" if "range" in check_map[ctype] else ""
             raise ValueError(f"{prefix_err}: value {value} out of bounds{range_err}")
 
 
@@ -229,7 +247,7 @@ class _LibLoader: # Singleton Pattern Design
     def call(self, func_name: str, *args, prefix_errmsg: str = ""):
         """Appel une fonction C et vérifie automatiquement son status code"""
         prefix_err = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
-        if func_name not in self._specs.keys():
+        if func_name not in self._specs["__function__"].keys():
             raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the JSON specs (missing or incorrect)")
         try:
             func = getattr(self._lib, func_name)
