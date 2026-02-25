@@ -122,3 +122,39 @@ NOTE: On ne peut charger qu'une seule fois la lib.
 Mtn on déclare les fonctions que l'on export (DLLEXPORT) dans les header.
 
 ////////////////////////////////////////////////////////
+
+            Support des typedef dans le parser
+
+On a eu besoin de gérer les typedef qui sont declarés dans les header.
+Avant on exportait que les signatures des fonctions.
+
+Donc j'ai modifié le parser C to JSON pour permettre de parser le nom des typedef.
+
+Maintenant les JSON sont réparti comme cela :
+- '__typedef__' : une liste de nom des typedef
+- '__function__' : comme avant (un dict des signatures des fcts)
+
+=> Exemple:
+```json
+{
+    "__typedef__": ["FloatPair", "StatusCode"],
+    "__function__": {
+        "my_add": { "restype": "unsigned char", "argtypes": ["float", "float", "float*"] },
+        ...
+    }
+}
+```
+
+Pourquoi ? pcque c'est plus clean et ça permet de :
+1. Charger toutes les specs dans un dict centralisé sans overwrite
+2. Valider les doublons (pb si 2 files ont la meme fonction export) -> bim err
+3. Utiliser les typedef pour normaliser les types (FloatPair* -> void*)
+
+Donc dans le loader.py:
+- _load_all_json_specs() lit tous les json et les merge avec validation
+- _normalize_str_type() remplace automatiquement tous les typedef pointers par void*
+  (pcque on peut pas avoir des typedef structs en ctypes, on passe juste un void*)
+- _attribute_types() itere sur __function__ maintenant au lieu de tout le dict
+
+////////////////////////////////////////////////////////
+

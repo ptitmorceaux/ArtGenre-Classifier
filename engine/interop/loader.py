@@ -2,7 +2,6 @@ import ctypes
 import os
 import sys
 import json
-import re
 
 
 
@@ -21,19 +20,20 @@ class _LibLoader: # Singleton Pattern Design
     _instance = None
     _isLoaded = False
     
+    # without spacing and pointer, for easier matching with normalized types
     _CTYPE_MAP = {
         "int32_t":         ctypes.c_int32,
         "uint32_t":        ctypes.c_uint32,
         "float":           ctypes.c_float,
         "char":            ctypes.c_byte,
-        "unsigned char":   ctypes.c_ubyte,
+        "unsignedchar":   ctypes.c_ubyte,
         
         "void*":           ctypes.c_void_p,
         "int32_t*":        ctypes.POINTER(ctypes.c_int32),
         "uint32_t*":       ctypes.POINTER(ctypes.c_uint32),
         "float*":          ctypes.POINTER(ctypes.c_float),
         "char*":           ctypes.c_char_p,
-        "unsigned char*":  ctypes.POINTER(ctypes.c_ubyte),
+        "unsignedchar*":  ctypes.POINTER(ctypes.c_ubyte),
         
         "void**":          ctypes.POINTER(ctypes.c_void_p),
         "float**":         ctypes.POINTER(ctypes.POINTER(ctypes.c_float)),
@@ -105,14 +105,20 @@ class _LibLoader: # Singleton Pattern Design
 
     def _normalize_str_type(self, type: str) -> str:
         """Normalize a C type string by removing 'const' and normalizing spaces."""
-        type = re.sub(r'\s+', ' ', type).strip()
-        type = type.replace("const ", "")
-        type = re.sub(r'\s*\*\s*', '*', type)
-        # if type in self._specs["__typedef__"]:
-        #     return "void*"
-        for typename in self._specs["__typedef__"]:
-            type = type.replace(f"{typename}*", "void*")
-        return type
+        type = type.strip()
+        if type.startswith("const "):
+            type = type[6:]
+        if type.endswith(" const"):
+            type = type[:-6]
+        
+        type = type.replace(" ", "")
+        pointer_count = type.count('*')
+        type = type.replace("*", "").strip()
+        
+        if type in self._specs["__typedef__"]:
+            return "void" + "*" * pointer_count
+        else:
+            return type + "*" * pointer_count
 
 
     def _get_ctype(self, type: str):
