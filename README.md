@@ -55,8 +55,6 @@ docker-compose up --build
 
 ## 🧪 Tests & Qualité du Code
 
-
-
 ### Vérification du code avec Ruff
 ```bash
 python -m ruff check
