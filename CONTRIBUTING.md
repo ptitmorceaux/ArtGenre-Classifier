@@ -41,7 +41,7 @@ Le titre de la PR doit résumer l'objectif global de la branche. Contrairement a
 1. **Clean history**: Use `git rebase -i` to rename or squash intermediate commits before merging.
 2. **Update branch**: Use `git pull --rebase origin main` to integrate the latest changes from `main`.
 3. **Update PR**: Use `git push --force-with-lease` after a rebase.
-4. **Merge**: Select the **Rebase and merge** option on GitHub.
+4. **Merge**: Select the **Merge** option on GitHub ("`Merge pull request`").
 
 ## 5. Conflict Resolution (Rebase)
 
@@ -52,4 +52,4 @@ In case of conflict during a rebase:
 3. Continue the rebase: `git rebase --continue` (do not create a commit).
 4. Cancel in case of error: `git rebase --abort`.
 5. **Update PR**: Once the rebase is complete, use `git push --force-with-lease` to synchronize the remote repository.
-6. **Merge**: Select the **Rebase and merge** option on GitHub.
+6. **Merge**: Select the **Merge** option on GitHub ("`Merge pull request`").
