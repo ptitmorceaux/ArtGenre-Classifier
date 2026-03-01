@@ -102,7 +102,26 @@ unsigned char multiplication_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     return RES_EXIT_SUCCESS;
 }
 
+unsigned char substraction_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
+    if (!a || !b || !res) return ERR_INVALID_PTR;
+    if (a->rows != b->rows || a->columns != b->columns) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status = allocate_2d_matrix_float32(a->rows, a->columns, res);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    Matrix* result = *res;
+    for (uint32_t i = 0; i < a->rows; i++) {
+        for (uint32_t j = 0; j < a->columns; j++) {
+            float a_ij, b_ij;
+            get_element_2d_matrix(a, i, j, &a_ij);
+            get_element_2d_matrix(b, i, j, &b_ij);
+            set_element_2d_matrix(result, i, j, a_ij - b_ij);
+        }
+    }
+    return RES_EXIT_SUCCESS;
+}
 /*===============================================================*/
+
 
 // FREE //
 
