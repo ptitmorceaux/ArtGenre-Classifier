@@ -40,8 +40,7 @@ unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
         
         unsigned char status = random_float(min, max, &m->data[i]);
         if (status != RES_EXIT_SUCCESS) {
-            free_matrix(m);
-            *matrix = NULL;
+            free_matrix(matrix);
             return status;
         }
     }
@@ -121,7 +120,7 @@ unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char scalar_multiply_2d_matrix(Matrix* matrix, float scalar, char is_addition) {
+unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition) {
     if (!matrix) return ERR_INVALID_PTR;
     
     for (uint32_t i = 0; i < matrix->rows; i++) {
@@ -139,9 +138,11 @@ unsigned char scalar_multiply_2d_matrix(Matrix* matrix, float scalar, char is_ad
 
 // FREE //
 
-unsigned char free_matrix(Matrix* matrix) {
+unsigned char free_matrix(Matrix** m) {
+    Matrix *matrix = *m;
     if (!matrix) return ERR_INVALID_PTR;
     if (matrix->data) free(matrix->data);
     free(matrix);
+    *m = NULL;
     return RES_EXIT_SUCCESS;
 }
