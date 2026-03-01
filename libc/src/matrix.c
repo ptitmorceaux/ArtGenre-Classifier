@@ -102,7 +102,7 @@ unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char add_sub_2d_matrix(Matrix* a, Matrix* b, char is_addition, Matrix** res) {
+unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     if (!a || !b || !res) return ERR_INVALID_PTR;
     if (a->rows != b->rows || a->columns != b->columns) return ERR_INVALID_MATRIX_DIMENSIONS;
 
@@ -115,23 +115,20 @@ unsigned char add_sub_2d_matrix(Matrix* a, Matrix* b, char is_addition, Matrix**
             float a_ij, b_ij;
             get_element_2d_matrix(a, i, j, &a_ij);
             get_element_2d_matrix(b, i, j, &b_ij);
-            set_element_2d_matrix(result, i, j, is_addition ? a_ij + b_ij : a_ij - b_ij);
+            set_element_2d_matrix(result, i, j, a_ij + b_ij);
         }
     }
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char scalar_multiply_2d_matrix(Matrix* matrix, float scalar, Matrix** res) {
-    if (!matrix || !res) return ERR_INVALID_PTR;
-    unsigned char status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, res);
-    if (status != RES_EXIT_SUCCESS) return status;
-
-    Matrix* result = *res;
+unsigned char scalar_multiply_2d_matrix(Matrix* matrix, float scalar, char is_addition) {
+    if (!matrix) return ERR_INVALID_PTR;
+    
     for (uint32_t i = 0; i < matrix->rows; i++) {
         for (uint32_t j = 0; j < matrix->columns; j++) {
             float value;
             get_element_2d_matrix(matrix, i, j, &value);
-            set_element_2d_matrix(result, i, j, value * scalar);
+            set_element_2d_matrix(matrix, i, j, is_addition ? value + scalar : value * scalar);
         }
     }
     return RES_EXIT_SUCCESS;
