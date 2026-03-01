@@ -9,6 +9,7 @@ const char* get_status_message(unsigned char code) {
         case ERR_MATH_DIV_BY_ZERO:  return "Division by Zero";
         case ERR_LENGTH_ZERO:       return "Length is Zero";
         case ERR_ALLOCATION_FAILED: return "Memory Allocation Failed";
+        case ERR_OUT_OF_BOUNDS:     return "Index Out of Bounds";
         default:                    return "Unknown Error";
     }
 }

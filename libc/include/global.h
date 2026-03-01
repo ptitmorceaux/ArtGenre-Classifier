@@ -21,6 +21,7 @@ typedef enum {
     ERR_MATH_DIV_BY_ZERO,
     ERR_LENGTH_ZERO,
     ERR_ALLOCATION_FAILED,
+    ERR_OUT_OF_BOUNDS,
 } StatusCode;
 
 
