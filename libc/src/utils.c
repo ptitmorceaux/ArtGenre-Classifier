@@ -4,13 +4,14 @@
 // status code to string
 const char* get_status_message(unsigned char code) {
     switch (code) {
-        case RES_EXIT_SUCCESS:      return "OK";
-        case ERR_INVALID_PTR:       return "Invalid Pointer";
-        case ERR_MATH_DIV_BY_ZERO:  return "Division by Zero";
-        case ERR_LENGTH_ZERO:       return "Length is Zero";
-        case ERR_ALLOCATION_FAILED: return "Memory Allocation Failed";
-        case ERR_OUT_OF_BOUNDS:     return "Index Out of Bounds";
-        default:                    return "Unknown Error";
+        case RES_EXIT_SUCCESS:              return "OK";
+        case ERR_INVALID_PTR:               return "Invalid Pointer";
+        case ERR_MATH_DIV_BY_ZERO:          return "Division by Zero";
+        case ERR_LENGTH_ZERO:               return "Length is Zero";
+        case ERR_ALLOCATION_FAILED:         return "Memory Allocation Failed";
+        case ERR_OUT_OF_BOUNDS:             return "Index Out of Bounds";
+        case ERR_INVALID_MATRIX_DIMENSIONS: return "Invalid Matrix Dimensions";
+        default:                            return "Unknown Error";
     }
 }
 

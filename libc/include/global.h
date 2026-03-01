@@ -22,6 +22,7 @@ typedef enum {
     ERR_LENGTH_ZERO,
     ERR_ALLOCATION_FAILED,
     ERR_OUT_OF_BOUNDS,
+    ERR_INVALID_MATRIX_DIMENSIONS,
 } StatusCode;
 
 

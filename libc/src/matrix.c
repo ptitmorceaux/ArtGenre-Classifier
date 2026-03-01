@@ -76,9 +76,31 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
 }
 
 
-// TODO: implement matrix operations (multiplication, addition, etc.) and corresponding tests (in pytest)
+// TODO: implement matrix operations (multiplication, "addition", transposé) and corresponding tests (in pytest)
 // INFO: https://www.geeksforgeeks.org/maths/matrix-operations/
 
+unsigned char multiplication_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
+    if (!a || !b || !res) return ERR_INVALID_PTR;
+    if (a->columns != b->rows) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status = allocate_2d_matrix_float32(a->rows, b->columns, res);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    Matrix* result = *res;
+    for (uint32_t i = 0; i < a->rows; i++) {
+        for (uint32_t j = 0; j < b->columns; j++) {
+            float sum = 0;
+            for (uint32_t k = 0; k < a->columns; k++) {
+                float a_ik, b_kj;
+                get_element_2d_matrix(a, i, k, &a_ik);
+                get_element_2d_matrix(b, k, j, &b_kj);
+                sum += a_ik * b_kj;
+            }
+            set_element_2d_matrix(result, i, j, sum);
+        }
+    }
+    return RES_EXIT_SUCCESS;
+}
 
 /*===============================================================*/
 
