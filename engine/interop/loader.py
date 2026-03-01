@@ -26,14 +26,14 @@ class _LibLoader: # Singleton Pattern Design
         "uint32_t":        ctypes.c_uint32,
         "float":           ctypes.c_float,
         "char":            ctypes.c_byte,
-        "unsignedchar":   ctypes.c_ubyte,
+        "unsignedchar":    ctypes.c_ubyte,
         
         "void*":           ctypes.c_void_p,
         "int32_t*":        ctypes.POINTER(ctypes.c_int32),
         "uint32_t*":       ctypes.POINTER(ctypes.c_uint32),
         "float*":          ctypes.POINTER(ctypes.c_float),
         "char*":           ctypes.c_char_p,
-        "unsignedchar*":  ctypes.POINTER(ctypes.c_ubyte),
+        "unsignedchar*":   ctypes.POINTER(ctypes.c_ubyte),
         
         "void**":          ctypes.POINTER(ctypes.c_void_p),
         "float**":         ctypes.POINTER(ctypes.POINTER(ctypes.c_float)),
