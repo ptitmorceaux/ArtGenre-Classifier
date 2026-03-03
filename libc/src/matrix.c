@@ -179,6 +179,30 @@ unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addit
     return RES_EXIT_SUCCESS;
 }
 
+unsigned char transpose_2d_matrix(Matrix* m, Matrix** res) {
+    if (!m || !m) return ERR_INVALID_PTR;
+    unsigned char status = allocate_2d_matrix_float32(m->rows, m->columns, res);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    for (unit32_t i = 0; i < m->rows; i+++) {
+        for(unit32_t j = 0; j < m->rows; j+++) {
+            float value;
+            status = get_element_2d_matrix(m, i, j, &value);
+            if (status != RES_EXIT_SUCCESS) {
+                free_matrix(res);
+                return status;
+            }
+            status = set_element_2d_matrix(res, j, i, value);
+            if (status != RES_EXIT_SUCCESS) {
+                free_matrix(res);
+                return status;
+            }
+        }    
+    }
+    
+    return RES_EXIT_SUCCESS;
+}
+
 /*===============================================================*/
 
 
