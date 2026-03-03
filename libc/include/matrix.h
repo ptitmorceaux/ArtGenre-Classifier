@@ -28,5 +28,6 @@ DLLEXPORT unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** m
 DLLEXPORT unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res);
 DLLEXPORT unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** res);
 DLLEXPORT unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addition);
+DLLEXPORT unsigned char transpose_2d_matrix(Matrix* m, Matrix** res); 
  
 #endif 
