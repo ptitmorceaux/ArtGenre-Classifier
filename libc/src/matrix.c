@@ -53,7 +53,7 @@ unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
 // OPERATIONS
 
 uint32_t get_index_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col) {
-    return row * matrix->columns + col;
+    return (row *matrix->row_stride + col * matrix->col_stride) / sizeof(float);
 }
 
 unsigned char get_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float* res) {
