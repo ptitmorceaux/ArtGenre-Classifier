@@ -45,6 +45,22 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
 
 // INIT
 
+unsigned char init_values_2d_matrix(float* values, Matrix** matrix) {
+    if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
+    if (!values) {
+        free_matrix(matrix);
+        return ERR_INVALID_PTR;
+    }
+    
+    Matrix* m = *matrix;
+    
+    for (uint32_t i = 0; i < m->rows * m->columns; i++) {
+        m->data[i] = values[i];
+    }
+    
+    return RES_EXIT_SUCCESS;
+}
+
 unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
     Matrix* m = *matrix;
