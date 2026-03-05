@@ -21,8 +21,8 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
 
     matrix->rows = rows;
     matrix->columns = columns;
-    matrix->row_stride = rows * sizeof(float);
-    matrix->col_stride = sizeof(float);
+    matrix->row_stride = rows;
+    matrix->col_stride = 1;
 
     *res_matrix = matrix;
     return RES_EXIT_SUCCESS; 
@@ -53,7 +53,7 @@ unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
 // OPERATIONS
 
 uint32_t get_index_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col) {
-    return (row * matrix->row_stride + col * matrix->col_stride) / sizeof(float);
+    return row * matrix->row_stride + col * matrix->col_stride;
 }
 
 unsigned char get_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float* res) {
@@ -61,7 +61,7 @@ unsigned char get_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
     if (row >= matrix->rows || col >= matrix->columns) return ERR_OUT_OF_BOUNDS;
     
     uint32_t index = get_index_2d_matrix(matrix, row, col);
-    *res = matrix->data[index]; 
+    *res = matrix->data[index];
     return RES_EXIT_SUCCESS;
 }
 
