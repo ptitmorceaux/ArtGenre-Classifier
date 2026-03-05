@@ -9,10 +9,11 @@
 // 2D matrix of float32 values (stored in row-major order) 
 typedef struct {
     float* data;
+    char owns_data;
     uint32_t rows;
     uint32_t columns;
     uint32_t row_stride;
-    uint32_t col_stride; 
+    uint32_t col_stride;
 } Matrix;
 
 

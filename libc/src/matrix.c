@@ -5,7 +5,7 @@
 
 // ALLOCATION
 
-unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix** res_matrix) {
+unsigned char allocate_2d_matrix_float32_without_data(uint32_t rows, uint32_t columns, Matrix** res_matrix) {
     if (!res_matrix) return ERR_INVALID_PTR;
     *res_matrix = NULL;
     if (rows == 0 || columns == 0) return ERR_LENGTH_ZERO;
@@ -13,18 +13,31 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
     Matrix* matrix = (Matrix*) malloc(sizeof(Matrix));
     if (!matrix) return ERR_ALLOCATION_FAILED;
     
-    matrix->data = (float*) malloc(rows * columns * sizeof(float));
-    if (!matrix->data) {
-        free(matrix);
-        return ERR_ALLOCATION_FAILED;
-    }
-
+    matrix->data = NULL;
+    matrix->owns_data = false;
     matrix->rows = rows;
     matrix->columns = columns;
-    matrix->row_stride = rows;
+    matrix->row_stride = columns;
     matrix->col_stride = 1;
 
     *res_matrix = matrix;
+    return RES_EXIT_SUCCESS; 
+}
+
+unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix** res_matrix) {
+    
+    unsigned char status = allocate_2d_matrix_float32_without_data(rows, columns, res_matrix);
+    if (status != RES_EXIT_SUCCESS) return status;
+    
+    Matrix* matrix = *res_matrix;
+    
+    matrix->data = (float*) malloc(rows * columns * sizeof(float));
+    if (!matrix->data) {
+        free_matrix(res_matrix);
+        return ERR_ALLOCATION_FAILED;
+    }
+    matrix->owns_data = true;
+    
     return RES_EXIT_SUCCESS; 
 }
 
@@ -44,6 +57,22 @@ unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
             return status;
         }
     }
+    return RES_EXIT_SUCCESS;
+}
+
+unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res) {
+    if (!matrix || !matrix->data || !res) return ERR_INVALID_PTR;
+    
+    unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, res);
+    if (status != RES_EXIT_SUCCESS) return status;
+    
+    Matrix *transposed = *res;
+    
+    transposed->data = matrix->data;
+    transposed->owns_data = false;
+    transposed->row_stride = matrix->col_stride;
+    transposed->col_stride = matrix->row_stride;
+    
     return RES_EXIT_SUCCESS;
 }
 
@@ -74,9 +103,7 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
     return RES_EXIT_SUCCESS;
 }
 
-
-// TODO: implement matrix operations (multiplication, "addition", transposé) and corresponding tests (in pytest)
-// INFO: https://www.geeksforgeeks.org/maths/matrix-operations/
+// Matrix Operations
 
 unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     if (!a || !b || !res) return ERR_INVALID_PTR;
@@ -179,30 +206,6 @@ unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addit
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char transpose_2d_matrix(Matrix* m, Matrix** res) {
-    if (!m || !res) return ERR_INVALID_PTR;
-    unsigned char status = allocate_2d_matrix_float32(m->rows, m->columns, res);
-    if (status != RES_EXIT_SUCCESS) return status;
-
-    for (uint32_t i = 0; i < m->rows; i++) {
-        for(uint32_t j = 0; j < m->columns; j++) {
-            float value;
-            status = get_element_2d_matrix(m, i, j, &value);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(res);
-                return status;
-            }
-            status = set_element_2d_matrix(*res, j, i, value);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(res);
-                return status;
-            }
-        }    
-    }
-    
-    return RES_EXIT_SUCCESS;
-}
-
 /*===============================================================*/
 
 
@@ -211,7 +214,7 @@ unsigned char transpose_2d_matrix(Matrix* m, Matrix** res) {
 unsigned char free_matrix(Matrix** m) {
     Matrix *matrix = *m;
     if (!matrix) return ERR_INVALID_PTR;
-    if (matrix->data) free(matrix->data);
+    if (matrix->data && matrix->owns_data) free(matrix->data);
     free(matrix);
     *m = NULL;
     return RES_EXIT_SUCCESS;
