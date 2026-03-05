@@ -119,6 +119,8 @@ unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
             for (uint32_t k = 0; k < a->columns; k++) {
                 float a_ik, b_kj;
 
+                // TODO: fix later as it is not optimal to check status at each iteration
+
                 status = get_element_2d_matrix(a, i, k, &a_ik);
                 if (status != RES_EXIT_SUCCESS) {
                     free_matrix(res);
