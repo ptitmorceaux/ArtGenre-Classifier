@@ -10,11 +10,7 @@ def get_float32_array_from_py_list(data: list[float | int], prefix_errmsg: str =
         raise TypeError(f"{prefix_err}: `data` must be a non-empty list of floats")
     
     length = len(data)
-    try:
-        Loader.check_ctype(length, ctypes.c_uint32, prefix_err)
-    except Exception as e:
-        raise TypeError(f"{prefix_err}: WARNING: maybe the size of the list is too large to fit in a uint32 ?") from e
-    
+
     try:
         ArrayType = ctypes.c_float * length
         c_array = ArrayType(*[ctypes.c_float(x) for x in data])
