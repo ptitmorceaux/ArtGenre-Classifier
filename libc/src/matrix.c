@@ -95,7 +95,7 @@ unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
 
 /*===============================================================*/
 
-// OPERATIONS
+// GETTER / SETTER
 
 uint32_t get_index_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col) {
     return row * matrix->row_stride + col * matrix->col_stride;
@@ -119,7 +119,9 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
     return RES_EXIT_SUCCESS;
 }
 
-// Matrix Operations
+/*===============================================================*/
+
+// MATRIX OPERATIONS
 
 unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     if (!a || !b || !res) return ERR_INVALID_PTR;
@@ -225,7 +227,6 @@ unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addit
 }
 
 /*===============================================================*/
-
 
 // FREE //
 
