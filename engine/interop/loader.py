@@ -4,7 +4,6 @@ import sys
 import json
 
 
-
 def require_loaded(func):
     """Décorateur qui vérifie que la lib est bien load avant d'executer une func"""
     def wrapper(*args, **kwargs):
@@ -12,7 +11,6 @@ def require_loaded(func):
             raise RuntimeError(f"{func.__name__}(): Library not loaded. Please call _LibLoader.loadLibrary() first.")
         return func(*args, **kwargs)
     return wrapper
-
 
 
 class _LibLoader: # Singleton Pattern Design
