@@ -14,7 +14,7 @@ unsigned char allocate_2d_matrix_float32_without_data(uint32_t rows, uint32_t co
     if (!matrix) return ERR_ALLOCATION_FAILED;
     
     matrix->data = NULL;
-    matrix->owns_data = false;
+    // matrix->owns_data = false;
     matrix->rows = rows;
     matrix->columns = columns;
     matrix->row_stride = columns;
@@ -36,7 +36,7 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
         free_matrix(res_matrix);
         return ERR_ALLOCATION_FAILED;
     }
-    matrix->owns_data = true;
+    // matrix->owns_data = true;
     
     return RES_EXIT_SUCCESS; 
 }
@@ -76,21 +76,21 @@ unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res) {
-    if (!matrix || !matrix->data || !res) return ERR_INVALID_PTR;
+// unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res) {
+//     if (!matrix || !matrix->data || !res) return ERR_INVALID_PTR;
     
-    unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, res);
-    if (status != RES_EXIT_SUCCESS) return status;
+//     unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, res);
+//     if (status != RES_EXIT_SUCCESS) return status;
     
-    Matrix *transposed = *res;
+//     Matrix *transposed = *res;
     
-    transposed->data = matrix->data;
-    transposed->owns_data = false;
-    transposed->row_stride = matrix->col_stride;
-    transposed->col_stride = matrix->row_stride;
+//     transposed->data = matrix->data;
+//     transposed->owns_data = false;
+//     transposed->row_stride = matrix->col_stride;
+//     transposed->col_stride = matrix->row_stride;
     
-    return RES_EXIT_SUCCESS;
-}
+//     return RES_EXIT_SUCCESS;
+// }
 
 
 /*===============================================================*/
@@ -232,7 +232,7 @@ unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addit
 unsigned char free_matrix(Matrix** m) {
     Matrix *matrix = *m;
     if (!matrix) return ERR_INVALID_PTR;
-    if (matrix->data && matrix->owns_data) free(matrix->data);
+    free(matrix->data); // if (matrix->data && matrix->owns_data) free(matrix->data);
     free(matrix);
     *m = NULL;
     return RES_EXIT_SUCCESS;
