@@ -45,7 +45,7 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
 
 // INIT
 
-unsigned char init_values_2d_matrix(float* values, Matrix** matrix) {
+unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
     if (!values) {
         free_matrix(matrix);

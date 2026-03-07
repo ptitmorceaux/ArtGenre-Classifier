@@ -23,7 +23,7 @@ DLLEXPORT unsigned char free_matrix(Matrix** m);
 DLLEXPORT unsigned char allocate_2d_matrix_float32_without_data(uint32_t rows, uint32_t columns, Matrix** res_matrix);
 DLLEXPORT unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix** res_matrix);
 // INIT / GETTER / SETTER
-DLLEXPORT unsigned char init_values_2d_matrix(float* values, Matrix** matrix);
+DLLEXPORT unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix);
 DLLEXPORT unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix);
 DLLEXPORT unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res);
 DLLEXPORT unsigned char get_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float* res);
