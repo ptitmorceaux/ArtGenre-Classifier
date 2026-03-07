@@ -1,9 +1,10 @@
 import ctypes
 from engine.interop.loader import Loader
 
-def get_c_array_from_py_list(data: list[float | int], prefix_errmsg: str = "") -> dict[str, ctypes.Array | int]:
+
+def get_float32_array_from_py_list(data: list[float | int], prefix_errmsg: str = "") -> dict[str, ctypes.Array | int]:
     """Convertit une liste Python de floats en un tableau C de float32 et retourne un pointeur vers ce tableau ainsi que sa longueur."""
-    prefix_err = f"{prefix_errmsg}: get_c_array_from_py_list()" if prefix_errmsg else "get_c_array_from_py_list()"
+    prefix_err = f"{prefix_errmsg}: get_float32_array_from_py_list()" if prefix_errmsg else "get_float32_array_from_py_list()"
     
     if not data or not isinstance(data, list):
         raise TypeError(f"{prefix_err}: `data` must be a non-empty list of floats")
