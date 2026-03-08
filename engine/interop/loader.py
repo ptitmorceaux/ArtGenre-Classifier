@@ -37,7 +37,7 @@ class _LibLoader: # Singleton Pattern Design
         "float**":         ctypes.POINTER(ctypes.POINTER(ctypes.c_float)),
     }
 
-    def __new__(cls):
+    def __new__(cls)-> "_LibLoader":
         if _LibLoader._instance is None:
             _LibLoader._instance = super(_LibLoader, cls).__new__(cls)
         return _LibLoader._instance
@@ -45,7 +45,7 @@ class _LibLoader: # Singleton Pattern Design
 
     #====== Méthode privée - Init ======#
 
-    def _set_lib_name(self, lib_name: str):
+    def _set_lib_name(self, lib_name: str) -> str:
         lib_name = lib_name.replace("\\", "/").strip()
         if lib_name.endswith(".dll"):
             lib_name = lib_name[:-4]
@@ -55,7 +55,7 @@ class _LibLoader: # Singleton Pattern Design
             lib_name = lib_name[:-6]
         return lib_name
 
-    def _set_path(self, path: str):
+    def _set_path(self, path: str) -> str:
         path = path.strip()
         path = os.path.abspath(path)
         
@@ -64,7 +64,7 @@ class _LibLoader: # Singleton Pattern Design
         return path
 
 
-    def _load_library(self):
+    def _load_library(self) -> None:
         """Charge la lib partagée en fct de l'os (.dll, .so, .dylib)"""
         lib_path = os.path.join(self._build_folder, f"{self._lib_name}.{self.ext}")
         
@@ -77,7 +77,7 @@ class _LibLoader: # Singleton Pattern Design
             raise OSError(f"_LibLoader: Failed to load library at `{lib_path}` ==> {e}")
     
 
-    def _load_all_json_specs(self):
+    def _load_all_json_specs(self) -> None:
         """Charge tous les fichiers json du folder specs"""
         for filename in os.listdir(self._specs_folder):
             if filename.endswith(".json"):
@@ -119,7 +119,7 @@ class _LibLoader: # Singleton Pattern Design
             return type + "*" * pointer_count
 
 
-    def _get_ctype(self, type: str):
+    def _get_ctype(self, type: str) -> ctypes._SimpleCData:
         """Return le type ctypes correspondant à une string"""
         type = self._normalize_str_type(type)
         res = _LibLoader._CTYPE_MAP.get(type)
@@ -128,7 +128,7 @@ class _LibLoader: # Singleton Pattern Design
         return res
 
 
-    def _attribute_types(self):
+    def _attribute_types(self) -> None:
         """Configure les types ctypes pour chaque fonction"""
         for name, info in self._specs["__function__"].items():
             try:
@@ -153,13 +153,13 @@ class _LibLoader: # Singleton Pattern Design
 
     #====== Méthode public - Init ======#
 
-    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int = None):
+    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int = None) -> None:
         
         if _LibLoader._isLoaded:
             raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
         
         if seed is not None:
-            self.check_ctype(seed, ctypes.c_uint32, "_LibLoader.loadLibrary(): `seed` must be a uint32 integer when `set_seed_randomly` is False")
+            self.check_primitive_values_range(seed, ctypes.c_uint32, "_LibLoader.loadLibrary(): `seed` must be a uint32 integer when `set_seed_randomly` is False")
         
         self._lib = None
         self._specs = dict()
@@ -190,7 +190,7 @@ class _LibLoader: # Singleton Pattern Design
 
     @staticmethod
     def is_integer(n) -> bool:
-        return isinstance(n, int) and not isinstance(n, bool)
+        return isinstance(n, (int, bool))
 
     @staticmethod
     def is_int32(n: int) -> bool:
@@ -207,63 +207,71 @@ class _LibLoader: # Singleton Pattern Design
     @staticmethod
     def is_ubyte(n: int) -> bool:
         return _LibLoader.is_integer(n) and 0 <= n <= 255
-    
+
     @staticmethod
     def is_float(n) -> bool:
-        return isinstance(n, (int, float)) and not isinstance(n, bool)
+        return isinstance(n, (float, int, bool))
+    
+    @staticmethod
+    def is_float32(n) -> bool:
+        return _LibLoader.is_float(n) and -3.4028235e+38 <= n <= 3.4028235e+38
 
 
     @staticmethod
-    def check_ctype(value, ctype, prefix_errmsg: str = ""):
-        """Vérifie qu'une valeur correspond au type ctypes attendu"""
-        prefix_err = f"{prefix_errmsg}: _LibLoader.check_ctype()" if prefix_errmsg else "_LibLoader.check_ctype()"
+    def check_primitive_values_range(value, ctype: ctypes._SimpleCData, prefix_errmsg: str = "") -> None:
+        """Vérifie que la valeur est dans la range autorisée pour ce type"""
+        prefix_err = f"{prefix_errmsg}: _LibLoader.check_primitive_values_range()" if prefix_errmsg else "_LibLoader.check_primitive_values_range()"
 
         check_map = {
-            ctypes.c_byte:   {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_byte, "range": "-128 to 127 (byte)"},
-            ctypes.c_ubyte:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_ubyte, "range": "0 to 255 (ubyte)"},
-            ctypes.c_int32:  {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_int32, "range": "-2147483648 to 2147483647 (int32)"},
-            ctypes.c_uint32: {"type_check": _LibLoader.is_integer, "type": "integer", "range_check": _LibLoader.is_uint32, "range": "0 to 4294967295 (uint32)"},
-            ctypes.c_float:  {"type_check": _LibLoader.is_float, "type": "float"},
+            ctypes.c_byte:   {"range_check": _LibLoader.is_byte, "range": "-128 to 127 (byte)"},
+            ctypes.c_ubyte:  {"range_check": _LibLoader.is_ubyte, "range": "0 to 255 (ubyte)"},
+            ctypes.c_int32:  {"range_check": _LibLoader.is_int32, "range": "-2147483648 to 2147483647 (int32)"},
+            ctypes.c_uint32: {"range_check": _LibLoader.is_uint32, "range": "0 to 4294967295 (uint32)"},
+            ctypes.c_float:  {"range_check": _LibLoader.is_float32, "range": "-3.4028235e+38 to 3.4028235e+38 (float32)"},
         }
 
-        if ctype not in check_map:
-            raise TypeError(f"{prefix_err}: Unsupported ctype for check: {ctype}")
-        
-        if not check_map[ctype]["type_check"](value):
-            raise TypeError(f"{prefix_err}: must be of type {check_map[ctype]['type']}, got {type(value)}")
-        
-        if "range_check" in check_map[ctype].keys() and not check_map[ctype]["range_check"](value):
-            range_err = f": {check_map[ctype]['range']}" if "range" in check_map[ctype] else ""
-            raise ValueError(f"{prefix_err}: value {value} out of bounds{range_err}")
+        if not ctype in check_map.keys():
+            raise TypeError(f"{prefix_err}: No range check defined for type {ctype}")
+
+        if not check_map[ctype]["range_check"](value):
+            raise ValueError(f"{prefix_err}: value {value} out of bounds for type {ctype.__name__}")
 
 
     @require_loaded
-    def check_status(self, status_code: int, prefix_errmsg: str = ""):
+    def check_status(self, status_code: int, prefix_errmsg: str = "") -> None:
         """Vérifie le status code d'une fonction C et lève une exception si besoin"""
         prefix_err = f"{prefix_errmsg}: _LibLoader.check_status()" if prefix_errmsg else "_LibLoader.check_status()"
-        _LibLoader.check_ctype(status_code, ctypes.c_ubyte, prefix_err)
+        _LibLoader.check_primitive_values_range(status_code, ctypes.c_ubyte, prefix_err)
         if status_code != 0:
             errmsg = str(self._lib.get_status_message(status_code).decode('utf-8'))
             raise RuntimeError(f"{prefix_err}: {errmsg}")
 
 
     @require_loaded
-    def call(self, func_name: str, *args, prefix_errmsg: str = ""):
+    def call(self, func_name: str, *args, prefix_errmsg: str = "") -> None:
         """Appel une fonction C et vérifie automatiquement son status code"""
-        prefix_err = f"{prefix_errmsg}: _LibLoader.call({func_name})" if prefix_errmsg else f"_LibLoader.call({func_name})"
+        prefix_err = f"{prefix_errmsg}: _LibLoader.call(`{func_name}`)" if prefix_errmsg else f"_LibLoader.call(`{func_name}`)"
+        
         if func_name not in self._specs["__function__"].keys():
             raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the JSON specs (missing or incorrect)")
+        
         try:
             func = getattr(self._lib, func_name)
         except AttributeError as e:
             raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the library: {e}")
-        status = func(*args)
+
+        try:
+            status = func(*args)
+        except Exception as e:
+            raise RuntimeError(f"{prefix_err}: {e}")
+        
         self.check_status(status, prefix_err)
+
         return status
 
 
     @require_loaded
-    def set_seed(self, seed: int = None):
+    def set_seed(self, seed: int = None) -> None:
         """
         Set the random seed in the C library :
         if `seed` is None, a random seed will be set
@@ -273,7 +281,7 @@ class _LibLoader: # Singleton Pattern Design
             func = ["set_randomly_seed"]
         else:
             prefix_errmsg = "_LibLoader.set_seed() -> call `set_seed` to set a specific seed"
-            _LibLoader.check_ctype(seed, ctypes.c_uint32, prefix_errmsg)
+            _LibLoader.check_primitive_values_range(seed, ctypes.c_uint32, prefix_errmsg)
             func = ["set_seed", seed]
         
         self.call(*func, prefix_errmsg=prefix_errmsg)
