@@ -198,31 +198,13 @@ unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addition) {
-    if (!m || !*m) return ERR_INVALID_PTR;
+unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition) {
+    if (!matrix || !matrix->data) return ERR_INVALID_PTR;
 
-    Matrix* matrix = *m;
-    Matrix* tmp = NULL;
-    unsigned char status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, &tmp);
-    if (status != RES_EXIT_SUCCESS) return status;
-
-    for (uint32_t i = 0; i < matrix->rows; i++) {
-        for (uint32_t j = 0; j < matrix->columns; j++) {
-            float value;
-            status = get_element_2d_matrix(matrix, i, j, &value);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(&tmp);
-                return status;
-            }
-            status = set_element_2d_matrix(tmp, i, j, is_addition ? value + scalar : value * scalar);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(&tmp);
-                return status;
-            }
-        }
+    for (uint32_t i = 0; i < matrix->rows * matrix->columns; i++) {
+        matrix->data[i] = is_addition ? matrix->data[i] + scalar : matrix->data[i] * scalar;
     }
-    free_matrix(m);
-    *m = tmp;
+    
     return RES_EXIT_SUCCESS;
 }
 
@@ -230,11 +212,11 @@ unsigned char scalar_operation_2d_matrix(Matrix** m, float scalar, char is_addit
 
 // FREE //
 
-unsigned char free_matrix(Matrix** m) {
-    Matrix *matrix = *m;
-    if (!matrix) return ERR_INVALID_PTR;
-    free(matrix->data); // if (matrix->data && matrix->owns_data) free(matrix->data);
-    free(matrix);
-    *m = NULL;
+unsigned char free_matrix(Matrix** matrix) {
+    Matrix *m = *matrix;
+    if (!m) return ERR_INVALID_PTR;
+    free(m->data); // if (m->data && m->owns_data) free(m->data);
+    free(m);
+    *matrix = NULL;
     return RES_EXIT_SUCCESS;
 }
