@@ -230,7 +230,7 @@ class _LibLoader: # Singleton Pattern Design
             ctypes.c_float:  {"type_check": _LibLoader.is_float,   "type_name": "float",   "range_check": _LibLoader.is_float32, "range": "-3.4028235e+38 to 3.4028235e+38 (float32)"},
         }
 
-        if not ctype in check_map.keys():
+        if ctype not in check_map.keys():
             raise TypeError(f"{prefix_err}: No range check defined for type {ctype}")
         
         if not check_map[ctype]["type_check"](value):
