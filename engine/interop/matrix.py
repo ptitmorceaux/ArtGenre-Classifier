@@ -1,5 +1,5 @@
+# ruff:noqa
 import ctypes
-
 import numpy as np
 from engine.interop.loader import Loader
 import engine.interop.array as C_Array
