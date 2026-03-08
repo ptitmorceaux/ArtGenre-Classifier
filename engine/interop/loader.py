@@ -223,15 +223,18 @@ class _LibLoader: # Singleton Pattern Design
         prefix_err = f"{prefix_errmsg}: _LibLoader.check_primitive_values_range()" if prefix_errmsg else "_LibLoader.check_primitive_values_range()"
 
         check_map = {
-            ctypes.c_byte:   {"range_check": _LibLoader.is_byte, "range": "-128 to 127 (byte)"},
-            ctypes.c_ubyte:  {"range_check": _LibLoader.is_ubyte, "range": "0 to 255 (ubyte)"},
-            ctypes.c_int32:  {"range_check": _LibLoader.is_int32, "range": "-2147483648 to 2147483647 (int32)"},
-            ctypes.c_uint32: {"range_check": _LibLoader.is_uint32, "range": "0 to 4294967295 (uint32)"},
-            ctypes.c_float:  {"range_check": _LibLoader.is_float32, "range": "-3.4028235e+38 to 3.4028235e+38 (float32)"},
+            ctypes.c_byte:   {"type_check": _LibLoader.is_integer, "type_name": "integer", "range_check": _LibLoader.is_byte,    "range": "-128 to 127 (byte)"},
+            ctypes.c_ubyte:  {"type_check": _LibLoader.is_integer, "type_name": "integer", "range_check": _LibLoader.is_ubyte,   "range": "0 to 255 (ubyte)"},
+            ctypes.c_int32:  {"type_check": _LibLoader.is_integer, "type_name": "integer", "range_check": _LibLoader.is_int32,   "range": "-2147483648 to 2147483647 (int32)"},
+            ctypes.c_uint32: {"type_check": _LibLoader.is_integer, "type_name": "integer", "range_check": _LibLoader.is_uint32,  "range": "0 to 4294967295 (uint32)"},
+            ctypes.c_float:  {"type_check": _LibLoader.is_float,   "type_name": "float",   "range_check": _LibLoader.is_float32, "range": "-3.4028235e+38 to 3.4028235e+38 (float32)"},
         }
 
         if not ctype in check_map.keys():
             raise TypeError(f"{prefix_err}: No range check defined for type {ctype}")
+        
+        if not check_map[ctype]["type_check"](value):
+            raise TypeError(f"{prefix_err}: value {value} must be of type {check_map[ctype]['type_name']}")
 
         if not check_map[ctype]["range_check"](value):
             raise ValueError(f"{prefix_err}: value {value} out of bounds for type {ctype.__name__}")

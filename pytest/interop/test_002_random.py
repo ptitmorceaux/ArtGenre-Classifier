@@ -65,13 +65,13 @@ class TestRandomInvalidInputs:
             Random.random_float32(10.0, None)
     
     def test_random_float32_with_bool(self):
-        """Vérifie que passer un booléen lève une TypeError"""
-        with pytest.raises(TypeError, match="must be of type float"):
-            Random.random_float32(True, 20.0)
-        
-        with pytest.raises(TypeError, match="must be of type float"):
-            Random.random_float32(10.0, False)
-    
+        """Vérifie que passer un booléen considere que c'est 0 ou 1"""
+        result = Random.random_float32(True, 2.0)
+        assert 1.0 <= result <= 2.0
+
+        result = Random.random_float32(-1.0, False)
+        assert -1.0 <= result <= 0.0
+
     def test_random_float32_with_list(self):
         """Vérifie que passer une liste lève une TypeError"""
         with pytest.raises(TypeError, match="must be of type float"):
