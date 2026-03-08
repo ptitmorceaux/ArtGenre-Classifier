@@ -1,5 +1,4 @@
 import ctypes
-from engine.interop.loader import Loader
 
 
 def get_float32_array_from_py_list(data: list[float | int], prefix_errmsg: str = "") -> dict[ctypes.Array, int]:
