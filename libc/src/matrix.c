@@ -123,14 +123,20 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
 
 // MATRIX OPERATIONS
 
-unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
-    if (!a || !b || !res) return ERR_INVALID_PTR;
+unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** result) {
+    if (!a || !b || !result) return ERR_INVALID_PTR;
     if (a->columns != b->rows) return ERR_INVALID_MATRIX_DIMENSIONS;
+    if (*result && ((*result)->rows != a->rows || (*result)->columns != b->columns)) return ERR_INVALID_MATRIX_DIMENSIONS;
 
-    unsigned char status = allocate_2d_matrix_float32(a->rows, b->columns, res);
-    if (status != RES_EXIT_SUCCESS) return status;
+    unsigned char status;
 
-    Matrix* result = *res;
+    if (*result == NULL) {
+        status = allocate_2d_matrix_float32(a->rows, b->columns, result);
+        if (status != RES_EXIT_SUCCESS) return status;
+    }
+
+    Matrix* res = *result;
+    
     for (uint32_t i = 0; i < a->rows; i++) {
         for (uint32_t j = 0; j < b->columns; j++) {
             float sum = 0;
@@ -141,22 +147,22 @@ unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
 
                 status = get_element_2d_matrix(a, i, k, &a_ik);
                 if (status != RES_EXIT_SUCCESS) {
-                    free_matrix(res);
+                    free_matrix(result);
                     return status;
                 }
 
                 status = get_element_2d_matrix(b, k, j, &b_kj);
                 if (status != RES_EXIT_SUCCESS) {
-                    free_matrix(res);
+                    free_matrix(result);
                     return status;
                 }
 
                 sum += a_ik * b_kj;
             }
 
-            status = set_element_2d_matrix(result, i, j, sum);
+            status = set_element_2d_matrix(res, i, j, sum);
             if (status != RES_EXIT_SUCCESS) {
-                free_matrix(res);
+                free_matrix(result);
                 return status;
             }
         }
@@ -164,45 +170,43 @@ unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** res) {
-    if (!a || !b || !res) return ERR_INVALID_PTR;
+
+unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** result) {
+    if (!a || !b || !result) return ERR_INVALID_PTR;
     if (a->rows != b->rows || a->columns != b->columns) return ERR_INVALID_MATRIX_DIMENSIONS;
+    if (*result && ((*result)->rows != a->rows || (*result)->columns != a->columns)) return ERR_INVALID_MATRIX_DIMENSIONS;
 
-    unsigned char status = allocate_2d_matrix_float32(a->rows, a->columns, res);
-    if (status != RES_EXIT_SUCCESS) return status;
+    unsigned char status;
 
-    Matrix* result = *res;
+    if (*result == NULL) {
+        status = allocate_2d_matrix_float32(a->rows, a->columns, result);
+        if (status != RES_EXIT_SUCCESS) return status;
+    }
+
+    Matrix* res = *result;
+    
     for (uint32_t i = 0; i < a->rows; i++) {
-        for (uint32_t j = 0; j < a->columns; j++) {
-            float a_ij, b_ij;
-
-            status = get_element_2d_matrix(a, i, j, &a_ij);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(res);
-                return status;
-            }
-
-            status = get_element_2d_matrix(b, i, j, &b_ij);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(res);
-                return status;
-            }
-
-            status = set_element_2d_matrix(result, i, j, a_ij + b_ij);
-            if (status != RES_EXIT_SUCCESS) {
-                free_matrix(res);
-                return status;
-            }
-        }
+        res->data[i] = a->data[i] + b->data[i];
     }
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition) {
-    if (!matrix || !matrix->data) return ERR_INVALID_PTR;
+
+unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition, Matrix** result) {
+    if (!result || !matrix || !matrix->data) return ERR_INVALID_PTR;
+    if (*result && ((*result)->rows != matrix->rows || (*result)->columns != matrix->columns)) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status;
+
+    if (*result == NULL) {
+        unsigned char status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, result);
+        if (status != RES_EXIT_SUCCESS) return status;
+    }
+
+    Matrix* res = *result;
 
     for (uint32_t i = 0; i < matrix->rows * matrix->columns; i++) {
-        matrix->data[i] = is_addition ? matrix->data[i] + scalar : matrix->data[i] * scalar;
+        res->data[i] = is_addition ? matrix->data[i] + scalar : matrix->data[i] * scalar;
     }
     
     return RES_EXIT_SUCCESS;

@@ -29,9 +29,9 @@ DLLEXPORT unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** m
 DLLEXPORT unsigned char get_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float* res);
 DLLEXPORT unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float value);
 // OPERATIONS
-DLLEXPORT unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** res);
-DLLEXPORT unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** res);
-DLLEXPORT unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition);
+DLLEXPORT unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** result);
+DLLEXPORT unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** result);
+DLLEXPORT unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition, Matrix** result);
 
 
 #endif 
