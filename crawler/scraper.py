@@ -19,10 +19,12 @@ DATASET_DIR = os.path.join(os.path.dirname(__file__), '..', 'dataset')
 
 
 def setup_driver():
+    """Configure et retourne un driver Selenium pour Chrome."""
     options = webdriver.ChromeOptions()
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def download_image(url, folder_path, filename):
+    """Fonction pour télécharger une image à partir d'une URL et la sauvegarder localement."""
     try:
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
