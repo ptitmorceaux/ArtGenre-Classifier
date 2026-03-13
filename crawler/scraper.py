@@ -53,3 +53,16 @@ def load_more_images(driver, max_clicks=3):
             print("Limite atteinte.")
             break
 
+
+def close_popup(driver):
+    """Fonction pour fermer les pop-ups de cookies ou autres qui pourraient bloquer le scraping."""
+    print("Vérification des pop-ups...")
+    try:
+        wait = WebDriverWait(driver, 5)
+        bouton_accept = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'agree') or contains(@class, 'close')]")))
+        bouton_accept.click()
+        print("Pop-up fermé avec succès !")
+        time.sleep(1)
+    except Exception:
+        print("Aucun pop-up bloquant détecté.")
+
