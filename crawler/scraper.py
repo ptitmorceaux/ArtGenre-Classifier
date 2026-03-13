@@ -5,6 +5,8 @@ import csv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 ART_MOVEMENTS = {
@@ -21,9 +23,12 @@ def setup_driver():
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def download_image(url, folder_path, filename):
-    """Fonction pour télécharger une image à partir d'une URL et la sauvegarder localement."""
+    """Télécharge une image depuis une URL et la sauvegarde dans le dossier spécifié."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, headers=headers, timeout=5)
         if response.status_code == 200:
             with open(os.path.join(folder_path, filename), 'wb') as f:
                 f.write(response.content)
@@ -32,112 +37,3 @@ def download_image(url, folder_path, filename):
         pass
     return False
 
-def load_more_images(driver, max_clicks=3):
-    """Fonction pour cliquer sur le bouton 'Charger plus' et charger plus d'images."""
-    print("Début du chargement des images supplémentaires")
-    for i in range(max_clicks):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(2)
-        try:
-            load_button = driver.find_element(
-                By.XPATH,
-                "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'charger plus') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'load more')]"
-            )
-            if load_button.is_displayed():
-                driver.execute_script("arguments[0].click();", load_button)
-                print(f"Click {i+1}/{max_clicks} sur Charger Plus effectué")
-                time.sleep(3)
-            else:
-                break
-        except Exception:
-            print("Limite atteinte.")
-            break
-
-
-def close_popup(driver):
-    """Fonction pour fermer les pop-ups de cookies ou autres qui pourraient bloquer le scraping."""
-    print("Vérification des pop-ups...")
-    try:
-        wait = WebDriverWait(driver, 5)
-        bouton_accept = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'agree') or contains(@class, 'close')]")))
-        bouton_accept.click()
-        print("Pop-up fermé avec succès !")
-        time.sleep(1)
-    except Exception:
-        print("Aucun pop-up bloquant détecté.")
-
-def run_scraper():
-    """Fonction principale pour exécuter le scraper et collecter les données pour chaque mouvement artistique."""
-    driver = setup_driver()
-    
-    for movement, url in ART_MOVEMENTS.items():
-        print(f"\nDémarage du scraping pour: {movement.upper()}")
-        
-        movement_dir = os.path.join(DATASET_DIRECTORY, movement)
-        os.makedirs(movement_dir, exist_ok=True)
-        csv_file = os.path.join(movement_dir, "metadata.csv")
-        
-        driver.get(url)
-        time.sleep(3)
-        
-
-        close_popup(driver)
-        load_more_images(driver, max_clicks=10)
-            
-        print("Début de l'extraction des données")
-        
-        images = driver.find_elements(By.TAG_NAME, "img")
-        
-        with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=["Nom_Fichier", "Titre", "Artiste"])
-            writer.writeheader()
-            
-            image_counter = 0
-            downloaded_links = set()
-            
-            for img_tag in images:
-                try:
-                    raw_img_url = img_tag.get_attribute("src")
-                    
-                    if not raw_img_url or "data:image" in raw_img_url:
-                        raw_img_url = img_tag.get_attribute("lazy-src") or img_tag.get_attribute("data-src")
-                        
-                    if not raw_img_url:
-                        continue
-                        
-                    image_url = raw_img_url.split('!')[0]
-                    
-                    if image_url in downloaded_links:
-                        continue
-                        
-                    full_title = img_tag.get_attribute("title") or img_tag.get_attribute("alt")
-                    
-                    if not full_title or "-" not in full_title:
-                        continue
-
-                    parts = full_title.split("-", 1)
-                    title = parts[0].strip()
-                    artist = parts[1].strip()
-                        
-                    filename = f"{movement}_{image_counter:04d}.jpg"
-                    
-                    if download_image(image_url, movement_dir, filename):
-                        writer.writerow({
-                            "Nom_Fichier": filename,
-                            "Titre": title,
-                            "Artiste": artist
-                        })
-                        downloaded_links.add(image_url)
-                        image_counter += 1
-                        print(f"[{image_counter}] Téléchargée: {title} part {artist}")
-                        
-                except Exception:
-                    continue
-                    
-        print(f"Terminé pour {movement}! {image_counter} images ajoutées")
-        
-    driver.quit()
-    print("\nScraping global terminé")
-
-if __name__ == "__main__":
-    run_scraper()
