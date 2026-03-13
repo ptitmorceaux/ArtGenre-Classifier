@@ -66,3 +66,32 @@ def close_popup(driver):
     except Exception:
         print("Aucun pop-up bloquant détecté.")
 
+def run_scraper():
+    """Fonction principale pour exécuter le scraper et collecter les données pour chaque mouvement artistique."""
+    driver = setup_driver()
+    
+    for movement, url in ART_MOVEMENTS.items():
+        print(f"\nDémarage du scraping pour: {movement.upper()}")
+        
+        movement_dir = os.path.join(DATASET_DIRECTORY, movement)
+        os.makedirs(movement_dir, exist_ok=True)
+        csv_file = os.path.join(movement_dir, "metadata.csv")
+        
+        driver.get(url)
+        time.sleep(3)
+        
+
+        close_popup(driver)
+        load_more_images(driver, max_clicks=10)
+            
+        print("Début de l'extraction des données")
+        
+        images = driver.find_elements(By.TAG_NAME, "img")
+        
+        
+        
+    driver.quit()
+    print("\nScraping global terminé")
+
+if __name__ == "__main__":
+    run_scraper()
