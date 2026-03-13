@@ -17,6 +17,11 @@ MOUVEMENTS = {
 
 DATASET_DIR = os.path.join(os.path.dirname(__file__), '..', 'dataset')
 
+
+def setup_driver():
+    options = webdriver.ChromeOptions()
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
 def download_image(url, folder_path, filename):
     try:
         response = requests.get(url, timeout=10)
