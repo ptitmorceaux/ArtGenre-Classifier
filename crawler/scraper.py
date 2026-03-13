@@ -88,7 +88,53 @@ def run_scraper():
         
         images = driver.find_elements(By.TAG_NAME, "img")
         
-        
+        with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=["Nom_Fichier", "Titre", "Artiste"])
+            writer.writeheader()
+            
+            image_counter = 0
+            downloaded_links = set()
+            
+            for img_tag in images:
+                try:
+                    raw_img_url = img_tag.get_attribute("src")
+                    
+                    if not raw_img_url or "data:image" in raw_img_url:
+                        raw_img_url = img_tag.get_attribute("lazy-src") or img_tag.get_attribute("data-src")
+                        
+                    if not raw_img_url:
+                        continue
+                        
+                    image_url = raw_img_url.split('!')[0]
+                    
+                    if image_url in downloaded_links:
+                        continue
+                        
+                    full_title = img_tag.get_attribute("title") or img_tag.get_attribute("alt")
+                    
+                    if not full_title or "-" not in full_title:
+                        continue
+
+                    parts = full_title.split("-", 1)
+                    title = parts[0].strip()
+                    artist = parts[1].strip()
+                        
+                    filename = f"{movement}_{image_counter:04d}.jpg"
+                    
+                    if download_image(image_url, movement_dir, filename):
+                        writer.writerow({
+                            "Nom_Fichier": filename,
+                            "Titre": title,
+                            "Artiste": artist
+                        })
+                        downloaded_links.add(image_url)
+                        image_counter += 1
+                        print(f"[{image_counter}] Téléchargée: {title} part {artist}")
+                        
+                except Exception:
+                    continue
+                    
+        print(f"Terminé pour {movement}! {image_counter} images ajoutées")
         
     driver.quit()
     print("\nScraping global terminé")
