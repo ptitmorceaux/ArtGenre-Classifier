@@ -45,6 +45,19 @@ EXPORT void free_linear_model(double* model) {
         - `predict_regression` : pour les tâches de régression, qui retourne la valeur
  */
 
+ EXPORT double predict_classification(double* model, double* input, int input_dim) {
+    """
+    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
+    """
+    // Commence avec le biais
+    double sum = model[0];
+    for (int i = 0; i < input_dim; i++) {
+        sum += model[i + 1] * input[i];
+    }
+
+    return sum >= 0 ? 1 : 0;
+ }
+
  /** Fonction d'entraînement **/
  /*
     # Implémenter une fonction d'entraînement :
