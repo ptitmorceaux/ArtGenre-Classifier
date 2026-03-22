@@ -4,6 +4,10 @@
 
 #include "global.h"
 
+// Allocation et libération
+EXPORT double* create_linear_model(int input_dim);
+EXPORT void free_linear_model(double* model);
+
 
 
 #endif
