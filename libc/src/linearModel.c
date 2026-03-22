@@ -1,6 +1,10 @@
-// #include "../include/linearModel.h"
+#include "../include/linearModel.h"
 
-// // Struct
+/**  Structure for a linear model */
+
+
+
+
 
 // typedef struct {
 //     float *coef;        // tableau des coefficients
