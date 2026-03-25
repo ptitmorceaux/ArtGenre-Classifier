@@ -95,4 +95,24 @@ EXPORT double predict_regression(double* model, double* input, int input_dim) {
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur)
 */
+EXPORT void train_classification(double* models, double* dataset_inputs, double* dataset_expected_outputs, int input_dim, int dataset_size, int alpha, int epochs) {
+    // On boucle sur le nombre d'époques
+    for (int i = 0; i < epochs; i++) {
+        // On boucle sur le nombre d'exemple dans le dataset
+        for (int j = 0; j < dataset_size; j++) {
+            // FORCE
+            // Reupere genre le resultats de la prédiction : g = predict_classification(model, x --> reucpere dans le dataset inputs(avec le stride jsp CEST APPLATI MON CERVEAU), input_dim)
+            // Cacluler l'erreur : double error = expect - predict
+            // Mise à jour des poids seulement si error est différent de 0
+            if (error != 0.) {
+                // Mise à jour du biais
+                model[0] += alpha * error;
 
+                // Mise à jour des poids
+                for (int k = 0; k < input_dim; k++) {
+                    model[k + 1] += alpha * error * X[k];
+                }
+            }
+        }
+    }
+}
