@@ -13,9 +13,9 @@
 */
 
 EXPORT double* create_linear_model(int input_dim) {
-    """
+    /*
     Crée un modèle linéaire avec des poids et un biais initialisés aléatoirement.
-    """
+    */
     // Allouer de la mémoire pour les poids et le biais et ajouter 1 pour le biais
     double *model = (double*)malloc((input_dim + 1) * sizeof(double));
 
@@ -32,9 +32,9 @@ EXPORT double* create_linear_model(int input_dim) {
 }
 
 EXPORT void free_linear_model(double* model) {
-    """
+    /*
     Libère la mémoire allouée pour le modèle linéaire.
-    """
+    */
     free(model);
 }
 
@@ -48,9 +48,9 @@ EXPORT void free_linear_model(double* model) {
 
 // Fonction de prédiction pour la classification
  EXPORT double predict_classification(double* model, double* input, int input_dim) {
-    """
+    /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
-    """
+    */
     // Commence avec le biais
     double sum = model[0];
     for (int i = 0; i < input_dim; i++) {
@@ -62,9 +62,9 @@ EXPORT void free_linear_model(double* model) {
 
 // Fonction de prédiction pour la regréssion
 EXPORT double predict_classification(double* model, double* input, int input_dim) {
-    """
+    /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
-    """
+    */
     // Commence avec le biais
     double sum = model[0];
     for (int i = 0; i < input_dim; i++) {
