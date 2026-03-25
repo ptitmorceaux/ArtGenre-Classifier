@@ -74,8 +74,6 @@ EXPORT double predict_classification(double* model, double* input, int input_dim
     return sum;
  }
 
-
-
  /** Fonction d'entraînement **/
  /*
     # Implémenter deux fonctions d'entraînement :
