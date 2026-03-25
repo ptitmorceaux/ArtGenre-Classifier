@@ -83,13 +83,16 @@ EXPORT double predict_classification(double* model, double* input, int input_dim
             ( Descente de gradient pour la régression)
  */
 
-// Règle de Rosenblatt `https://fr.wikipedia.org/wiki/Perceptron` & `https://www.anyflo.com/bret/cours/rn/rn4.htm`
+// Règle de Rosenblatt (Perceptron Learning Algorithm) `https://fr.wikipedia.org/wiki/Perceptron` & `https://www.anyflo.com/bret/cours/rn/rn4.htm`
 /*
-    Il faut en premier mettre les poids et le biais à 0 ainsi que définir un pas d'apprentissage.
-    Ici pour mettre à jour les poids et les biais, on va faire la différence (sur notre jeu de donnée) entre la valeur attendu (Y_attendu) et la valeur prédite (Y_predit).
-    Si le preceptron est égale à 0 alors pas besoin de modifier les poids, mais il se trompe alors on doit mettre à jour chaque poids avec la formule :
-        - w = w + (taux_apprentissage * Erreur* x)
-    et le biais :
-        - b = b + (taux_apprentissage * Erreur)  
+    Entraîner un modèle de classification binaire supervisé.
+    Note : L'initialisation des poids et du biais est déjà gérée par `create_linear_model`.
+
+    Algorithme (à répéter pour chaque époque et chaque exemple du dataset) :
+        - Prédire la sortie g(X) avec les poids et le biais actuels.
+        - Calculer l'erreur : Erreur = Y_attendu - g(X).
+        -Si l'erreur est non nulle (le modèle s'est trompé), on ajuste le modèle avec le pas d'apprentissage (alpha) :
+            - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
+            - Mise à jour du biais  : b = b + (alpha * Erreur)
 */
-        
+
