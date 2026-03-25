@@ -69,7 +69,7 @@ EXPORT void free_linear_model(double* model) {
 
 // Règle de Rosenblatt `https://fr.wikipedia.org/wiki/Perceptron` & `https://www.anyflo.com/bret/cours/rn/rn4.htm`
 /*
-    Il faut en premier mettre les poids et le biais à 0 ainsi que définir un pas d'apprentissage (taux_apprentissage).
+    Il faut en premier mettre les poids et le biais à 0 ainsi que définir un pas d'apprentissage.
     Ici pour mettre à jour les poids et les biais, on va faire la différence (sur notre jeu de donnée) entre la valeur attendu (Y_attendu) et la valeur prédite (Y_predit).
     Si le preceptron est égale à 0 alors pas besoin de modifier les poids, mais il se trompe alors on doit mettre à jour chaque poids avec la formule :
         - w = w + (taux_apprentissage * Erreur* x)
