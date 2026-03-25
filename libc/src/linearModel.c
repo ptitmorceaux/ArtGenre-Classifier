@@ -45,6 +45,8 @@ EXPORT void free_linear_model(double* model) {
         - `predict_regression` : pour les tâches de régression, qui retourne la valeur
  */
 
+
+// Fonction de prédiction pour la classification
  EXPORT double predict_classification(double* model, double* input, int input_dim) {
     """
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
@@ -57,6 +59,22 @@ EXPORT void free_linear_model(double* model) {
 
     return sum >= 0 ? 1 : 0;
  }
+
+// Fonction de prédiction pour la regréssion
+EXPORT double predict_classification(double* model, double* input, int input_dim) {
+    """
+    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
+    """
+    // Commence avec le biais
+    double sum = model[0];
+    for (int i = 0; i < input_dim; i++) {
+        sum += model[i + 1] * input[i];
+    }
+
+    return sum;
+ }
+
+
 
  /** Fonction d'entraînement **/
  /*
@@ -74,7 +92,6 @@ EXPORT void free_linear_model(double* model) {
     Si le preceptron est égale à 0 alors pas besoin de modifier les poids, mais il se trompe alors on doit mettre à jour chaque poids avec la formule :
         - w = w + (taux_apprentissage * Erreur* x)
     et le biais :
-        - b = b + (taux_apprentissage * Erreur)
-        
+        - b = b + (taux_apprentissage * Erreur)  
 */
         
