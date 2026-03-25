@@ -60,7 +60,10 @@ EXPORT void free_linear_model(double* model) {
 
  /** Fonction d'entraînement **/
  /*
-    # Implémenter une fonction d'entraînement :
-        - `train_linear_model` : pour entraîner le modèle sur un ensemble de données
-            (Règle de Rosenblatt pour la classification ou descente de gradient pour la régression)
- */
+    # Implémenter deux fonctions d'entraînement :
+        - `train_classification_rossenblatt` : pour entraîner le modèle sur un ensemble de données
+            (Règle de Rosenblatt pour la classification)
+        - `train_regressions_gradient_descent` : pour entraîner le modèle sur un ensemble de données
+            ( Descente de gradient pour la régression)
+ */    
+        
