@@ -91,7 +91,7 @@ EXPORT double predict_regression(double* model, double* input, int input_dim) {
     Algorithme (à répéter pour chaque époque et chaque exemple du dataset) :
         - Prédire la sortie g(X) avec les poids et le biais actuels.
         - Calculer l'erreur : Erreur = Y_attendu - g(X).
-        -Si l'erreur est non nulle (le modèle s'est trompé), on ajuste le modèle avec le pas d'apprentissage (alpha) :
+        - Si l'erreur est différent de 0, on met à jour le modèle avec le pas d'apprentissage (alpha) en modifiant le biais ainsi que les poids :
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur)
 */
@@ -101,7 +101,7 @@ EXPORT void train_classification(double* models, double* dataset_inputs, double*
         // On boucle sur le nombre d'exemple dans le dataset
         for (int j = 0; j < dataset_size; j++) {
             // FORCE
-            // Reupere genre le resultats de la prédiction : g = predict_classification(model, x --> reucpere dans le dataset inputs(avec le stride jsp CEST APPLATI MON CERVEAU), input_dim)
+            // Recupere genre le resultats de la prédiction : g = predict_classification(model, x --> recupere dans le dataset inputs(avec le stride jsp CEST APPLATI MON CERVEAU), input_dim)
             // Cacluler l'erreur : double error = expect - predict
             // Mise à jour des poids seulement si error est différent de 0
             if (error != 0.) {
@@ -110,7 +110,7 @@ EXPORT void train_classification(double* models, double* dataset_inputs, double*
 
                 // Mise à jour des poids
                 for (int k = 0; k < input_dim; k++) {
-                    model[k + 1] += alpha * error * X[k];
+                    model[k + 1] += alpha * error * X[k]; // jsp
                 }
             }
         }
