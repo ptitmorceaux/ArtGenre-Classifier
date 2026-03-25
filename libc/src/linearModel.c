@@ -61,7 +61,7 @@ EXPORT void free_linear_model(double* model) {
  }
 
 // Fonction de prédiction pour la regréssion
-EXPORT double predict_classification(double* model, double* input, int input_dim) {
+EXPORT double predict_regression(double* model, double* input, int input_dim) {
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
     */
