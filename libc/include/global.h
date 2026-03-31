@@ -13,6 +13,10 @@
 #endif
 
 
+#define true 1
+#define false 0
+
+
 // Status codes
 // -> unsigned char -> entre 0 et 255 status possibles pour le moment
 typedef enum {

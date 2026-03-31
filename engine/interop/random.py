@@ -6,8 +6,8 @@ from engine.interop.loader import Loader
 def random_float32(a: float, b: float) -> float:
     """base ^ exp"""
     prefix_errmsg = "Random.random_float32()"
-    Loader.check_ctype(a, ctypes.c_float, prefix_errmsg)
-    Loader.check_ctype(b, ctypes.c_float, prefix_errmsg)
+    Loader.check_primitive_values_range(a, ctypes.c_float, prefix_errmsg)
+    Loader.check_primitive_values_range(b, ctypes.c_float, prefix_errmsg)
     result = ctypes.c_float()
     Loader.call(
         "random_float",
