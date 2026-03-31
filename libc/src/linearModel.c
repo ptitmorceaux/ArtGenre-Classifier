@@ -23,7 +23,7 @@ EXPORT double* create_linear_model(int input_dim) {
     srand(time(NULL));
 
 
-    // INitialiser les poids et le biais avec des valeurs aléatoires entre -1 et 1
+    // Initialiser les poids et le biais avec des valeurs aléatoires entre -1 et 1
     for (int i = 0; i < input_dim + 1; i++) {
         model[i] = ((double)rand() / RAND_MAX) * 2 - 1;
     }
@@ -80,7 +80,7 @@ EXPORT double predict_regression(double* model, double* input, int input_dim) {
         - `train_classification_rossenblatt` : pour entraîner le modèle sur un ensemble de données
             (Règle de Rosenblatt pour la classification)
         - `train_regressions_gradient_descent` : pour entraîner le modèle sur un ensemble de données
-            ( Descente de gradient pour la régression)
+            (Descente de gradient pour la régression)
  */
 
 // Règle de Rosenblatt (Perceptron Learning Algorithm) `https://fr.wikipedia.org/wiki/Perceptron` & `https://www.anyflo.com/bret/cours/rn/rn4.htm`
