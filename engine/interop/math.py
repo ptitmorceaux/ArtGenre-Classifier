@@ -7,8 +7,8 @@ from engine.interop.loader import Loader
 def _call(func_name: str, a, b, prefix_errmsg: str = "") -> float:
     """Exécute l'appel C et gère les erreurs de manière générique"""
     prefix = f"{prefix_errmsg}: _call()" if prefix_errmsg else "_call()"
-    Loader.check_ctype(a, ctypes.c_float, prefix)
-    Loader.check_ctype(b, ctypes.c_float, prefix)
+    Loader.check_primitive_values_range(a, ctypes.c_float, prefix)
+    Loader.check_primitive_values_range(b, ctypes.c_float, prefix)
     result = ctypes.c_float()
     Loader.call(
         func_name,
@@ -40,8 +40,8 @@ def division(a: float, b: float) -> float:
 def power(base: float, exp: int) -> float:
     """base ^ exp"""
     prefix_errmsg = "Math.power()"
-    Loader.check_ctype(base, ctypes.c_float, prefix_errmsg)
-    Loader.check_ctype(exp, ctypes.c_uint32, prefix_errmsg)
+    Loader.check_primitive_values_range(base, ctypes.c_float, prefix_errmsg)
+    Loader.check_primitive_values_range(exp, ctypes.c_uint32, prefix_errmsg)
     result = ctypes.c_float()
     Loader.call(
         "my_pow",
