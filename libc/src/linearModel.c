@@ -121,21 +121,29 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur)
 */
-unsigned char train_classification(LinearModel* models, float* dataset_inputs, float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {
+unsigned char train_classification(LinearModel* models, float* dataset_inputs,
+        float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
+    if (!model || !(*model) return ERR_INVALID_PTR;
     // On boucle sur le nombre d'époques
-    for (int i = 0; i < epochs; i++) {
+    for (uint32_t i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset
-        for (int j = 0; j < dataset_size; j++) {
-            // FORCE
-            // Recupere genre le resultats de la prédiction : g = predict_classification(model, x --> recupere dans le dataset inputs(avec le stride jsp CEST APPLATI MON CERVEAU), input_dim)
-            // Cacluler l'erreur : double error = expect - predict
-            // Mise à jour des poids seulement si error est différent de 0
+        for (uint32_t j = 0; j < dataset_size; j++) {
+            /* 
+                ==============================================================================================================================
+                # TODO
+                    // Recupere genre le resultats de la prédiction : g = predict_classification(model, x --> recupere dans le dataset inputs
+                    // input_dim)
+                    // Cacluler l'erreur : double error = expect - predict
+                    // Mise à jour des poids seulement si error est différent de 0
+                ==============================================================================================================================
+            */
+            //             
             if (error != 0.) {
                 // Mise à jour du biais
                 model[0] += alpha * error;
 
                 // Mise à jour des poids
-                for (int k = 0; k < input_dim; k++) {
+                for (uint32_t k = 0; k < input_dim; k++) {
                     model[k + 1] += alpha * error * X[k]; // jsp
                 }
             }
