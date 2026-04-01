@@ -72,7 +72,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
     */
-    if (!model || !(*model) return ERR_INVALID_PTR;
+    if (!model || !(*model)) return ERR_INVALID_PTR;
     // Commence avec le biais
     float sum = model[0];
     for (int i = 0; i < input_dim; i++) {
@@ -89,7 +89,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
     */
-    if (!model || !(*model) return ERR_INVALID_PTR;
+    if (!model || !(*model)) return ERR_INVALID_PTR;
 
     float sum = 0.0f;
     unsigned char status = RES_EXIT_SUCCESS; 
@@ -123,8 +123,13 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
 */
 unsigned char train_classification(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
-    if (!model || !(*model) return ERR_INVALID_PTR;
+    if (!model || !(*model)) return ERR_INVALID_PTR;
     /*
+     * Début de l'entraînement par la règle de Rosenblatt.
+     * L'algorithme va parcourir toutes les images du dataset plusieurs fois (epochs).
+     * Pour chaque image, il effectue une prédiction. S'il se trompe (erreur != 0), 
+     * il ajuste immédiatement son biais et ses poids en fonction du pas d'apprentissage (alpha)
+     * pour s'améliorer lors du prochain passage.
     */
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
@@ -165,4 +170,19 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
     return RES_EXIT_SUCCESS;
 }
 
+// Descente de Gradient Stochastique (SGD) `https://fr.wikipedia.org/wiki/Algorithme_du_gradient_stochastique` & `https://www.ibm.com/fr-fr/think/topics/stochastic-gradient-descent`
+/*
+    Entraîner un modèle de régression (valeurs continues) via la descente de gradient stochastique.
+    Note : L'initialisation des poids et du biais est déjà gérée par `create_linear_model`.
 
+    Algorithme (à répéter pour chaque époque et chaque exemple du dataset) :
+        - Prédire la sortie continue g(X) avec les poids et le biais actuels.
+        - Calculer l'erreur : Erreur = Y_attendu - g(X).
+        - Ajuster continuellement le modèle avec le pas d'apprentissage (alpha) pour réduire cette erreur :
+            - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
+            - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
+*/
+unsigned char train_regression(LinearModel* model, float* dataset_inputs,
+        float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
+    return RES_EXIT_SUCCESS;
+}
