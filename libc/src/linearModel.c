@@ -207,15 +207,13 @@ unsigned char train_regression(LinearModel* model, float* dataset_inputs,
             // Calcul de l'erreur
             float Y_expected = dataset_expected_outputs[j];
             float error = Y_expected - g;
-            
-            if (error != 0.0f) {
-                // Mise à jour du biais
-                model->weights[0] += alpha * error * 1.0f; // --> Pour Milhane 
+   
+            // Mise à jour du biais
+            model->weights[0] += alpha * error * 1.0f; // --> Pour Milhane 
 
-                // Mise à jour des poids
-                for (uint32_t k = 0; k < input_dim; k++) {
-                    model->weights[k + 1] += alpha * error * image[k];
-                }
+            // Mise à jour des poids
+            for (uint32_t k = 0; k < input_dim; k++) {
+                model->weights[k + 1] += alpha * error * image[k];
             }
         }
     }
