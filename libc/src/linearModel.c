@@ -75,7 +75,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     if (!model || !model->weights) return ERR_INVALID_PTR;
     // Commence avec le biais
     float sum = model->weights[0];
-    for (int i = 0; i < input_dim; i++) {
+    for (int i = 0; i < model->input_dim; i++) {
         sum += model->weights[i + 1] * input[i];
     }
 
@@ -95,6 +95,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     unsigned char status = RES_EXIT_SUCCESS; 
     
     status = predict_regression(model, input, &sum);
+    if (status != RES_EXIT_SUCCESS) return status;
      
     *result = sum >= 0.0f ? 1 : 0.0f;
     return RES_EXIT_SUCCESS;
@@ -131,6 +132,8 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
      * il ajuste immédiatement son biais et ses poids en fonction du pas d'apprentissage (alpha)
      * pour s'améliorer lors du prochain passage.
     */
+
+    uint32_t input_dim = model->input_dim;
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset
@@ -192,6 +195,8 @@ unsigned char train_regression(LinearModel* model, float* dataset_inputs,
      * Il va ensuite utiliser cet écart pour ajuster proportionnellement le biais et les poids.
      * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on se rapproche de la valeur, plus le pas de correction sera petit.
     */
+    
+    uint32_t input_dim = model->input_dim;
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset
