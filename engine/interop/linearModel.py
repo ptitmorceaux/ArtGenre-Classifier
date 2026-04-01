@@ -28,3 +28,47 @@ class LinearModel:
             ctypes.byref(self.ptr),
             prefix_errmsg="LinearModel.__init__()"
         )
+    
+    def predict_regression(self, input_data: list[float]) -> float:
+        Loader.call(
+            "predict_regressions",
+            self.ptr,
+            prefix_errmsg="LinearModel.predict_regression()"
+        )
+        return float()
+
+    def predict_classification(self, input_data: list[float]) -> int:
+        Loader.call(
+            "predict_classifications",
+            self.ptr,
+            prefix_errmsg="LinearModel.predict_classification()"
+        )
+        return int()
+    
+    def train_classification(
+            self, 
+            dataset_inputs: list[float],
+            dataset_expected_outputs: list[float],
+            alpha: float,
+            epochs: int
+            ) -> None:
+        
+        Loader.call(
+            "train_classification",
+            self.ptr,
+            prefix_errmsg="LinearModel.train_classification()"
+        )
+
+    def train_regression(
+            self, 
+            dataset_inputs: list[float],
+            dataset_expected_outputs: list[float],
+            alpha: float,
+            epochs: int
+            ) -> None:
+        
+        Loader.call(
+            "train_regression",
+            self.ptr,
+            prefix_errmsg="LinearModel.train_regression()"
+        )
