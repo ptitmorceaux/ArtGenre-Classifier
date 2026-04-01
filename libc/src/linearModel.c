@@ -184,5 +184,40 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
 */
 unsigned char train_regression(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {
+    if (!model || !model->weights) return ERR_INVALID_PTR;
+    /*
+     * Début de l'entraînement par descente de gradient stochastique.
+     * Contrairement à la classification (0 ou 1), ici on prédit une valeur continue (ex: 25.4, 100.2).
+     * L'algorithme calcule l'écart (la distance) entre la prédiction et la vraie valeur.
+     * Il va ensuite utiliser cet écart pour ajuster proportionnellement le biais et les poids.
+     * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on s'approche de la cible, plus l'ajustement est fin.
+    */
+    // On boucle sur le nombre d'époques
+    for (uint32_t i = 0; i < epochs; i++) {
+        // On boucle sur le nombre d'exemple dans le dataset
+        for (uint32_t j = 0; j < dataset_size; j++) {
+            // On va récupere l'adresse mémoire de chaque image (cela revient à chercher le premier pixel de notre image)
+            float* image = &dataset_inputs[j * input_dim];
+
+            // Recupere le résulat de la prédiction
+            float g = 0.0f;
+            unsigned char status = predict_classification(model, image, &g);
+            if (status != RES_EXIT_SUCCESS) return status;
+
+            // Calcul de l'erreur
+            float Y_expected = dataset_expected_outputs[j];
+            float error = Y_expected - g;
+            
+            if (error != 0.0f) {
+                // Mise à jour du biais
+                model->weights[0] += alpha * error * 1.0f; // --> Pour Milhane 
+
+                // Mise à jour des poids
+                for (uint32_t k = 0; k < input_dim; k++) {
+                    model->weights[k + 1] += alpha * error * image[k];
+                }
+            }
+        }
+    }
     return RES_EXIT_SUCCESS;
 }
