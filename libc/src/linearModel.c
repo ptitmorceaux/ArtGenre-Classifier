@@ -72,7 +72,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
     */
-    if (!model || !(*model)) return ERR_INVALID_PTR;
+    if (!model || !model->weights) return ERR_INVALID_PTR;
     // Commence avec le biais
     float sum = model[0];
     for (int i = 0; i < input_dim; i++) {
@@ -89,7 +89,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
     */
-    if (!model || !(*model)) return ERR_INVALID_PTR;
+    if (!model || !model->weights) return ERR_INVALID_PTR;
 
     float sum = 0.0f;
     unsigned char status = RES_EXIT_SUCCESS; 
@@ -123,7 +123,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
 */
 unsigned char train_classification(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
-    if (!model || !(*model)) return ERR_INVALID_PTR;
+    if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par la règle de Rosenblatt.
      * L'algorithme va parcourir toutes les images du dataset plusieurs fois (epochs).
@@ -183,6 +183,6 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
 */
 unsigned char train_regression(LinearModel* model, float* dataset_inputs,
-        float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
+        float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {
     return RES_EXIT_SUCCESS;
 }
