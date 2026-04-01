@@ -201,7 +201,7 @@ unsigned char train_regression(LinearModel* model, float* dataset_inputs,
 
             // Recupere le résulat de la prédiction
             float g = 0.0f;
-            unsigned char status = predict_classification(model, image, &g);
+            unsigned char status = predict_regression(model, image, &g);
             if (status != RES_EXIT_SUCCESS) return status;
 
             // Calcul de l'erreur
