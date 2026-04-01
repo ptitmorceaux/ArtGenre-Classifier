@@ -67,33 +67,37 @@ unsigned char free_linear_model(LinearModel** model_ptr) {
         - `predict_classification` : pour les tâches de classification, qui retourne la classe prédite (0 ou 1)
         - `predict_regression` : pour les tâches de régression, qui retourne la valeur
  */
- 
-// Fonction de prédiction pour la classification
- unsigned char predict_classification(double* model, double* input, int input_dim) {
-    /*
-    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
-    */
-    // Commence avec le biais
-    double sum = model[0];
-    for (int i = 0; i < input_dim; i++) {
-        sum += model[i + 1] * input[i];
-    }
-
-    return sum >= 0 ? 1 : 0;
- }
-
 // Fonction de prédiction pour la regréssion
-unsigned char predict_regression(double* model, double* input, int input_dim) {
+unsigned char predict_regression(LinearModel* model, float* input, float* result) {
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
     */
+    if (!model || !(*model) return ERR_INVALID_PTR;
     // Commence avec le biais
-    double sum = model[0];
+    float sum = model[0];
     for (int i = 0; i < input_dim; i++) {
         sum += model[i + 1] * input[i];
     }
 
-    return sum;
+    *result = sum;
+    return RES_EXIT_SUCCESS;
+ }
+
+
+// Fonction de prédiction pour la classification
+ unsigned char predict_classification(LinearModel* model, float* input, float* result) {
+    /*
+    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
+    */
+    if (!model || !(*model) return ERR_INVALID_PTR;
+
+    float sum = 0.0f;
+    unsigned char status = RES_EXIT_SUCCESS; 
+    
+    status = predict_regression(mode, input, &sum);
+     
+    *result = sum >= 0.0f ? 1 : 0.0f;
+    return RES_EXIT_SUCCESS;
  }
 
  /** Fonction d'entraînement **/
