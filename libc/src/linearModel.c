@@ -94,7 +94,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     float sum = 0.0f;
     unsigned char status = RES_EXIT_SUCCESS; 
     
-    status = predict_regression(mode, input, &sum);
+    status = predict_regression(model, input, &sum);
      
     *result = sum >= 0.0f ? 1 : 0.0f;
     return RES_EXIT_SUCCESS;
@@ -122,7 +122,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
 */
 unsigned char train_classification(LinearModel* model, float* dataset_inputs,
-        float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
+        float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs) {   
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par la règle de Rosenblatt.
@@ -183,7 +183,7 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
 */
 unsigned char train_regression(LinearModel* model, float* dataset_inputs,
-        float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {
+        float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs) {
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par descente de gradient stochastique.
