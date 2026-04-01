@@ -121,7 +121,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur)
 */
-unsigned char train_classification(double* models, double* dataset_inputs, double* dataset_expected_outputs, int input_dim, int dataset_size, int alpha, int epochs) {
+unsigned char train_classification(LinearModel* models, float* dataset_inputs, float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {
     // On boucle sur le nombre d'époques
     for (int i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset
