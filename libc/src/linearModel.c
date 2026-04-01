@@ -121,9 +121,11 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
 */
-unsigned char train_classification(LinearModel* models, float* dataset_inputs,
+unsigned char train_classification(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
     if (!model || !(*model) return ERR_INVALID_PTR;
+    /*
+    */
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset
@@ -149,16 +151,18 @@ unsigned char train_classification(LinearModel* models, float* dataset_inputs,
             float Y_expected = dataset_expected_outputs[j];
             float error = Y_expected - g;
             
-            if (error != 0.) {
+            if (error != 0.0f) {
                 // Mise à jour du biais
-                model[0] += alpha * error * 1.0f; // --> Pour Milhane 
+                model->weights[0] += alpha * error * 1.0f; // --> Pour Milhane 
 
                 // Mise à jour des poids
                 for (uint32_t k = 0; k < input_dim; k++) {
-                    model[k + 1] += alpha * error * X[k];
+                    model->weights[k + 1] += alpha * error * image[k];
                 }
             }
         }
     }
     return RES_EXIT_SUCCESS;
 }
+
+
