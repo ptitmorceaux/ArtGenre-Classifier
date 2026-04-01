@@ -119,7 +119,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
         - Calculer l'erreur : Erreur = Y_attendu - g(X).
         - Si l'erreur est différent de 0, on met à jour le modèle avec le pas d'apprentissage (alpha) en modifiant le biais ainsi que les poids :
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
-            - Mise à jour du biais  : b = b + (alpha * Erreur)
+            - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
 */
 unsigned char train_classification(LinearModel* models, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t input_dim, uint32_t dataset_size, float alpha, uint32_t epochs) {   
@@ -129,24 +129,36 @@ unsigned char train_classification(LinearModel* models, float* dataset_inputs,
         // On boucle sur le nombre d'exemple dans le dataset
         for (uint32_t j = 0; j < dataset_size; j++) {
             /* 
-                ==============================================================================================================================
+                ========================================================================================================================================
                 # TODO
-                    // Recupere genre le resultats de la prédiction : g = predict_classification(model, x --> recupere dans le dataset inputs
+                    // Recupere genre le resultats de la prédiction : g = predict_classification(model, x --> recupere dans le dataset inputs     --> OK
                     // input_dim)
-                    // Cacluler l'erreur : double error = expect - predict
-                    // Mise à jour des poids seulement si error est différent de 0
-                ==============================================================================================================================
+                    // Cacluler l'erreur : float error = expect - predict                                                                         --> OK
+                    // Mise à jour des poids seulement si error est différent de 0                                                                --> OK
+                ========================================================================================================================================
             */
-            //             
+            // On va récupere l'adresse mémoire de chaque image (cela revient à chercher le premier pixel de notre image)
+            float* image = &dataset_inputs[j * input_dim];
+
+            // Recupere le résulat de la prédiction
+            float g = 0.0f;
+            unsigned char status = predict_classification(model, image, &g);
+            if (status != RES_EXIT_SUCCESS) return status;
+
+            // Calcul de l'erreur
+            float Y_expected = dataset_expected_outputs[j];
+            float error = Y_expected - g;
+            
             if (error != 0.) {
                 // Mise à jour du biais
-                model[0] += alpha * error;
+                model[0] += alpha * error * 1.0f; // --> Pour Milhane 
 
                 // Mise à jour des poids
                 for (uint32_t k = 0; k < input_dim; k++) {
-                    model[k + 1] += alpha * error * X[k]; // jsp
+                    model[k + 1] += alpha * error * X[k];
                 }
             }
         }
     }
+    return RES_EXIT_SUCCESS;
 }
