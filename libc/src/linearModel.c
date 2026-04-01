@@ -75,7 +75,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     if (!model || !model->weights) return ERR_INVALID_PTR;
     // Commence avec le biais
     float sum = model->weights[0];
-    for (int i = 0; i < model->input_dim; i++) {
+    for (uint32_t i = 0; i < model->input_dim; i++) {
         sum += model->weights[i + 1] * input[i];
     }
 
