@@ -76,7 +76,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
     // Commence avec le biais
     float sum = model->weights[0];
     for (int i = 0; i < input_dim; i++) {
-        sum += model[i + 1] * input[i];
+        sum += model->weights[i + 1] * input[i];
     }
 
     *result = sum;
