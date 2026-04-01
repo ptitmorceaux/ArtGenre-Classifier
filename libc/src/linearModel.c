@@ -39,7 +39,7 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
         return status;
     }
     
-    *res_model = model
+    *res_model = model;
         
     return RES_EXIT_SUCCESS;
 }
