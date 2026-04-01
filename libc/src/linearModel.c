@@ -187,10 +187,10 @@ unsigned char train_regression(LinearModel* model, float* dataset_inputs,
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par descente de gradient stochastique.
-     * Contrairement à la classification (0 ou 1), ici on prédit une valeur continue (ex: 25.4, 100.2).
+     * Contrairement à la classification (0 ou 1), ici on prédit une valeur continue (ex: 6.7).
      * L'algorithme calcule l'écart (la distance) entre la prédiction et la vraie valeur.
      * Il va ensuite utiliser cet écart pour ajuster proportionnellement le biais et les poids.
-     * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on s'approche de la cible, plus l'ajustement est fin.
+     * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on se rapproche de la valeur, plus le pas de correction sera petit.
     */
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
