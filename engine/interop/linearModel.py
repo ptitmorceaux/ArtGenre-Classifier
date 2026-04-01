@@ -31,12 +31,13 @@ class LinearModel:
     
     def close(self):
         """"Libère la mémoire allouée pour le modèle C."""
-        if self.ptr.value is not None and self.ptr is not None: 
+        if self.ptr is not None and self.ptr.value is not None:
             Loader.call(
                 "free_linear_model",
                 ctypes.byref(self.ptr),
                 prefix_errmsg="LinearModel.close()"
             )
+            self.ptr = ctypes.c_void_p()
 
     def predict_regression(self, input_data: list[float]) -> float:
         """"Prédit une valeur continue pour un vecteur d'entrée de données."""
