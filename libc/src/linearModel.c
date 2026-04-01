@@ -12,12 +12,13 @@
         -> (w(0) = b) et les cases suivantes seront les poids (w(i) = W(i-1)).
 */
 
-unsigned char create_linear_model(uint32_t input_dim, Matrix** res_model) {
+unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     /*
     Crée un modèle linéaire avec des poids et un biais initialisés aléatoirement.
     */
     // Allouer de la mémoire pour les poids et le biais et ajouter 1 pour le biais
     if (!res_model) return ERR_INVALID_PTR;
+    unsigned char status = RES_EXIT_SUCCESS;
     
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
     if (!model) return ERR_ALLOCATION_FAILED;
@@ -31,8 +32,15 @@ unsigned char create_linear_model(uint32_t input_dim, Matrix** res_model) {
     }
 
     // Initialisation pour les poids et le biais avec des valeurs aléatoires entre -1 et 1
-    fill_randomly_float_array(-1.0f, 1.0f, model->weights, input_dim + 1);
+    status = fill_randomly_float_array(-1.0f, 1.0f, &(model->weights), input_dim + 1);
+
+    if (status != RES_EXIT_SUCCESS) {
+        free_linear_model(&model);
+        return status;
+    }
     
+    *res_model = model
+        
     return RES_EXIT_SUCCESS;
 }
 
