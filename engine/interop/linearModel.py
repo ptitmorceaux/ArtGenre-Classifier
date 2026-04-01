@@ -30,6 +30,7 @@ class LinearModel:
         )
     
     def predict_regression(self, input_data: list[float]) -> float:
+        """"Prédit une valeur continue pour un vecteur d'entrée de données."""
         Loader.call(
             "predict_regressions",
             self.ptr,
@@ -38,6 +39,7 @@ class LinearModel:
         return float()
 
     def predict_classification(self, input_data: list[float]) -> int:
+        """Prédit une classe binaire (0 ou 1) pour un vecteur d'entréer données."""
         Loader.call(
             "predict_classifications",
             self.ptr,
@@ -52,6 +54,7 @@ class LinearModel:
             alpha: float,
             epochs: int
             ) -> None:
+        """"Entraîne le modèle de classification binaire en utilisant la règle de Rosenblatt."""
         
         Loader.call(
             "train_classification",
@@ -66,7 +69,7 @@ class LinearModel:
             alpha: float,
             epochs: int
             ) -> None:
-        
+        """"Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique."""
         Loader.call(
             "train_regression",
             self.ptr,
