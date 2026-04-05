@@ -1,2 +1,5 @@
 numpy
 matplotlib
+selenium
+webdriver-manager
+requests
