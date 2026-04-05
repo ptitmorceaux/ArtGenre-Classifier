@@ -158,9 +158,9 @@ class LinearModel:
             self.ptr,
             (ctypes.c_float * all_data_length)(*dataset_inputs),
             (ctypes.c_float * y_size)(*dataset_expected_outputs),
-            data_size,
-            alpha,
-            epochs,
+            ctypes.c_uint32(data_size),
+            ctypes.c_float(alpha),
+            ctypes.c_uint32(epochs),
             prefix_errmsg="LinearModel.train_linear_classification()"
         )
 
@@ -185,8 +185,8 @@ class LinearModel:
             self.ptr,
             (ctypes.c_float * all_data_length)(*dataset_inputs),
             (ctypes.c_float * y_size)(*dataset_expected_outputs),
-            data_size,
-            alpha,
-            epochs,
+            ctypes.c_uint32(data_size),
+            ctypes.c_float(alpha),
+            ctypes.c_uint32(epochs),
             prefix_errmsg="LinearModel.train_linear_regression()"
         )
