@@ -91,14 +91,19 @@ def run_scraper():
                     raw_img_url = img_tag.get_attribute("src")
                     if not raw_img_url or "data:image" in raw_img_url:
                         raw_img_url = img_tag.get_attribute("lazy-src") or img_tag.get_attribute("data-src")
+                  
+                    if not raw_img_url:
+                        continue
                         
-                    if not raw_img_url: continue
                     image_url = raw_img_url.split('!')[0]
-                    
-                    if image_url in liens_recoltes: continue
+                
+                    if image_url in liens_recoltes:
+                        continue
                         
                     full_title = img_tag.get_attribute("title") or img_tag.get_attribute("alt")
-                    if not full_title or "-" not in full_title: continue
+                    
+                    if not full_title or "-" not in full_title:
+                        continue
 
                     parts = full_title.split("-", 1)
                     liens_recoltes[image_url] = {
