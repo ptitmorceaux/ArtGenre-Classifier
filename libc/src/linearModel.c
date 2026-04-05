@@ -16,24 +16,24 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     /*
     Crée un modèle linéaire avec des poids et un biais initialisés aléatoirement.
     */
-    // Allouer de la mémoire pour les poids et le biais et ajouter 1 pour le biais
+    // Allouer de la mémoire pour les poids + le biais
     if (!res_model) return ERR_INVALID_PTR;
     unsigned char status = RES_EXIT_SUCCESS;
     
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
     if (!model) return ERR_ALLOCATION_FAILED;
     model->weights = NULL;
-    // + 1 pour le biais dans input_dim (Il n'y a pas le biais dans input_dim)
-    model->input_dim = input_dim;
+    // length = input_dim + 1 pour le biais
+    model->length = input_dim + 1;
 
-    model->weights = (float*) malloc((input_dim + 1) * sizeof(float)); // +1 pour le biais
+    model->weights = (float*) malloc((model->length) * sizeof(float));
     if (!model->weights) {
         free_linear_model(&model);
         return ERR_ALLOCATION_FAILED;
     }
 
     // Initialisation pour les poids et le biais avec des valeurs aléatoires entre -1 et 1
-    status = fill_randomly_float_array(-1.0f, 1.0f, &(model->weights), input_dim + 1);
+    status = fill_randomly_float_array(-1.0f, 1.0f, &(model->weights), model->length);
 
     if (status != RES_EXIT_SUCCESS) {
         free_linear_model(&model);
@@ -42,6 +42,37 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     
     *res_model = model;
         
+    return RES_EXIT_SUCCESS;
+}
+
+unsigned char create_linear_model_from_init_weights(float* weights, uint32_t input_dim, float bias, LinearModel** res_model) {
+    /*
+    Crée un modèle linéaire avec des poids et un biais initialisés à partir de données fournies.
+    */
+    // Allouer de la mémoire pour les poids et le biais et ajouter 1 pour le biais
+    if (!weights || !res_model) return ERR_INVALID_PTR;
+    unsigned char status = RES_EXIT_SUCCESS;
+    
+    LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
+    if (!model) return ERR_ALLOCATION_FAILED;
+    model->weights = NULL;
+    // + 1 pour le biais dans length (Il n'y a pas le biais dans size)
+    model->length = input_dim + 1;
+
+    model->weights = (float*) malloc((model->length) * sizeof(float));
+    if (!model->weights) {
+        free_linear_model(&model);
+        return ERR_ALLOCATION_FAILED;
+    }
+
+    // Initialisation pour les poids et le biais avec les valeurs fournies
+    model->weights[0] = bias;
+    for (uint32_t i = 0; i < input_dim; i++) {
+        model->weights[i + 1] = weights[i];
+    }
+    
+    *res_model = model;
+    
     return RES_EXIT_SUCCESS;
 }
 
@@ -55,7 +86,7 @@ unsigned char free_linear_model(LinearModel** model_ptr) {
     if (model->weights) {
         free(model->weights);
     }
-
+    
     free(model);
 
     *model_ptr = NULL;
@@ -74,10 +105,12 @@ unsigned char predict_linear_regression(LinearModel* model, float* input, float*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
     */
     if (!model || !model->weights) return ERR_INVALID_PTR;
+    
     // Commence avec le biais
     float sum = model->weights[0];
-    for (uint32_t i = 0; i < model->input_dim; i++) {
-        sum += model->weights[i + 1] * input[i];
+    
+    for (uint32_t i = 1; i < model->length; i++) {
+        sum += model->weights[i] * input[i - 1];
     }
 
     *result = sum;
@@ -97,10 +130,11 @@ unsigned char predict_linear_classification(LinearModel* model, float* input, in
     
     status = predict_linear_regression(model, input, &sum);
     if (status != RES_EXIT_SUCCESS) return status;
-     
+    
     *result = sum >= 0 ? 1 : 0;
     return RES_EXIT_SUCCESS;
  }
+
 
  /** Fonction d'entraînement **/
  /*
@@ -110,6 +144,7 @@ unsigned char predict_linear_classification(LinearModel* model, float* input, in
         - `train_linear_regressions_gradient_descent` : pour entraîner le modèle sur un ensemble de données
             (Descente de gradient pour la régression)
  */
+
 
 // Règle de Rosenblatt (Perceptron Learning Algorithm) `https://fr.wikipedia.org/wiki/Perceptron` & `https://www.anyflo.com/bret/cours/rn/rn4.htm`
 /*
@@ -134,7 +169,7 @@ unsigned char train_linear_classification(LinearModel* model, float* dataset_inp
      * pour s'améliorer lors du prochain passage.
     */
 
-    uint32_t input_dim = model->input_dim;
+    uint32_t input_dim = model->length - 1;
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset
@@ -200,7 +235,7 @@ unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs,
      * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on se rapproche de la valeur, plus le pas de correction sera petit.
     */
     
-    uint32_t input_dim = model->input_dim;
+    uint32_t input_dim = model->length - 1;
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
         // On boucle sur le nombre d'exemple dans le dataset

@@ -8,7 +8,7 @@
 
 typedef struct {
     float* weights;
-    uint32_t input_dim;
+    uint32_t length; // length = input_dim + 1 (nombre de poids + biais)
 } LinearModel;
 
 // =============================
