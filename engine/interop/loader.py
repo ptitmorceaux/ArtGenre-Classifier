@@ -153,7 +153,7 @@ class _LibLoader: # Singleton Pattern Design
 
     #====== Méthode public - Init ======#
 
-    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int = None) -> None:
+    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int | None = None) -> None:
         
         if _LibLoader._isLoaded:
             raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
