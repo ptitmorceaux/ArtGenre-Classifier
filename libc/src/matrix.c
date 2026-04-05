@@ -192,10 +192,10 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
     if (!result || !matrix || !matrix->data) return ERR_INVALID_PTR;
     if (*result && ((*result)->rows != matrix->rows || (*result)->columns != matrix->columns)) return ERR_INVALID_MATRIX_DIMENSIONS;
 
-    unsigned char status;
+    unsigned char status = RES_EXIT_SUCCESS;
 
     if (*result == NULL) {
-        unsigned char status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, result);
+        status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, result);
         if (status != RES_EXIT_SUCCESS) return status;
     }
 
@@ -205,7 +205,7 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
         res->data[i] = is_addition ? matrix->data[i] + scalar : matrix->data[i] * scalar;
     }
     
-    return RES_EXIT_SUCCESS;
+    return status;
 }
 
 /*===============================================================*/
