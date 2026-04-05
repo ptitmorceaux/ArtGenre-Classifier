@@ -23,6 +23,7 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
     if (!model) return ERR_ALLOCATION_FAILED;
     model->weights = NULL;
+    // + 1 pour le biais dans input_dim (Il n'y a pas le biais dans input_dim)
     model->input_dim = input_dim;
 
     model->weights = (float*) malloc((input_dim + 1) * sizeof(float)); // +1 pour le biais
@@ -85,7 +86,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
 
 
 // Fonction de prédiction pour la classification
- unsigned char predict_classification(LinearModel* model, float* input, float* result) {
+unsigned char predict_classification(LinearModel* model, float* input, float* result) {
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
     */
