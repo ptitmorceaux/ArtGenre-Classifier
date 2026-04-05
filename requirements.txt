@@ -1,4 +1,5 @@
 numpy
 matplotlib
-selenium webdriver-manager
-selenium webdriver-manager requests
+selenium
+webdriver-manager
+requests
