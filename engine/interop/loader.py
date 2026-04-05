@@ -119,7 +119,7 @@ class _LibLoader: # Singleton Pattern Design
             return type + "*" * pointer_count
 
 
-    def _get_ctype(self, type: str) -> ctypes._SimpleCData:
+    def _get_ctype(self, type: str) -> type:
         """Return le type ctypes correspondant à une string"""
         type = self._normalize_str_type(type)
         res = _LibLoader._CTYPE_MAP.get(type)
@@ -218,8 +218,8 @@ class _LibLoader: # Singleton Pattern Design
 
 
     @staticmethod
-    def check_primitive_values_range(value, ctype: ctypes._SimpleCData, prefix_errmsg: str = "") -> None:
-        """Vérifie que la valeur est dans la range autorisée pour ce type"""
+    def check_primitive_values_range(value, ctype: type, prefix_errmsg: str = "") -> None:
+        """Vérifie que la valeur est dans la range autorisée pour ce ctype"""
         prefix_err = f"{prefix_errmsg}: _LibLoader.check_primitive_values_range()" if prefix_errmsg else "_LibLoader.check_primitive_values_range()"
 
         check_map = {
@@ -274,7 +274,7 @@ class _LibLoader: # Singleton Pattern Design
 
 
     @require_loaded
-    def set_seed(self, seed: int = None) -> None:
+    def set_seed(self, seed: int | None = None) -> None:
         """
         Set the random seed in the C library :
         if `seed` is None, a random seed will be set
@@ -284,7 +284,7 @@ class _LibLoader: # Singleton Pattern Design
             func = ["set_randomly_seed"]
         else:
             prefix_errmsg = "_LibLoader.set_seed() -> call `set_seed` to set a specific seed"
-            _LibLoader.check_primitive_values_range(seed, ctypes.c_uint32, prefix_errmsg)
+            self.check_primitive_values_range(seed, ctypes.c_uint32, prefix_errmsg)
             func = ["set_seed", seed]
         
         self.call(*func, prefix_errmsg=prefix_errmsg)
