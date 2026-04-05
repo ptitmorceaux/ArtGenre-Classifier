@@ -15,6 +15,8 @@ typedef struct {
 // Allocation et libération
 // =============================
 DLLEXPORT unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model);
+DLLEXPORT unsigned char create_linear_model_randomly(uint32_t input_dim, LinearModel** res_model);
+DLLEXPORT unsigned char create_linear_model_from_init_weights(float* weights, uint32_t input_dim, float bias, LinearModel** res_model);
 DLLEXPORT unsigned char free_linear_model(LinearModel** model_ptr);
 
 // =============================
