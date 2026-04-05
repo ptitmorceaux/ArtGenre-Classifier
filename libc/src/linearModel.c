@@ -86,7 +86,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
 
 
 // Fonction de prédiction pour la classification
-unsigned char predict_classification(LinearModel* model, float* input, float* result) {
+unsigned char predict_classification(LinearModel* model, float* input, int32_t* result) {
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
     */
@@ -98,7 +98,7 @@ unsigned char predict_classification(LinearModel* model, float* input, float* re
     status = predict_regression(model, input, &sum);
     if (status != RES_EXIT_SUCCESS) return status;
      
-    *result = sum >= 0.0f ? 1 : 0.0f;
+    *result = sum >= 0 ? 1 : 0;
     return RES_EXIT_SUCCESS;
  }
 

@@ -25,46 +25,64 @@ class LinearModel:
             prefix_errmsg="LinearModel.__init__()"
         )
     
-    def close(self):
+    def _close(self):
         """"Libère la mémoire allouée pour le modèle C."""
-        if self.ptr is not None and self.ptr.value is not None:
+        if self.ptr is not None:
             Loader.call(
                 "free_linear_model",
                 ctypes.byref(self.ptr),
-                prefix_errmsg="LinearModel.close()"
+                prefix_errmsg="LinearModel._close()"
             )
-            self.ptr = ctypes.c_void_p()
+
+    def __del__(self):
+        self._close()
 
     def predict_regression(self, input_data: list[float]) -> float:
         """"Prédit une valeur continue pour un vecteur d'entrée de données."""
+        result = ctypes.c_float()
         Loader.call(
             "predict_regressions",
             self.ptr,
+            input_data,
+            ctypes.byref(result),
             prefix_errmsg="LinearModel.predict_regression()"
         )
-        return float()
+        return result.value
 
     def predict_classification(self, input_data: list[float]) -> int:
         """Prédit une classe binaire (0 ou 1) pour un vecteur d'entréer données."""
+        result = ctypes.c_int32()
         Loader.call(
             "predict_classifications",
             self.ptr,
+            input_data,
+            ctypes.byref(result),
             prefix_errmsg="LinearModel.predict_classification()"
         )
-        return int()
+        return result.value
     
     def train_classification(
             self, 
             dataset_inputs: list[float],
             dataset_expected_outputs: list[float],
+            data_size: int,
             alpha: float,
             epochs: int
             ) -> None:
         """"Entraîne le modèle de classification binaire en utilisant la règle de Rosenblatt."""
         
+        # On vérifie les types des arguments
+        Loader.check_primitive_values_range(data_size, ctypes.c_uint32, "LinearModel.train_classification()")
+        Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train_classification()")
+        Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train_classification()")
         Loader.call(
             "train_classification",
             self.ptr,
+            dataset_inputs,
+            dataset_expected_outputs,
+            data_size,
+            alpha,
+            epochs,
             prefix_errmsg="LinearModel.train_classification()"
         )
 
@@ -72,12 +90,24 @@ class LinearModel:
             self, 
             dataset_inputs: list[float],
             dataset_expected_outputs: list[float],
+            data_size: int,
             alpha: float,
             epochs: int
             ) -> None:
         """"Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique."""
+        
+        # On vérifie les types des arguments
+        Loader.check_primitive_values_range(data_size, ctypes.c_uint32, "LinearModel.train_regression()")
+        Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train_regression()")
+        Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train_regression()")
+
         Loader.call(
             "train_regression",
             self.ptr,
+            dataset_inputs,
+            dataset_expected_outputs,
+            data_size,
+            alpha,
+            epochs,
             prefix_errmsg="LinearModel.train_regression()"
         )

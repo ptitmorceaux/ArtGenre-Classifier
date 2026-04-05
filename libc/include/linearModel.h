@@ -20,7 +20,7 @@ DLLEXPORT unsigned char free_linear_model(LinearModel** model_ptr);
 // =============================
 // Prédiction
 // =============================
-DLLEXPORT unsigned char predict_classification(LinearModel* model, float* input, float* results);
+DLLEXPORT unsigned char predict_classification(LinearModel* model, float* input, int32_t* results);
 DLLEXPORT unsigned char predict_regression(LinearModel* model, float* input, float* results);
 
 // =============================
