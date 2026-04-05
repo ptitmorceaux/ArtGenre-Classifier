@@ -20,14 +20,14 @@ DLLEXPORT unsigned char free_linear_model(LinearModel** model_ptr);
 // =============================
 // Prédiction
 // =============================
-DLLEXPORT unsigned char predict_classification(LinearModel* model, float* input, int32_t* results);
-DLLEXPORT unsigned char predict_regression(LinearModel* model, float* input, float* results);
+DLLEXPORT unsigned char predict_linear_classification(LinearModel* model, float* input, int32_t* results);
+DLLEXPORT unsigned char predict_linear_regression(LinearModel* model, float* input, float* results);
 
 // =============================
 // Entraînements
 // =============================
-DLLEXPORT unsigned char train_classification(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
-DLLEXPORT unsigned char train_regression(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
+DLLEXPORT unsigned char train_linear_classification(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
+DLLEXPORT unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
 
 #endif
     

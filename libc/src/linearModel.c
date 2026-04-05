@@ -65,11 +65,11 @@ unsigned char free_linear_model(LinearModel** model_ptr) {
  /** Fonction de prédiction **/
  /*
     # Implémenter 2 fonction de prédiction :
-        - `predict_classification` : pour les tâches de classification, qui retourne la classe prédite (0 ou 1)
-        - `predict_regression` : pour les tâches de régression, qui retourne la valeur
+        - `predict_linear_classification` : pour les tâches de classification, qui retourne la classe prédite (0 ou 1)
+        - `predict_linear_regression` : pour les tâches de régression, qui retourne la valeur
  */
 // Fonction de prédiction pour la regréssion
-unsigned char predict_regression(LinearModel* model, float* input, float* result) {
+unsigned char predict_linear_regression(LinearModel* model, float* input, float* result) {
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie un double).
     */
@@ -86,7 +86,7 @@ unsigned char predict_regression(LinearModel* model, float* input, float* result
 
 
 // Fonction de prédiction pour la classification
-unsigned char predict_classification(LinearModel* model, float* input, int32_t* result) {
+unsigned char predict_linear_classification(LinearModel* model, float* input, int32_t* result) {
     /*
     Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
     */
@@ -95,7 +95,7 @@ unsigned char predict_classification(LinearModel* model, float* input, int32_t* 
     float sum = 0.0f;
     unsigned char status = RES_EXIT_SUCCESS; 
     
-    status = predict_regression(model, input, &sum);
+    status = predict_linear_regression(model, input, &sum);
     if (status != RES_EXIT_SUCCESS) return status;
      
     *result = sum >= 0 ? 1 : 0;
@@ -105,9 +105,9 @@ unsigned char predict_classification(LinearModel* model, float* input, int32_t* 
  /** Fonction d'entraînement **/
  /*
     # Implémenter deux fonctions d'entraînement :
-        - `train_classification_rossenblatt` : pour entraîner le modèle sur un ensemble de données
+        - `train_linear_classification_rossenblatt` : pour entraîner le modèle sur un ensemble de données
             (Règle de Rosenblatt pour la classification)
-        - `train_regressions_gradient_descent` : pour entraîner le modèle sur un ensemble de données
+        - `train_linear_regressions_gradient_descent` : pour entraîner le modèle sur un ensemble de données
             (Descente de gradient pour la régression)
  */
 
@@ -123,7 +123,7 @@ unsigned char predict_classification(LinearModel* model, float* input, int32_t* 
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1) (car le biais on le multiplie par 1)
 */
-unsigned char train_classification(LinearModel* model, float* dataset_inputs,
+unsigned char train_linear_classification(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs) {   
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
@@ -142,7 +142,7 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
             /* 
                 ========================================================================================================================================
                 # TODO
-                    // Recupere genre le resultats de la prédiction : g = predict_classification(model, x --> recupere dans le dataset inputs     --> OK
+                    // Recupere genre le resultats de la prédiction : g = predict_linear_classification(model, x --> recupere dans le dataset inputs     --> OK
                     // input_dim)
                     // Cacluler l'erreur : float error = expect - predict                                                                         --> OK
                     // Mise à jour des poids seulement si error est différent de 0                                                                --> OK
@@ -153,7 +153,7 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
 
             // Recupere le résulat de la prédiction
             int32_t g = 0;
-            unsigned char status = predict_classification(model, image, &g);
+            unsigned char status = predict_linear_classification(model, image, &g);
             if (status != RES_EXIT_SUCCESS) {
                 free_linear_model(&model);
                 return status;
@@ -189,7 +189,7 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1) (car le biais on le multiplie par 1)
 */
-unsigned char train_regression(LinearModel* model, float* dataset_inputs,
+unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs) {
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
@@ -210,7 +210,7 @@ unsigned char train_regression(LinearModel* model, float* dataset_inputs,
 
             // Recupere le résulat de la prédiction
             float g = 0.0f;
-            unsigned char status = predict_regression(model, image, &g);
+            unsigned char status = predict_linear_regression(model, image, &g);
             if (status != RES_EXIT_SUCCESS) {
                 free_linear_model(&model);
                 return status;
