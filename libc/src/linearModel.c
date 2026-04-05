@@ -121,7 +121,7 @@ unsigned char predict_classification(LinearModel* model, float* input, int32_t* 
         - Calculer l'erreur : Erreur = Y_attendu - g(X).
         - Si l'erreur est différent de 0, on met à jour le modèle avec le pas d'apprentissage (alpha) en modifiant le biais ainsi que les poids :
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
-            - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
+            - Mise à jour du biais  : b = b + (alpha * Erreur * 1) (car le biais on le multiplie par 1)
 */
 unsigned char train_classification(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs) {   
@@ -149,20 +149,23 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
                 ========================================================================================================================================
             */
             // On va récupere l'adresse mémoire de chaque image (cela revient à chercher le premier pixel de notre image)
-            float* image = &dataset_inputs[j * input_dim];
+            float* image = &(dataset_inputs[j * input_dim]);
 
             // Recupere le résulat de la prédiction
-            float g = 0.0f;
+            int32_t g = 0;
             unsigned char status = predict_classification(model, image, &g);
-            if (status != RES_EXIT_SUCCESS) return status;
+            if (status != RES_EXIT_SUCCESS) {
+                free_linear_model(&model);
+                return status;
+            }
 
             // Calcul de l'erreur
             float Y_expected = dataset_expected_outputs[j];
             float error = Y_expected - g;
             
-            if (error != 0.0f) {
+            if (error != 0) {
                 // Mise à jour du biais
-                model->weights[0] += alpha * error * 1.0f; // --> Pour Milhane 
+                model->weights[0] += alpha * error;
 
                 // Mise à jour des poids
                 for (uint32_t k = 0; k < input_dim; k++) {
@@ -184,7 +187,7 @@ unsigned char train_classification(LinearModel* model, float* dataset_inputs,
         - Calculer l'erreur : Erreur = Y_attendu - g(X).
         - Ajuster continuellement le modèle avec le pas d'apprentissage (alpha) pour réduire cette erreur :
             - Mise à jour des poids : W_i = W_i + (alpha * Erreur * X_i)
-            - Mise à jour du biais  : b = b + (alpha * Erreur * 1 --> pour Milhane) (car le biais on le multiplie par 1) --> Toujours pour Milhane
+            - Mise à jour du biais  : b = b + (alpha * Erreur * 1) (car le biais on le multiplie par 1)
 */
 unsigned char train_regression(LinearModel* model, float* dataset_inputs,
         float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs) {
@@ -208,14 +211,17 @@ unsigned char train_regression(LinearModel* model, float* dataset_inputs,
             // Recupere le résulat de la prédiction
             float g = 0.0f;
             unsigned char status = predict_regression(model, image, &g);
-            if (status != RES_EXIT_SUCCESS) return status;
+            if (status != RES_EXIT_SUCCESS) {
+                free_linear_model(&model);
+                return status;
+            }
 
             // Calcul de l'erreur
             float Y_expected = dataset_expected_outputs[j];
             float error = Y_expected - g;
    
             // Mise à jour du biais
-            model->weights[0] += alpha * error * 1.0f; // --> Pour Milhane 
+            model->weights[0] += alpha * error;
 
             // Mise à jour des poids
             for (uint32_t k = 0; k < input_dim; k++) {
