@@ -113,25 +113,26 @@ class LinearModel:
             self,
             dataset_inputs: list[float],
             dataset_expected_outputs: list[float],
-            errmsg: int
+            errmsg: str
             ) -> tuple[int, int, int]:
         """Vérifie que les données d'entraînement sont valides pour le modèle (renvoie le nombre d'éléments de données)."""        
         
         all_data_length = len(dataset_inputs)
         y_size = len(dataset_expected_outputs)
-        data_size = all_data_length / self.input_dim
 
-        if data_size == 0:
-            raise ValueError("LinearModel.train_linear_classification(): `dataset_inputs` cannot be empty.")
+        if all_data_length == 0:
+            raise ValueError(f"{errmsg}: `dataset_inputs` cannot be empty.")
+
+        if all_data_length % self.input_dim != 0:
+            raise ValueError(f"{errmsg}: `dataset_inputs` length must be a multiple of model's input_dim ({self.input_dim}).")
+
+        data_size = all_data_length // self.input_dim
 
         if y_size == 0:
-            raise ValueError("LinearModel.train_linear_classification(): `dataset_expected_outputs` cannot be empty.")
-        
-        if isinstance(data_size, int):
-            raise ValueError(f"LinearModel.train_linear_classification(): `dataset_inputs` length must be a multiple of model's input_dim ({self.input_dim}).")
+            raise ValueError(f"{errmsg}: `dataset_expected_outputs` cannot be empty.")
 
-        if y_size != self.input_dim + 1:
-            raise ValueError(f"LinearModel.train_linear_classification(): `dataset_expected_outputs` length must be equal to model's input_dim + 1 ({self.input_dim + 1}).")
+        if y_size != data_size:
+            raise ValueError(f"{errmsg}: `dataset_expected_outputs` length must equal dataset_size ({data_size}).")
         
         return all_data_length, y_size, data_size
 
