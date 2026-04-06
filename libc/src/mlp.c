@@ -196,15 +196,15 @@ unsigned char propagate_forward_mlp(MLP* model, float* input, char is_classifica
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char predict_mlp(MLP* model, float* input, float* output, char is_classification) {
-    if (!model || !input || !output) return ERR_INVALID_PTR;
+unsigned char predict_mlp(MLP* model, float* input, char is_classification, float* outputs) {
+    if (!model || !outputs) return ERR_INVALID_PTR;
 
     unsigned char status = propagate_forward_mlp(model, input, is_classification);
     if (status != RES_EXIT_SUCCESS) return status;
 
     // Copier les activations de la couche de sortie dans output
-    for (uint32_t i = 1; i < model->d[model->L] + 1; i++) {
-        output[i - 1] = model->X[model->L][i];
+    for (uint32_t i = 1; i <= model->d[model->L]; i++) {
+        outputs[i - 1] = model->X[model->L][i];
     }
 
     return RES_EXIT_SUCCESS;
