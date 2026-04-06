@@ -108,8 +108,8 @@ class LinearModel:
 
     def predict(self, input_data: list[float], is_classification: bool) -> float | int:
         """
-        Si is_classification = True: Prédit une valeur continue pour un vecteur d'entrée de données.
-        Si is_classification = False: Prédit une classe binaire (0 ou 1) pour un vecteur d'entréer données.
+        Si is_classification = True: Prédit une classe binaire (0 ou 1) pour un vecteur d'entrée.
+        Si is_classification = False: Prédit une valeur continue pour un vecteur d'entrée.
         """
         if len(input_data) != self.input_dim:
             raise ValueError(f"LinearModel.predict(): `input_data` length must be equal to model's input_dim ({self.input_dim}).")
