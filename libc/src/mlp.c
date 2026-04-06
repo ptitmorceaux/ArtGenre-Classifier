@@ -59,7 +59,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
         model->deltas[i] = NULL;
     }
 
-    // Allouer et initialiser les poids, activations et deltas pour chaque couche
+    // Allouer et initialiser activations et deltas pour chaque couche
     for (uint32_t l = 0; l <= model->L; l++) {
         // Allocations X et deltas
         model->X[l] = (float*) malloc(model->d[l] * sizeof(float));
@@ -78,12 +78,28 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
                 model->X[l][j] = 0.0f;
             }
         }
+    }
 
+    for (uint32_t l = 0; l < model->L; l++) {
+        // La couche 0 n'a pas de poids entrants
+        if (l == 0) continue;
+        
+        // Allocation de W pour la couche l > 0
+        uint32_t w_size = (model->d[l-1] + 1) * (model->d[l] + 1);
+        model->W[l] = (float*) malloc(w_size * sizeof(float));
+
+        if (!model->W[l]) {
+            free_mlp(&model);
+            return ERR_ALLOCATION_FAILED;
+        }
+
+        // Initialisation aléatoire des poids entre -1.0 et 1.0
+        unsigned char status = fill_
     }
     
     *res_model = model;
 
-    return RES_EXIT_SUCCESS;
+    return status;
 }
 
 unsigned char free_mlp(MLP** model_ptr) {

@@ -3,7 +3,7 @@
 
 
 #include "global.h"
-#include "random.h"
+#include "array.h"
  
 typedef struct {
     uint32_t* d;            // Tableau de dimensions (nombre de neuronnes par couche) + 1 pour le biais
