@@ -43,7 +43,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     }
 
     // Allocation des tableaux de poids, activations et deltas
-    model->W = (float**) malloc((model->L + 1) * sizeof(float*));
+    model->W = (float**) malloc((model->L) * sizeof(float*));
     model->X = (float**) malloc((model->L + 1) * sizeof(float*));
     model->deltas = (float**) malloc((model->L + 1) * sizeof(float*));
 
@@ -62,8 +62,8 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     // Allouer et initialiser activations et deltas pour chaque couche
     for (uint32_t l = 0; l <= model->L; l++) {
         // Allocations X et deltas
-        model->X[l] = (float*) malloc(model->d[l] * sizeof(float));
-        model->deltas[l] = (float*) malloc(model->d[l] * sizeof(float));
+        model->X[l] = (float*) malloc((model->d[l] + 1) * sizeof(float));
+        model->deltas[l] = (float*) malloc((model->d[l] + 1) * sizeof(float));
 
         if (!model->X[l] || !model->deltas[l]) {
             free_mlp(&model);
@@ -81,11 +81,8 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     }
 
     for (uint32_t l = 0; l < model->L; l++) {
-        // La couche 0 n'a pas de poids entrants
-        if (l == 0) continue;
-        
         // Allocation de W pour la couche l > 0
-        uint32_t w_size = (model->d[l-1] + 1) * (model->d[l] + 1);
+        uint32_t w_size = (model->d[l] + 1) * (model->d[l + 1]);
         model->W[l] = (float*) malloc(w_size * sizeof(float));
 
         if (!model->W[l]) {
@@ -94,12 +91,16 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
         }
 
         // Initialisation aléatoire des poids entre -1.0 et 1.0
-        unsigned char status = fill_
+        unsigned char status = fill_randomly_float_array(-1.0f, 1.0f, &model->W[l], w_size);
+        if (status != RES_EXIT_SUCCESS) {
+            free_mlp(&model);
+            return status;
+        }
     }
     
     *res_model = model;
 
-    return status;
+    return RES_EXIT_SUCCESS;
 }
 
 unsigned char free_mlp(MLP** model_ptr) {
