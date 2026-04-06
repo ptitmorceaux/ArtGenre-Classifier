@@ -109,5 +109,36 @@ unsigned char free_mlp(MLP** model_ptr) {
     */
     if (!model_ptr || !(*model_ptr)) return ERR_INVALID_PTR;
 
+    MLP* model = *model_ptr;
+
+    if (model->W) {
+        for (uint32_t l = 0; l < model->L; l++) {
+            free(model->W[l]);
+        }
+        free(model->W);
+        model->W = NULL;
+    }
+    if (model->X) {
+        for (uint32_t l = 0; l <= model->L; l++) {
+            free(model->X[l]);
+        }
+        free(model->X);
+        model->X = NULL;
+    }
+    if (model->deltas) {
+        for (uint32_t l = 0; l <= model->L; l++) {
+            free(model->deltas[l]);
+        }
+        free(model->deltas);
+        model->deltas = NULL;
+    }
+    if (model->d) {
+        free(model->d);
+        model->d = NULL;
+    }
+
+    free(model);
+    *model_ptr = NULL;
+
     return RES_EXIT_SUCCESS;
 }
