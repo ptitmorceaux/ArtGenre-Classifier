@@ -227,7 +227,9 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
 
     // Boucle d'entraînement stochastique
     for (uint32_t i = 0; i < epochs; i++) {
-        uint32_t k = random_float(0, dataset_size - 1, &k);
+        float tmp;
+        random_float(0, dataset_size - 1, &tmp);
+        uint32_t k = (uint32_t)tmp;
         float* inputs_k = &dataset_inputs[k * input_dim];
         float* y_k = &dataset_expected_outputs[k * outputs_dim];
 
