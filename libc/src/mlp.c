@@ -226,6 +226,7 @@ unsigned char predict_mlp(MLP* model, float* input, char is_classification, floa
 unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expected_outputs,
         uint32_t dataset_size, float alpha, uint32_t epochs, char is_classification) {
     if (!model || !dataset_inputs || !dataset_expected_outputs) return ERR_INVALID_PTR;
+    if (dataset_size == 0) return ERR_LENGTH_ZERO;
 
     uint32_t input_dim = model->d[0]; // Nombre de neurones d'entrée (sans le biais)
     uint32_t outputs_dim = model->d[model->L]; // Nombre de neurones de sortie
@@ -250,31 +251,30 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
                 model->deltas[model->L][j] *= (1.0f - model->X[model->L][j] * model->X[model->L][j]);
             }
         }
-    }
+        // Backpropagation des deltas
+        for (int32_t l = model->L - 1; l >= 1; l--) {
+            for (uint32_t n = 1; n <= model->d[l]; n++) {
+                float total_errors = 0.0f;
 
-    // Backpropagation des deltas et mise à jour des poids
-    for (int32_t l = model->L - 1; l >= 1; l--) {
-        for (uint32_t i = 1; i <= model->d[l]; i++) {
-            float total_errors = 0.0f;
+                // On somme (poids * deltas) pour la couche suivante (l + 1)
+                for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
+                    // W[l] connecte la couche l à l+1
+                    total_errors += model->W[l][n][j - 1] * model->deltas[l + 1][j];
+                }
 
-            // On somme (poids * deltas) pour la couche suivante (l + 1)
-            for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
-                // W[l] connecte la couche l à l+1
-                total_errors += model->W[l][i][j - 1] * model->deltas[l + 1][j];
+                // On multiplie par la dérivée de l'activation (tanh) pour obtenir les deltas des couches cachées
+                total_errors *= (1.0f - model->X[l][n] * model->X[l][n]);
+
+                model->deltas[l][n] = total_errors;
             }
+        }
 
-            // On multiplie par la dérivée de l'activation (tanh) pour obtenir les deltas des couches cachées
-            total_errors *= (1.0f - model->X[l][i] * model->X[l][i]);
-
-            model->deltas[l][i] = total_errors;
-        }   
-    }
-
-
-    for (uint32_t l = 0; l < model->L; l++) {
-        for (uint32_t i = 0; i <= model->d[l]; i++) {
-            for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
-               model->W[l][i][j - 1] -= alpha * model->X[l][i] * model->deltas[l + 1][j];
+        // Mise à jour des poids
+        for (uint32_t l = 0; l < model->L; l++) {
+            for (uint32_t n = 0; n <= model->d[l]; n++) {
+                for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
+                    model->W[l][n][j - 1] -= alpha * model->X[l][n] * model->deltas[l + 1][j];
+                }
             }
         }
     }
