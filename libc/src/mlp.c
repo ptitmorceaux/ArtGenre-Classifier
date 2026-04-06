@@ -1,5 +1,8 @@
 #include "../include/mlp.h"
 
+extern double tanh(double x);
+
+
 /** ==========================================
  * Structure for a Multi-Layer Perceptron (MLP)
  * ========================================== **/
@@ -33,8 +36,8 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     // Configuration de d et L
     model->L = npl_size - 1;
     model->d = (uint32_t*) malloc(npl_size * sizeof(uint32_t));
-    if (model->d) {
-        free_mlp(model);
+    if (!model->d) {
+        free_mlp(&model);
         return ERR_ALLOCATION_FAILED;
     }
 
@@ -53,14 +56,16 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     }
 
     // Initialiser les pointeurs à NULL
-    for (uint32_t i = 0; i <= model->L; i++) {
+    for (uint32_t i = 0; i < model->L; i++) {
         model->W[i] = NULL;
+    }
+    for (uint32_t i = 0; i <= model->L; i++) {
         model->X[i] = NULL;
         model->deltas[i] = NULL;
     }
 
     // Allouer et initialiser activations et deltas pour chaque couche
-    for (uint32_t l = 0; l <= model->L + 1; l++) {
+    for (uint32_t l = 0; l <= model->L; l++) {
         // Allocations X et deltas
         model->X[l] = (float*) malloc((model->d[l] + 1) * sizeof(float));
         model->deltas[l] = (float*) malloc((model->d[l] + 1) * sizeof(float));
@@ -99,7 +104,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
             }
 
             // On remplit les lignes des poids aléatoirements entre -1.0 et 1.0
-            unsigned char status = fill_randomly_float_array(-1.0f, 1.0f, &model->W[l], cols);
+            unsigned char status = fill_randomly_float_array(-1.0f, 1.0f, &model->W[l][i], cols);
             if (status != RES_EXIT_SUCCESS) {
                 free_mlp(&model);
                 return status;
@@ -249,7 +254,7 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
 
     // Backpropagation des deltas et mise à jour des poids
     for (int32_t l = model->L - 1; l >= 1; l--) {
-        for (uint32_t i = 1; i <= model->d[l] + 1; i++) {
+        for (uint32_t i = 1; i <= model->d[l]; i++) {
             float total_errors = 0.0f;
 
             // On somme (poids * deltas) pour la couche suivante (l + 1)
@@ -269,7 +274,7 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
     for (uint32_t l = 0; l < model->L; l++) {
         for (uint32_t i = 0; i <= model->d[l]; i++) {
             for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
-               model->W[l][i][j - 1] -= alpha * model->X[l + 1][j] * model->deltas[l][i];
+               model->W[l][i][j - 1] -= alpha * model->X[l][i] * model->deltas[l + 1][j];
             }
         }
     }
