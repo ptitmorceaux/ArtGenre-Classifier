@@ -43,7 +43,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     }
 
     // Allocation des tableaux de poids, activations et deltas
-    model->W = (float**) malloc((model->L) * sizeof(float*));
+    model->W = (float***) malloc((model->L) * sizeof(float**));
     model->X = (float**) malloc((model->L + 1) * sizeof(float*));
     model->deltas = (float**) malloc((model->L + 1) * sizeof(float*));
 
@@ -60,7 +60,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     }
 
     // Allouer et initialiser activations et deltas pour chaque couche
-    for (uint32_t l = 0; l <= model->L; l++) {
+    for (uint32_t l = 0; l <= model->L + 1; l++) {
         // Allocations X et deltas
         model->X[l] = (float*) malloc((model->d[l] + 1) * sizeof(float));
         model->deltas[l] = (float*) malloc((model->d[l] + 1) * sizeof(float));
@@ -82,20 +82,29 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
 
     for (uint32_t l = 0; l < model->L; l++) {
         // Allocation de W pour la couche l > 0
-        uint32_t w_size = (model->d[l] + 1) * (model->d[l + 1]);
-        model->W[l] = (float*) malloc(w_size * sizeof(float));
-
+        uint32_t rows = model->d[l] + 1;
+        uint32_t cols = model->d[l + 1];
+        
+        model->W[l] = (float**) malloc(rows * sizeof(float*));
         if (!model->W[l]) {
             free_mlp(&model);
             return ERR_ALLOCATION_FAILED;
         }
+        for (uint32_t i = 0; i < rows; i++) {
+            model->W[l][i] = (float*) malloc(cols * sizeof(float));
+            
+            if (!model->W[l][i]) {
+                free_mlp(&model);
+                return ERR_ALLOCATION_FAILED;
+            }
 
-        // Initialisation aléatoire des poids entre -1.0 et 1.0
-        unsigned char status = fill_randomly_float_array(-1.0f, 1.0f, &model->W[l], w_size);
-        if (status != RES_EXIT_SUCCESS) {
-            free_mlp(&model);
-            return status;
-        }
+            // On remplit les lignes des poids aléatoirements entre -1.0 et 1.0
+            unsigned char status = fill_randomly_float_array(-1.0f, 1.0f, &model->W[l], cols);
+            if (status != RES_EXIT_SUCCESS) {
+                free_mlp(&model);
+                return status;
+            }
+        }   
     }
     
     *res_model = model;
@@ -114,21 +123,32 @@ unsigned char free_mlp(MLP** model_ptr) {
 
     if (model->W) {
         for (uint32_t l = 0; l < model->L; l++) {
+            if (!model->W[l]) continue;
+            for (uint32_t i = 0; i < model->d[l] + 1; i++) {
+                if (!model->W[l][i]) continue;
+                free(model->W[l][i]);
+                model->W[l][i] = NULL;
+            }
             free(model->W[l]);
+            model->W[l] = NULL;
         }
         free(model->W);
         model->W = NULL;
     }
     if (model->X) {
         for (uint32_t l = 0; l <= model->L; l++) {
+            if (!model->X[l]) continue;
             free(model->X[l]);
+            model->X[l] = NULL;
         }
         free(model->X);
         model->X = NULL;
     }
     if (model->deltas) {
         for (uint32_t l = 0; l <= model->L; l++) {
+            if (!model->deltas[l]) continue;
             free(model->deltas[l]);
+            model->deltas[l] = NULL;
         }
         free(model->deltas);
         model->deltas = NULL;
@@ -141,5 +161,37 @@ unsigned char free_mlp(MLP** model_ptr) {
     free(model);
     *model_ptr = NULL;
 
+    return RES_EXIT_SUCCESS;
+}
+
+/** =========================================
+ * Fonction de prédiction (Forward pass)
+ * ==========================================
+ */
+    // FEUR
+
+unsigned char propagate_forward_mlp(MLP* model, float* input, char is_classification) {
+    if (!model || !model->W || !model->X || !input) return ERR_INVALID_PTR;
+
+    // Remplir la couche d'entrée (Couche 0) (en laissant la case 0 pour le biais)
+    for (uint32_t j = 1; j < model->d[0] + 1; j++) {
+        model->X[0][j] = input[j - 1];
+    }
+
+    // Propagation couche par couche
+    for (uint32_t l = 1; l < model->L + 1; l++) {
+        for (uint32_t i = 1; i < model->d[l] + 1; i++) {
+            float sum = 0.0f;
+            for (uint32_t j = 0; j < model->d[l - 1] + 1; j++) {
+                sum += model->W[l - 1][j][i - 1] * model->X[l - 1][j];
+            }
+
+            if (l < model->L || is_classification) {
+                sum = tanh(sum);
+            }
+
+            model->X[l][i] = sum;
+        }
+    }
     return RES_EXIT_SUCCESS;
 }
