@@ -108,13 +108,13 @@ class LinearModel:
 
     def predict(self, input_data: list[float], is_classification: bool) -> float | int:
         """
-        Si is_classification = True: Prédit une classe binaire (0 ou 1) pour un vecteur d'entrée.
+        Si is_classification = True: Prédit une classe binaire signée (-1 ou 1) pour un vecteur d'entrée.
         Si is_classification = False: Prédit une valeur continue pour un vecteur d'entrée.
         """
         if len(input_data) != self.input_dim:
             raise ValueError(f"LinearModel.predict(): `input_data` length must be equal to model's input_dim ({self.input_dim}).")
     
-        result = ctypes.c_uint32() if is_classification else ctypes.c_float()
+        result = ctypes.c_int32() if is_classification else ctypes.c_float()
         Loader.call(
             "predict_linear_classification" if is_classification else "predict_linear_regression",
             self.ptr,
@@ -135,7 +135,7 @@ class LinearModel:
             is_classification: bool
             ) -> None:
         """
-        Si is_classification = True: Entraîne le modèle de classification binaire en utilisant la règle de Rosenblatt.
+        Si is_classification = True: Entraîne le modèle de classification binaire signée (-1 / 1) en utilisant la règle de Rosenblatt.
         Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
         """
 
