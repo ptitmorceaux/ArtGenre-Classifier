@@ -107,7 +107,8 @@ unsigned char free_mlp(MLP** model_ptr) {
     /*
     Libérer la mémoire allouée pour le MLP
     */
-    if (!model_ptr || !(*model_ptr)) return ERR_INVALID_PTR;
+    if (!model_ptr) return ERR_INVALID_PTR;    
+    if (!(*model_ptr)) return RES_EXIT_SUCCESS; 
 
     MLP* model = *model_ptr;
 
