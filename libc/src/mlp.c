@@ -232,48 +232,52 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
     uint32_t outputs_dim = model->d[model->L]; // Nombre de neurones de sortie
 
     // Boucle d'entraînement stochastique
-    for (uint32_t i = 0; i < epochs; i++) {
-        float tmp;
-        random_float(0, dataset_size - 1, &tmp);
-        uint32_t k = (uint32_t)tmp;
-        float* inputs_k = &dataset_inputs[k * input_dim];
-        float* y_k = &dataset_expected_outputs[k * outputs_dim];
+    // Une époque effectue dataset_size mises à jour pour mieux couvrir le dataset.
+    for (uint32_t e = 0; e < epochs; e++) {
+        for (uint32_t s = 0; s < dataset_size; s++) {
+            float tmp;
+            random_float(0, dataset_size - 1, &tmp);
+            uint32_t k = (uint32_t)tmp;
+            float* inputs_k = &dataset_inputs[k * input_dim];
+            float* y_k = &dataset_expected_outputs[k * outputs_dim];
 
-        unsigned char status = propagate_forward_mlp(model, inputs_k, is_classification);
-        if (status != RES_EXIT_SUCCESS) return status;
+            unsigned char status = propagate_forward_mlp(model, inputs_k, is_classification);
+            if (status != RES_EXIT_SUCCESS) return status;
 
-        // Calcul des deltas pour la couche de sortie
-        for (uint32_t j = 1; j <= outputs_dim; j++) {
-            model->deltas[model->L][j] = model->X[model->L][j] - y_k[j - 1];
+            // Calcul des deltas pour la couche de sortie
+            for (uint32_t j = 1; j <= outputs_dim; j++) {
+                model->deltas[model->L][j] = model->X[model->L][j] - y_k[j - 1];
 
-            // Si classification, on applique la dérivée de tanh (1 - x^2)
-            if (is_classification) {
-                model->deltas[model->L][j] *= (1.0f - model->X[model->L][j] * model->X[model->L][j]);
-            }
-        }
-        // Backpropagation des deltas
-        for (int32_t l = model->L - 1; l >= 1; l--) {
-            for (uint32_t n = 1; n <= model->d[l]; n++) {
-                float total_errors = 0.0f;
-
-                // On somme (poids * deltas) pour la couche suivante (l + 1)
-                for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
-                    // W[l] connecte la couche l à l+1
-                    total_errors += model->W[l][n][j - 1] * model->deltas[l + 1][j];
+                // Si classification, on applique la dérivée de tanh (1 - x^2)
+                if (is_classification) {
+                    model->deltas[model->L][j] *= (1.0f - model->X[model->L][j] * model->X[model->L][j]);
                 }
-
-                // On multiplie par la dérivée de l'activation (tanh) pour obtenir les deltas des couches cachées
-                total_errors *= (1.0f - model->X[l][n] * model->X[l][n]);
-
-                model->deltas[l][n] = total_errors;
             }
-        }
 
-        // Mise à jour des poids
-        for (uint32_t l = 0; l < model->L; l++) {
-            for (uint32_t n = 0; n <= model->d[l]; n++) {
-                for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
-                    model->W[l][n][j - 1] -= alpha * model->X[l][n] * model->deltas[l + 1][j];
+            // Backpropagation des deltas
+            for (int32_t l = model->L - 1; l >= 1; l--) {
+                for (uint32_t n = 1; n <= model->d[l]; n++) {
+                    float total_errors = 0.0f;
+
+                    // On somme (poids * deltas) pour la couche suivante (l + 1)
+                    for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
+                        // W[l] connecte la couche l à l+1
+                        total_errors += model->W[l][n][j - 1] * model->deltas[l + 1][j];
+                    }
+
+                    // On multiplie par la dérivée de l'activation (tanh) pour obtenir les deltas des couches cachées
+                    total_errors *= (1.0f - model->X[l][n] * model->X[l][n]);
+
+                    model->deltas[l][n] = total_errors;
+                }
+            }
+
+            // Mise à jour des poids
+            for (uint32_t l = 0; l < model->L; l++) {
+                for (uint32_t n = 0; n <= model->d[l]; n++) {
+                    for (uint32_t j = 1; j <= model->d[l + 1]; j++) {
+                        model->W[l][n][j - 1] -= alpha * model->X[l][n] * model->deltas[l + 1][j];
+                    }
                 }
             }
         }
