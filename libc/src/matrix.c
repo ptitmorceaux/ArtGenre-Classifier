@@ -64,14 +64,10 @@ unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
 unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
     Matrix* m = *matrix;
-
-    for (uint32_t i = 0; i < m->rows * m->columns; i++) {
-        
-        unsigned char status = random_float(min, max, &m->data[i]);
-        if (status != RES_EXIT_SUCCESS) {
-            free_matrix(matrix);
-            return status;
-        }
+    unsigned char status = fill_randomly_float_array(min, max, &m->data, m->rows * m->columns);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(matrix);
+        return status;
     }
     return RES_EXIT_SUCCESS;
 }
@@ -196,10 +192,10 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
     if (!result || !matrix || !matrix->data) return ERR_INVALID_PTR;
     if (*result && ((*result)->rows != matrix->rows || (*result)->columns != matrix->columns)) return ERR_INVALID_MATRIX_DIMENSIONS;
 
-    unsigned char status;
+    unsigned char status = RES_EXIT_SUCCESS;
 
     if (*result == NULL) {
-        unsigned char status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, result);
+        status = allocate_2d_matrix_float32(matrix->rows, matrix->columns, result);
         if (status != RES_EXIT_SUCCESS) return status;
     }
 
@@ -209,7 +205,7 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
         res->data[i] = is_addition ? matrix->data[i] + scalar : matrix->data[i] * scalar;
     }
     
-    return RES_EXIT_SUCCESS;
+    return status;
 }
 
 /*===============================================================*/

@@ -3,7 +3,7 @@
 
 
 #include "global.h"
-#include "random.h"
+#include "array.h"
 
 
 // 2D matrix of float32 values (stored in row-major order) 
