@@ -55,7 +55,7 @@ class MLP:
         c_input_array = (ctypes.c_float * len(input_data))(*input_data)
         output_dim = self.npl[-1]
         c_res_outputs = (ctypes.c_float * output_dim)()
-        c_is_classification = ctypes.c_char(1 if is_classification else 0)
+        c_is_classification = ctypes.c_byte(1 if is_classification else 0)
 
         Loader.call(
             "predict_mlp",
@@ -94,9 +94,9 @@ class MLP:
             self.ptr,
             c_dataset_inputs,
             c_expected_outputs,
-            data_size,
-            alpha,
-            epochs,
+            ctypes.c_uint32(data_size),
+            ctypes.c_float(alpha),
+            ctypes.c_uint32(epochs),
             c_is_classification,
             prefix_errmsg="MLP.train()"
         )
