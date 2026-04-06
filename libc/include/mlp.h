@@ -4,7 +4,8 @@
 
 #include "global.h"
 #include "array.h"
- 
+#include "random.h"
+
 typedef struct {
     uint32_t* d;            // Tableau de dimensions (nombre de neuronnes par couche) + 1 pour le biais
     uint32_t L;             // Nombre de "sauts" entre les couches (len(dimension) - 1)
