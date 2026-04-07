@@ -75,38 +75,6 @@ class LinearModel:
             # Evite de remonter des exceptions pendant le GC/interpreter shutdown o-o
             pass
     
-    #====== Méthode publique - Prédiction ======#
-
-    def predict_linear_regression(self, input_data: list[float]) -> float:
-        """Prédit une valeur continue pour un vecteur d'entrée de données."""
-        if len(input_data) != self.input_dim:
-            raise ValueError(f"LinearModel.predict_linear_regression(): `input_data` length must be equal to model's input_dim ({self.input_dim}).")
-    
-        result = ctypes.c_float()
-        Loader.call(
-            "predict_linear_regression",
-            self.ptr,
-            (ctypes.c_float * len(input_data))(*input_data),
-            ctypes.byref(result),
-            prefix_errmsg="LinearModel.predict_linear_regression()"
-        )
-        return result.value
-
-    def predict_linear_classification(self, input_data: list[float]) -> int:
-        """Prédit une classe binaire (0 ou 1) pour un vecteur d'entréer données."""
-        if len(input_data) != self.input_dim:
-            raise ValueError(f"LinearModel.predict_linear_classification(): `input_data` length must be equal to model's input_dim ({self.input_dim}).")
-
-        result = ctypes.c_int32()
-        Loader.call(
-            "predict_linear_classification",
-            self.ptr,
-            (ctypes.c_float * len(input_data))(*input_data),
-            ctypes.byref(result),
-            prefix_errmsg="LinearModel.predict_linear_classification()"
-        )
-        return result.value
-    
     #====== Méthode privée - Entraînement ======#
 
     def _check_training_data(
@@ -135,58 +103,55 @@ class LinearModel:
             raise ValueError(f"{errmsg}: `dataset_expected_outputs` length must equal dataset_size ({data_size}).")
         
         return all_data_length, y_size, data_size
+    
+    #====== Méthode publique - Prédiction ======#
+
+    def predict(self, input_data: list[float], is_classification: bool) -> float | int:
+        """
+        Si is_classification = True: Prédit une classe binaire signée (-1 ou 1) pour un vecteur d'entrée.
+        Si is_classification = False: Prédit une valeur continue pour un vecteur d'entrée.
+        """
+        if len(input_data) != self.input_dim:
+            raise ValueError(f"LinearModel.predict(): `input_data` length must be equal to model's input_dim ({self.input_dim}).")
+    
+        result = ctypes.c_int32() if is_classification else ctypes.c_float()
+        Loader.call(
+            "predict_linear_classification" if is_classification else "predict_linear_regression",
+            self.ptr,
+            (ctypes.c_float * len(input_data))(*input_data),
+            ctypes.byref(result),
+            prefix_errmsg="LinearModel.predict()"
+        )
+        return result.value
 
     #====== Méthode publique - Entraînement ======#
 
-    def train_linear_classification(
+    def train(
             self,
             dataset_inputs: list[float],
             dataset_expected_outputs: list[float],
             alpha: float,
-            epochs: int
+            epochs: int,
+            is_classification: bool
             ) -> None:
-        """Entraîne le modèle de classification binaire en utilisant la règle de Rosenblatt."""
+        """
+        Si is_classification = True: Entraîne le modèle de classification binaire signée (-1 / 1) en utilisant la règle de Rosenblatt.
+        Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
+        """
 
-        all_data_length, y_size, data_size = self._check_training_data(dataset_inputs, dataset_expected_outputs, "LinearModel.train_linear_classification()")
+        all_data_length, y_size, data_size = self._check_training_data(dataset_inputs, dataset_expected_outputs, "LinearModel.train()")
 
         # On vérifie les types des arguments
-        Loader.check_primitive_values_range(data_size, ctypes.c_uint32, "LinearModel.train_linear_classification()")
-        Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train_linear_classification()")
-        Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train_linear_classification()")
+        Loader.check_primitive_values_range(data_size, ctypes.c_uint32, "LinearModel.train()")
+        Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train()")
+        Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train()")
         Loader.call(
-            "train_linear_classification",
+            "train_linear_classification" if is_classification else "train_linear_regression",
             self.ptr,
             (ctypes.c_float * all_data_length)(*dataset_inputs),
             (ctypes.c_float * y_size)(*dataset_expected_outputs),
             ctypes.c_uint32(data_size),
             ctypes.c_float(alpha),
             ctypes.c_uint32(epochs),
-            prefix_errmsg="LinearModel.train_linear_classification()"
-        )
-
-    def train_linear_regression(
-            self, 
-            dataset_inputs: list[float],
-            dataset_expected_outputs: list[float],
-            alpha: float,
-            epochs: int
-            ) -> None:
-        """Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique."""
-
-        all_data_length, y_size, data_size = self._check_training_data(dataset_inputs, dataset_expected_outputs, "LinearModel.train_linear_regression()")
-
-        # On vérifie les types des arguments
-        Loader.check_primitive_values_range(data_size, ctypes.c_uint32, "LinearModel.train_linear_regression()")
-        Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train_linear_regression()")
-        Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train_linear_regression()")
-
-        Loader.call(
-            "train_linear_regression",
-            self.ptr,
-            (ctypes.c_float * all_data_length)(*dataset_inputs),
-            (ctypes.c_float * y_size)(*dataset_expected_outputs),
-            ctypes.c_uint32(data_size),
-            ctypes.c_float(alpha),
-            ctypes.c_uint32(epochs),
-            prefix_errmsg="LinearModel.train_linear_regression()"
+            prefix_errmsg="LinearModel.train()"
         )

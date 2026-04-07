@@ -88,7 +88,7 @@ unsigned char free_linear_model(LinearModel** model_ptr) {
  /** Fonction de prédiction **/
  /*
     # Implémenter 2 fonction de prédiction :
-        - `predict_linear_classification` : pour les tâches de classification, qui retourne la classe prédite (0 ou 1)
+        - `predict_linear_classification` : pour les tâches de classification, qui retourne la classe prédite (-1 ou 1)
         - `predict_linear_regression` : pour les tâches de régression, qui retourne la valeur
  */
 // Fonction de prédiction pour la regréssion
@@ -113,7 +113,7 @@ unsigned char predict_linear_regression(LinearModel* model, float* input, float*
 // Fonction de prédiction pour la classification
 unsigned char predict_linear_classification(LinearModel* model, float* input, int32_t* result) {
     /*
-    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
+    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie -1 ou 1).
     */
     if (!model || !model->weights) return ERR_INVALID_PTR;
 
@@ -123,7 +123,7 @@ unsigned char predict_linear_classification(LinearModel* model, float* input, in
     status = predict_linear_regression(model, input, &sum);
     if (status != RES_EXIT_SUCCESS) return status;
     
-    *result = sum >= 0 ? 1 : 0;
+    *result = sum >= 0 ? 1 : -1;
     return RES_EXIT_SUCCESS;
  }
 
@@ -221,7 +221,7 @@ unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs,
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par descente de gradient stochastique.
-     * Contrairement à la classification (0 ou 1), ici on prédit une valeur continue (ex: 6.7).
+    * Contrairement à la classification (-1 ou 1), ici on prédit une valeur continue (ex: 6.7).
      * L'algorithme calcule l'écart (la distance) entre la prédiction et la vraie valeur.
      * Il va ensuite utiliser cet écart pour ajuster proportionnellement le biais et les poids.
      * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on se rapproche de la valeur, plus le pas de correction sera petit.
