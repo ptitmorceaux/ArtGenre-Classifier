@@ -78,8 +78,8 @@ python -m pytest -v
 ## 📈 État d'avancement
 
 * [ **x** ] Structure globale et interopérabilité (ctypes)
-* [ **-** ] Implémentation du Modèle Linéaire
-* [ **-** ] Finalisation du Perceptron Multicouche (PMC)
+* [ **e** ] Implémentation du Modèle Linéaire
+* [ **e** ] Finalisation du Perceptron Multicouche (PMC)
 * [ **-** ] Implémentation des fonctions RBF
 * [ **-** ] Dataset complet et évaluation des performances
 
