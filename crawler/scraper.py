@@ -23,7 +23,7 @@ DATASET_DIRECTORY = os.path.join(os.path.dirname(__file__), '..', 'dataset')
 def setup_driver():
     """Configure et retourne un driver Selenium pour Chrome."""
     options = webdriver.ChromeOptions()
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    return webdriver.Chrome(options=options)
 
 def download_image(url, folder_path, filename):
     """Télécharge une image depuis une URL et la sauvegarde dans le dossier spécifié."""
