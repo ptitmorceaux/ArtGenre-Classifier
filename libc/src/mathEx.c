@@ -1,4 +1,4 @@
-#include "../include/math.h"
+#include "../include/mathEx.h"
 
 
 unsigned char my_add(float a, float b, float* result) {

@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <math.h>
 
 
 #ifdef _WIN32
