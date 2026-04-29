@@ -64,14 +64,10 @@ unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
 unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
     Matrix* m = *matrix;
-
-    for (uint32_t i = 0; i < m->rows * m->columns; i++) {
-        
-        unsigned char status = random_float(min, max, &m->data[i]);
-        if (status != RES_EXIT_SUCCESS) {
-            free_matrix(matrix);
-            return status;
-        }
+    unsigned char status = fill_randomly_float_array(min, max, &m->data, m->rows * m->columns);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(matrix);
+        return status;
     }
     return RES_EXIT_SUCCESS;
 }

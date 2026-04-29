@@ -1,50 +1,87 @@
-# import ctypes
-# from engine.interop.loader import Loader
-# from engine.interop.array import ArrayFloat32Ptr
+import ctypes
+from typing import Type
+from engine.interop.loader import Loader
 
-# class LinearModel:
+
+class LinearModel:
+    """
+    Wrapper Python pour LinearModel en C.
+    Cette classe permet de gérer le pointeur mémoire côté C.
+    """
+
+    @staticmethod
+    def _check_range(value, ctype: Type[ctypes._SimpleCData], prefix_errmsg: str) -> None:
+        Loader.check_primitive_values_range(value, ctype=ctype, prefix_errmsg=prefix_errmsg)  # type: ignore[arg-type]
+
+    def __init__(self, input_dim: int):
+        LinearModel._check_range(input_dim, ctypes.c_uint32, "LinearModel.__init__()")
+        if input_dim == 0:
+            raise ValueError("LinearModel.__init__(): `input_dim` must be > 0")
+
+        self.input_dim = input_dim
+        # On crée un pointeur vide (void*) qui recevra l'adresse du modèle C.
+        self.ptr = ctypes.c_void_p()
+
+        Loader.call(
+            "create_linear_model",
+            ctypes.c_uint32(input_dim),
+            ctypes.byref(self.ptr),
+            prefix_errmsg="LinearModel.__init__()"
+        )
     
-#     def __init__(self, coef_list: list[float | int], feature_list: list[float | int], intercept = 0.0):
-#         self._set_linear_model(coef_list, feature_list, intercept)    
+    def close(self):
+        """"Libère la mémoire allouée pour le modèle C."""
+        if self.ptr is not None and self.ptr.value is not None:
+            Loader.call(
+                "free_linear_model",
+                ctypes.byref(self.ptr),
+                prefix_errmsg="LinearModel.close()"
+            )
+            self.ptr = ctypes.c_void_p()
 
-#     def __str__(self):
-#         return f"LinearModel(coef={self.coef_list}, constant={self.feature_list})"
+    def predict_regression(self, input_data: list[float]) -> float:
+        """"Prédit une valeur continue pour un vecteur d'entrée de données."""
+        Loader.call(
+            "predict_regressions",
+            self.ptr,
+            prefix_errmsg="LinearModel.predict_regression()"
+        )
+        return float()
+
+    def predict_classification(self, input_data: list[float]) -> int:
+        """Prédit une classe binaire (0 ou 1) pour un vecteur d'entréer données."""
+        Loader.call(
+            "predict_classifications",
+            self.ptr,
+            prefix_errmsg="LinearModel.predict_classification()"
+        )
+        return int()
     
-
-#     #====== Properties ======#
-
-#     def _get_coef_list(self):
-#         return self._coef_list.array
-    
-#     def _set_coef_list(self, data: list[float | int]):
-#         self._coef_list = ArrayFloat32Ptr(data)
-    
-#     def _get_constant_list(self):
-#         return self._constant_list.array
-
-#     def _set_constant_list(self, data: list[float | int]):
-#         self._constant_list = ArrayFloat32Ptr(data)
-
-#     def _get_linear_model(self):
-#         return (self.coef_list, self.feature_list)
-
-#     def _set_linear_model(self, coef_list: list[float | int], feature_list: list[float | int]):
-#         if len(coef_list) != len(feature_list):
-#             raise ValueError("LinearModel.__init__(): `coef_list` and `feature_list` must have the same length")
-#         self._set_coef_list(coef_list)
-#         self._set_constant_list(feature_list)
-
-#     coef_list = property(_get_coef_list, _set_coef_list)
-#     feature_list = property(_get_constant_list, _set_constant_list)
-#     linear_model = property(_get_linear_model, _set_linear_model)
-#     intercept = property(_get_constant_list, _set_constant_list)
-
-#     #====== Pulbic ======#
-#     def predict(self, input_vector: list[float | int]) -> float:
-#         if len(input_vector) != len(self.coef_list):
-#             raise ValueError("LinearModel.predict(): `input_vector` length must match number of coefficients")
+    def train_classification(
+            self, 
+            dataset_inputs: list[float],
+            dataset_expected_outputs: list[float],
+            alpha: float,
+            epochs: int
+            ) -> None:
+        """"Entraîne le modèle de classification binaire en utilisant la règle de Rosenblatt."""
         
-#         result = 0.0
-#         for coef, feature, input_val in zip(self.coef_list, self.feature_list, input_vector):
-#             result += coef * input_val
-#         return result
+        Loader.call(
+            "train_classification",
+            self.ptr,
+            prefix_errmsg="LinearModel.train_classification()"
+        )
+
+    def train_regression(
+            self, 
+            dataset_inputs: list[float],
+            dataset_expected_outputs: list[float],
+            alpha: float,
+            epochs: int
+            ) -> None:
+        """"Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique."""
+        Loader.call(
+            "train_regression",
+            self.ptr,
+            prefix_errmsg="LinearModel.train_regression()"
+        )
