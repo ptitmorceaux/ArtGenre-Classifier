@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import ping_view, predict_view
+from .views import predict_view, test
 
 urlpatterns = [
-    path('ping/', ping_view, name='ping'),
-    path('predict/', predict_view, name='predict'), # La nouvelle route !
+    path('predict/', predict_view, name='predict'), 
+    path("test/", test, name="test"),
 ]
