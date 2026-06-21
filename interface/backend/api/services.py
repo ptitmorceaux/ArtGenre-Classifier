@@ -6,6 +6,7 @@ from engine.interop.mlp import MLP
 from engine.interop.loader import _LibLoader
 # from engine.interop.linearModel import LinearModel
 
+# --- 1. DÉFINITION DES CHEMINS ---
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 LIB_NAME = 'libc.dll' if platform.system() == 'Windows' else 'libc.so'
 
@@ -23,7 +24,7 @@ class ArtClassifierService:
     @staticmethod
     def process_image(image_file):
         img = Image.open(image_file).convert('RGB')
-        img = img.resize((32, 32))
+        img = img.resize((64, 64))
         flat_data = [pixel_val / 255.0 for pixel in img.getdata() for pixel_val in pixel]
         return flat_data
 
@@ -35,6 +36,7 @@ class ArtClassifierService:
         if model_type == 'mlp':
             model = MLP([input_size, 128, 3])
             
+            # --- LA PRÉDICTION C ---
             prediction = model.predict(input_data, is_classification=True)
             model.close()
             
