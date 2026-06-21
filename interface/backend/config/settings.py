@@ -1,8 +1,12 @@
 import os
+import sys
 from pathlib import Path
 
 # Construit les chemins à l'intérieur du projet
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+PROJECT_ROOT = BASE_DIR.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
 SECRET_KEY = 'django-insecure-cle-de-test-art-classifier'
 DEBUG = True
