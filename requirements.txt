@@ -4,3 +4,7 @@ selenium
 webdriver-manager
 requests
 undetected-chromedriver
+django
+django-cors-headers
+rest_framework
+djangorestframework
