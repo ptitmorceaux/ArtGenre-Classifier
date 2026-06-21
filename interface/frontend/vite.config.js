@@ -7,8 +7,6 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [
-      // 'datafilter.ptitgourmand.uk',
-      // 'datafilter-frontend',
       'localhost'
     ]
   }

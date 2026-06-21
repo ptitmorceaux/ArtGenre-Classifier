@@ -2,17 +2,17 @@
   <div id="app">
     <header>
       <h1>🎨 ArtGenre Classifier</h1>
-      <p>Projet Annuel - Machine Learning en C</p>
+      <p>Projet Annuel - Machine Learning en C & Django</p>
     </header>
     
     <main>
-      <TestConnection />
+      <ArtClassifier />
     </main>
   </div>
 </template>
 
 <script setup>
-import TestConnection from './components/TestConnection.vue'
+import ArtClassifier from './components/ArtClassifier.vue'
 </script>
 
 <style>
@@ -25,17 +25,20 @@ body {
 }
 
 #app {
+  padding: 40px 20px;
+}
+
+header {
   text-align: center;
-  padding-top: 50px;
+  margin-bottom: 30px;
 }
 
 header h1 {
-  margin-bottom: 5px;
-  color: #2c3e50;
+  margin: 0 0 5px 0;
 }
 
 header p {
   color: #7f8c8d;
-  margin-bottom: 40px;
+  margin: 0;
 }
 </style>
