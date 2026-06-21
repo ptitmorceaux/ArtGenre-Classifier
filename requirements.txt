@@ -8,3 +8,4 @@ django
 django-cors-headers
 rest_framework
 djangorestframework
+datafilter
