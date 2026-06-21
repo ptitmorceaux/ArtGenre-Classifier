@@ -1,27 +1,22 @@
 # interface/backend/api/apps.py
 import os
+from pathlib import Path
 import platform
 
-from engine.interop.loader import _LibLoader
+from engine.interop.loader import Loader
 
 from django.apps import AppConfig
 from django.conf import settings
+
+# --- 1. DÉFINITION DES CHEMINS ---
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
 class ApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'api'
 
-    def ready(self):
-        if not _LibLoader._isLoaded:
-            # 1. Détection du nom du binaire selon l'OS (tu utilises libc.dll sous windows)
-            system = platform.system()
-            if system == "Windows":
-                lib_name = "libc.dll"
-            elif system == "Darwin":
-                lib_name = "libc.dylib"
-            else:
-                lib_name = "libc.so"
-                
+    def ready(self):      
+            lib_name = 'libc.dll' if platform.system() == 'Windows' else 'libc.so'
             lib_folder = os.path.join(settings.PROJECT_ROOT, "libc")
             build_folder = os.path.join(settings.PROJECT_ROOT, "libc", "build")
             specs_folder = os.path.join(settings.PROJECT_ROOT, "libc", "specs")
@@ -32,13 +27,13 @@ class ApiConfig(AppConfig):
             print(f"    - Dossier Specs : {specs_folder}")
             
             try:
-                loader = _LibLoader()
-                loader.loadLibrary(
+                Loader.loadLibrary(
                     lib_name=lib_name,
                     lib_folder=lib_folder,
                     build_folder=build_folder,
-                    specs_folder=specs_folder
+                    specs_folder=specs_folder,
+                    seed=None
                 )
                 print("[+] Librairie C et métadonnées chargées avec succès !")
             except Exception as e:
-                print(f"[-] Erreur critique lors de l'initialisation de la lib C : {e}")
+                print(f"[ERREUR C] Échec du chargement : {e}")
