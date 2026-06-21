@@ -1,8 +1,7 @@
 <template>
   <div id="app">
     <header>
-      <h1>🎨 ArtGenre Classifier</h1>
-      <p>Projet Annuel - Machine Learning en C & Django</p>
+      <h1>ArtGenre Classifier</h1>
     </header>
     
     <main>

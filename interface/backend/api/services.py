@@ -15,7 +15,8 @@ BUILD_FOLDER = str(PROJECT_ROOT / 'libc' / 'build')
 SPECS_FOLDER = str(PROJECT_ROOT / 'libc' / 'specs')
 
 try:
-    _LibLoader.loadLibrary(LIB_NAME, LIB_FOLDER, BUILD_FOLDER, SPECS_FOLDER)
+    loader = _LibLoader()
+    loader.loadLibrary(LIB_NAME, LIB_FOLDER, BUILD_FOLDER, SPECS_FOLDER)
     print(f"[MOTEUR C] Librairie {LIB_NAME} et Specs JSON prêtes à l'emploi !")
 except Exception as e:
     print(f"[ERREUR C] Échec du chargement : {e}")

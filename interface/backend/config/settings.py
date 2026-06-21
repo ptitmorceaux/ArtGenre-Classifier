@@ -6,7 +6,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 PROJECT_ROOT = BASE_DIR.parent.parent
-sys.path.append(str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT))
+LIBC_DIR = PROJECT_ROOT / "libc"
 
 SECRET_KEY = 'django-insecure-cle-de-test-art-classifier'
 DEBUG = True
@@ -20,7 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'api',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
