@@ -9,7 +9,7 @@ libc/specs/*.json
 
 drawio/
 
-.vscode/
+.vscode/*
 
 ########################
 
