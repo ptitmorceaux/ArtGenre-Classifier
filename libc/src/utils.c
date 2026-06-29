@@ -11,6 +11,9 @@ const char* get_status_message(unsigned char code) {
         case ERR_ALLOCATION_FAILED:         return "Memory Allocation Failed";
         case ERR_OUT_OF_BOUNDS:             return "Index Out of Bounds";
         case ERR_INVALID_MATRIX_DIMENSIONS: return "Invalid Matrix Dimensions";
+        case ERR_INVALID_MATRIX_SQUARE:     return "Matrices must be square and have the same dimensions";
+        case ERR_INVALID_MATRIX_INVERSION_SINGULAR: return "Matrix is singular and cannot be inverted";
+        case ERR_INVALID_MATRIX_INVERSION:          return "Matrix inversion failed";
         default:                            return "Unknown Error";
     }
 }

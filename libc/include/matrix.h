@@ -5,11 +5,15 @@
 #include "global.h"
 #include "array.h"
 
+// For matrix inversion, we will use the LAPACK library
+#include <openblas/cblas.h>   // get CblasColMajor
+#include <openblas/lapacke.h> // header for inversion functions
+
 
 // 2D matrix of float32 values (stored in row-major order) 
 typedef struct {
     float* data;
-    // char owns_data;
+    char owns_data; // boolean: 1 / 0
     uint32_t rows;
     uint32_t columns;
     uint32_t row_stride;
@@ -32,6 +36,6 @@ DLLEXPORT unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint
 DLLEXPORT unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** result);
 DLLEXPORT unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** result);
 DLLEXPORT unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_addition, Matrix** result);
-
+DLLEXPORT unsigned char inverse_2d_matrix(Matrix* A);
 
 #endif 

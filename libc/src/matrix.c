@@ -14,7 +14,7 @@ unsigned char allocate_2d_matrix_float32_without_data(uint32_t rows, uint32_t co
     if (!matrix) return ERR_ALLOCATION_FAILED;
     
     matrix->data = NULL;
-    // matrix->owns_data = false;
+    matrix->owns_data = false;
     matrix->rows = rows;
     matrix->columns = columns;
     matrix->row_stride = columns;
@@ -36,7 +36,7 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
         free_matrix(res_matrix);
         return ERR_ALLOCATION_FAILED;
     }
-    // matrix->owns_data = true;
+    matrix->owns_data = true;
     
     return RES_EXIT_SUCCESS; 
 }
@@ -115,6 +115,19 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
     return RES_EXIT_SUCCESS;
 }
 
+unsigned char get_transpose(Matrix* matrix, Matrix** transpose) {
+    if (!matrix || !matrix->data || !transpose || *transpose != NULL) return ERR_INVALID_PTR;
+
+    Matrix *T = *transpose;
+
+    unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, T);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    T->data = matrix->data;
+
+    return RES_EXIT_SUCCESS;
+}
+
 /*===============================================================*/
 
 // MATRIX OPERATIONS
@@ -181,9 +194,10 @@ unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** result) {
 
     Matrix* res = *result;
     
-    for (uint32_t i = 0; i < a->rows; i++) {
+    for (uint32_t i = 0; i < a->rows * a->columns; i++) {
         res->data[i] = a->data[i] + b->data[i];
     }
+
     return RES_EXIT_SUCCESS;
 }
 
@@ -208,6 +222,42 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
     return status;
 }
 
+/**
+ * Inverse la matrice carrée A directement EN PLACE.
+ * Modifie et écrase A->data pour y stocker son inverse mathématique.
+ * * Vitesse : Maximale (optimisé par le cache CPU et les instructions vectorielles).
+ * RAM : Économe au maximum (0 réallocation de matrice).
+ */
+unsigned char inverse_2d_matrix(Matrix* A) {
+    // Vérification de sécurité réglementaire
+    if (A->rows != A->columns) {
+        return ERR_INVALID_MATRIX_SQUARE; 
+    }
+
+    int32_t n = (int32_t)A->rows;
+    int32_t info;
+
+    // 1. Allocation du vecteur de pivot requis par LAPACKE
+    // Pour n = 1729, cela ne prend que ~7 Ko en RAM (négligeable)
+    int32_t* ipiv = (int32_t*)calloc(n, sizeof(int32_t));
+    if (!ipiv) return ERR_INVALID_PTR;
+
+    // 2. Étape 1 : Factorisation LU en place directement dans A->data
+    // Cette fonction transforme la matrice et prépare l'inversion rapide
+    info = LAPACKE_sgetrf(CblasColMajor, n, n, A->data, n, ipiv);
+    if (info != 0) {
+        free(ipiv);
+        return ERR_INVALID_MATRIX_INVERSION_SINGULAR; // Matrice singulière (non inversible)
+    }
+
+    // 3. Étape 2 : Calcul de l'inverse à partir de LU, directement dans A->data
+    info = LAPACKE_sgetri(CblasColMajor, n, A->data, n, ipiv);
+    
+    free(ipiv);
+    
+    return (info == 0) ? RES_EXIT_SUCCESS : ERR_INVALID_MATRIX_INVERSION;
+}
+
 /*===============================================================*/
 
 // FREE //
@@ -215,7 +265,7 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
 unsigned char free_matrix(Matrix** matrix) {
     Matrix *m = *matrix;
     if (!m) return ERR_INVALID_PTR;
-    free(m->data); // if (m->data && m->owns_data) free(m->data);
+    if (m->data && m->owns_data) free(m->data);
     free(m);
     *matrix = NULL;
     return RES_EXIT_SUCCESS;
