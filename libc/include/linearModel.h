@@ -36,6 +36,7 @@ DLLEXPORT unsigned char train_linear_regression(LinearModel* model, float* datas
 // =============================
 DLLEXPORT unsigned char pseudo_inverse_2d_matrix(Matrix* X, Matrix** res);
 DLLEXPORT unsigned char get_linear_regression_weights(Matrix* dataset_inputs, Matrix* dataset_expected_outputs, LinearModel** res_model);
+DLLEXPORT unsigned char get_linear_regression_weights_from_list(float* dataset_inputs_without_bias, float* dataset_expected_outputs, uint32_t row, uint32_t col, LinearModel** res_model);
+
 
 #endif
-    

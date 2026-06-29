@@ -64,7 +64,7 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
         //     1.0f, 0.9f, 0.3f
         // };
     ------------------------------
-        Matrix* matrix = create_2d_matrix_float32(2, 3);  // -> 2 lignes, 3 colonnes (la première colonne NE sera PAS le biais)
+        Matrix* matrix = create_2d_matrix_float32(3, 2);  // -> 3 lignes, 2 colonnes (la première colonne NE sera PAS le biais)
         fill_from_list_2d_matrix(values, false, &matrix); // bias = false
         // VIEW, matrix->data = {
         //     0.5f, 0.2f,

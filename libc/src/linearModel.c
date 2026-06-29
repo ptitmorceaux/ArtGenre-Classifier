@@ -412,3 +412,35 @@ unsigned char get_linear_regression_weights(Matrix* dataset_inputs_with_bias, Ma
 
     return status;
 }
+
+
+/*
+    Prend en entrée list de float32 et appel `get_linear_regression_weights`
+*/
+unsigned char get_linear_regression_weights_from_list(float* dataset_inputs_without_bias, float* dataset_expected_outputs, uint32_t row, uint32_t col, LinearModel** res_model) {
+    if (!res_model || *res_model != NULL) return ERR_INVALID_PTR;
+    if (!dataset_inputs_without_bias || !dataset_expected_outputs) return ERR_INVALID_PTR;
+    if (row == 0 || col == 0) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status = RES_EXIT_SUCCESS;
+
+    Matrix* X = NULL;
+    status = allocate_2d_matrix_float32_without_data(row, col + 1, &X); // +1 pour la colonne du biais
+    if (status != RES_EXIT_SUCCESS) return status;
+    status = fill_from_list_2d_matrix(dataset_inputs_without_bias, true, &X); // bias = true
+
+    Matrix* Y = NULL;
+    status = allocate_2d_matrix_float32_without_data(row, 1, &Y);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&X);
+        return status;
+    }
+    Y->data = dataset_expected_outputs;
+
+    status = get_linear_regression_weights(X, Y, res_model);
+
+    free_matrix(&X);
+    free_matrix(&Y);
+
+    return status;
+}
