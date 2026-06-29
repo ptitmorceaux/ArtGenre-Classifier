@@ -3,14 +3,12 @@ import time
 import requests
 import csv
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
-TARGET_IMAGES = 2500
+TARGET_IMAGES = 3600
 
 ART_MOVEMENTS = {
     "surrealism": "https://www.wikiart.org/fr/paintings-by-style/surrealism-0#!#filterName:all-works,viewType:masonry",
@@ -21,9 +19,14 @@ ART_MOVEMENTS = {
 DATASET_DIRECTORY = os.path.join(os.path.dirname(__file__), '..', 'dataset')
 
 def setup_driver():
-    """Configure et retourne un driver Selenium pour Chrome."""
-    options = webdriver.ChromeOptions()
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    """Configure et retourne un driver furtif pour contourner Cloudflare."""
+    options = uc.ChromeOptions()
+    
+    options.add_argument("--disable-popup-blocking")
+    options.add_argument("--window-size=1920,1080")
+    
+    driver = uc.Chrome(options=options, version_main=146)
+    return driver
 
 def download_image(url, folder_path, filename):
     """Télécharge une image depuis une URL et la sauvegarde dans le dossier spécifié."""
