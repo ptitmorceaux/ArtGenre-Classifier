@@ -122,7 +122,7 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
  *  ===============================================
 **/
 
-unsigned char create_rbf_model(uint32_t input_dim, uint32_t num_centers, float gamma, RBF** res_model) {
+unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, RBF** res_model) {
     if (!res_model) return ERR_INVALID_PTR;
 
     RBF* model = (RBF*) malloc(sizeof(RBF));
