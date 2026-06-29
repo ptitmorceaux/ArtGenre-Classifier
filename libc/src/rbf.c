@@ -258,5 +258,5 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
     );
 
     free(transformed_inputs);
-    return RES_EXIT_SUCCESS;
+    return status;
 }

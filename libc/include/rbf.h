@@ -23,7 +23,7 @@ DLLEXPORT unsigned char euclidean_distance(float* a, float* b, uint32_t dim, flo
 DLLEXPORT unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim, uint32_t k, float* out_centers, uint32_t max_iters);
 DLLEXPORT unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, RBF** res_model);
 DLLEXPORT unsigned char free_rbf(RBF** model_ptr);
-DLLEXPORT unsigned char predict_rbf(RBF* model, float* input, float* outputs);
+DLLEXPORT unsigned char predict_rbf(RBF* model, float* input, int32_t* outputs);
 DLLEXPORT unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
 
 #endif 
