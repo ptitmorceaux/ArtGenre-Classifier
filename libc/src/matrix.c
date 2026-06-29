@@ -287,14 +287,14 @@ unsigned char inverse_2d_matrix(Matrix* A) {
 
     // 2. Étape 1 : Factorisation LU en place directement dans A->data
     // Cette fonction transforme la matrice et prépare l'inversion rapide
-    info = LAPACKE_sgetrf(CblasColMajor, n, n, A->data, n, ipiv);
+    info = LAPACKE_sgetrf(CblasRowMajor, n, n, A->data, n, ipiv);
     if (info != 0) {
         free(ipiv);
         return ERR_INVALID_MATRIX_INVERSION_SINGULAR; // Matrice singulière (non inversible)
     }
 
     // 3. Étape 2 : Calcul de l'inverse à partir de LU, directement dans A->data
-    info = LAPACKE_sgetri(CblasColMajor, n, A->data, n, ipiv);
+    info = LAPACKE_sgetri(CblasRowMajor, n, A->data, n, ipiv);
     
     free(ipiv);
     
