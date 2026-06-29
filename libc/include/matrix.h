@@ -29,9 +29,9 @@ DLLEXPORT unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t colum
 // INIT / GETTER / SETTER
 DLLEXPORT unsigned char fill_from_list_2d_matrix(float* values, char add_the_bias_in_first_column, Matrix** matrix);
 DLLEXPORT unsigned char fill_randomly_2d_matrix(float min, float max, char first_column_is_bias, Matrix** matrix);
-// DLLEXPORT unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res);
 DLLEXPORT unsigned char get_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float* res);
 DLLEXPORT unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, float value);
+DLLEXPORT unsigned char get_transpose(Matrix* matrix, Matrix** transpose);
 // OPERATIONS
 DLLEXPORT unsigned char multiply_2d_matrix(Matrix* a, Matrix* b, Matrix** result);
 DLLEXPORT unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** result);

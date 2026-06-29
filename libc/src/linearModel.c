@@ -387,13 +387,14 @@ unsigned char get_linear_regression_weights(Matrix* dataset_inputs_with_bias, Ma
         return status;
     }
 
-    Matrix W = {
-        .data = weights->weights,
-        .rows = weights->length,
-        .columns = 1,
-        .row_stride = 1,
-        .col_stride = 1
-    };
+    Matrix* W = NULL;
+    status = allocate_2d_matrix_float32_without_data(weights->length, 1, &W);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&pseudo_inverse);
+        free_linear_model(&weights);
+        return status;
+    }
+    W->data = weights->weights;
 
     // X+ * Y = W
     // (n, m) * (m, 1) = (n, 1)
@@ -404,7 +405,10 @@ unsigned char get_linear_regression_weights(Matrix* dataset_inputs_with_bias, Ma
         return status;
     }
 
-    free_matrix(&pseudo_inverse);
     *res_model = weights;
+    
+    free_matrix(&pseudo_inverse);
+    free_matrix(&W);
+
     return status;
 }

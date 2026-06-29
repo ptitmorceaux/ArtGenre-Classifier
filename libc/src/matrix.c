@@ -86,10 +86,10 @@ unsigned char fill_from_list_2d_matrix(float* values, char add_the_bias_in_first
         for (uint32_t j = 0; j < m->columns; j++) {
             
             if (add_the_bias_in_first_column && j == 0)
-                m->data[get_index_2d_matrix(m, i, j)] = 1.0f;
+                set_element_2d_matrix(m, i, j, 1.0f);
             
             else
-                m->data[get_index_2d_matrix(m, i, j)] = values[i * m->columns + j];
+                set_element_2d_matrix(m, i, j, values[i * m->columns + j]);
         }
     }
     
@@ -109,28 +109,11 @@ unsigned char fill_randomly_2d_matrix(float min, float max, char first_column_is
     
     if (first_column_is_bias) {
         for (uint32_t i = 0; i < m->rows; i++)
-            m->data[get_index_2d_matrix(m, i, 0)] = 1.0f;
+            set_element_2d_matrix(m, i, 0, 1.0f);
     }
 
     return RES_EXIT_SUCCESS;
 }
-
-// unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res) {
-//     if (!matrix || !matrix->data || !res) return ERR_INVALID_PTR;
-    
-//     unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, res);
-//     if (status != RES_EXIT_SUCCESS) return status;
-    
-//     Matrix *transposed = *res;
-    
-//     transposed->data = matrix->data;
-//     transposed->owns_data = false;
-//     transposed->row_stride = matrix->col_stride;
-//     transposed->col_stride = matrix->row_stride;
-    
-//     return RES_EXIT_SUCCESS;
-// }
-
 
 /*===============================================================*/
 
@@ -161,13 +144,11 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
 unsigned char get_transpose(Matrix* matrix, Matrix** transpose) {
     if (!matrix || !matrix->data || !transpose || *transpose != NULL) return ERR_INVALID_PTR;
 
-    Matrix *T = *transpose;
-
-    unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, T);
+    unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, transpose);
     if (status != RES_EXIT_SUCCESS) return status;
 
-    T->data = matrix->data;
-
+    (*transpose)->data = matrix->data;
+    
     return RES_EXIT_SUCCESS;
 }
 
