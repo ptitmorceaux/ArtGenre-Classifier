@@ -20,7 +20,7 @@ class RBF:
         self.ptr = ctypes.c_void_p()
 
         Loader.call(
-            "create_rbf_model",
+            "create_rbf",
             ctypes.c_uint32(input_dim),
             ctypes.c_uint32(num_centers),
             ctypes.c_float(gamma),
