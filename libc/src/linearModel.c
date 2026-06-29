@@ -13,14 +13,14 @@
 */
 
 // Structure pour un modèle linéaire
-unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
+unsigned char create_linear_model(uint32_t input_dim, char add_a_bias, LinearModel** res_model) {
     if (!res_model || *res_model) return ERR_INVALID_PTR;
     
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
     if (!model) return ERR_MEMORY_ALLOCATION;
     
     // Allouer de la mémoire pour les poids + le biais
-    model->length = input_dim + 1; // (+ 1 pour le biais)
+    model->length = input_dim + (add_a_bias ? 1 : 0); // (+ 1 pour le biais si il n'est pas déjà dans les features d'entrée)
     model->weights = (float*) malloc((model->length) * sizeof(float));
     if (!model->weights) {
         free_linear_model(res_model);
@@ -32,11 +32,11 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
 }
 
 // Initialise un modèle linéaire avec des poids et un biais initialisés aléatoirement.
-unsigned char create_linear_model_randomly(uint32_t input_dim, LinearModel** res_model) {
+unsigned char create_linear_model_randomly(uint32_t input_dim, char add_a_bias, LinearModel** res_model) {
     if (!res_model || *res_model) return ERR_INVALID_PTR;
     unsigned char status = RES_EXIT_SUCCESS;
     
-    status = create_linear_model(input_dim, res_model);
+    status = create_linear_model(input_dim, add_a_bias, res_model);
     if (status != RES_EXIT_SUCCESS) return status;
     LinearModel* model = *res_model;
 
@@ -55,7 +55,7 @@ unsigned char create_linear_model_from_init_weights(float* weights, uint32_t inp
     if (!res_model || *res_model) return ERR_INVALID_PTR;
     unsigned char status = RES_EXIT_SUCCESS;
     
-    status = create_linear_model(input_dim, res_model);
+    status = create_linear_model(input_dim, true, res_model);
     if (status != RES_EXIT_SUCCESS) return status;
     LinearModel* model = *res_model;
 

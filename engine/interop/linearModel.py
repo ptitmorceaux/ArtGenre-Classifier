@@ -10,25 +10,26 @@ class LinearModel:
 
     #====== Constructeurs ======#
 
-    def __init__(self, input_dim: int) -> None:
+    def __init__(self, input_dim: int, add_a_bias: bool) -> None:
         Loader.check_primitive_values_range(input_dim, ctypes.c_uint32, "LinearModel.__init__()")
         if input_dim == 0:
             raise ValueError("LinearModel.__init__(): `input_dim` must be > 0")
         self.ptr = None
         self.input_dim = input_dim
+        self.add_a_bias = add_a_bias
     
     @classmethod
-    def init_random(cls, input_dim: int) -> 'LinearModel':
+    def init_random(cls, input_dim: int, add_a_bias: bool) -> 'LinearModel':
         """Initialise un modèle de régression linéaire avec des poids aléatoires."""        
-        instance = cls(input_dim)
+        instance = cls(input_dim, add_a_bias)
 
         # On crée un pointeur vide (void*) qui recevra l'adresse du modèle C.
         instance.ptr = ctypes.c_void_p()
-        instance.input_dim = input_dim
 
         Loader.call(
             "create_linear_model_randomly",
             ctypes.c_uint32(input_dim),
+            ctypes.c_char(add_a_bias),
             ctypes.byref(instance.ptr),
             prefix_errmsg="LinearModel.init_random()"
         )
@@ -42,13 +43,13 @@ class LinearModel:
 
         Loader.check_primitive_values_range(bias, ctypes.c_float, "LinearModel.init_from_weights()")
 
-        instance = cls(len(weights))
+        instance = cls(len(weights), True)  # add_a_bias is set to True for this constructor
         instance.ptr = ctypes.c_void_p()
 
         Loader.call(
             "create_linear_model_from_init_weights",
             (ctypes.c_float * instance.input_dim)(*weights),
-            ctypes.c_uint32(instance.input_dim),
+            ctypes.c_uint32(instance.input_dim), # the library needs to know the length without the "bias" column
             ctypes.c_float(bias),
             ctypes.byref(instance.ptr),
             prefix_errmsg="LinearModel.init_from_weights()"

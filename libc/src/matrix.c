@@ -45,7 +45,35 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
 
 // INIT
 
-unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
+/*
+    Si `add_the_bias_in_first_column` est vrai, le premier élément de la matrice sera défini sur 1.0f (biais).
+    -> et donc la taille values doit etre [rows * (columns - 1)]
+    -> ex d'appel :
+    ------------------------------
+        float values[6] = {
+            0.5f, 0.2f,
+            0.8f, 0.1f,
+            0.9f, 0.3f
+        };
+    ------------------------------      
+        Matrix* matrix = create_2d_matrix_float32(3, 3); // -> 3 lignes, 3 colonnes (la première colonne sera le biais)
+        fill_from_list_2d_matrix(values, true, &matrix); // bias = true
+        // VIEW, matrix->data = {
+        //     1.0f, 0.5f, 0.2f,
+        //     1.0f, 0.8f, 0.1f,
+        //     1.0f, 0.9f, 0.3f
+        // };
+    ------------------------------
+        Matrix* matrix = create_2d_matrix_float32(2, 3);  // -> 2 lignes, 3 colonnes (la première colonne NE sera PAS le biais)
+        fill_from_list_2d_matrix(values, false, &matrix); // bias = false
+        // VIEW, matrix->data = {
+        //     0.5f, 0.2f,
+        //     0.8f, 0.1f,
+        //     0.9f, 0.3f
+        // };
+    ------------------------------
+*/
+unsigned char fill_from_list_2d_matrix(float* values, char add_the_bias_in_first_column, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
     if (!values) {
         free_matrix(matrix);
@@ -54,21 +82,36 @@ unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
     
     Matrix* m = *matrix;
     
-    for (uint32_t i = 0; i < m->rows * m->columns; i++) {
-        m->data[i] = values[i];
+    for (uint32_t i = 0; i < m->rows; i++) {
+        for (uint32_t j = 0; j < m->columns; j++) {
+            
+            if (add_the_bias_in_first_column && j == 0)
+                m->data[get_index_2d_matrix(m, i, j)] = 1.0f;
+            
+            else
+                m->data[get_index_2d_matrix(m, i, j)] = values[i * m->columns + j];
+        }
     }
     
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
+unsigned char fill_randomly_2d_matrix(float min, float max, char first_column_is_bias, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
+    
     Matrix* m = *matrix;
+    
     unsigned char status = fill_randomly_float_array(min, max, &m->data, m->rows * m->columns);
     if (status != RES_EXIT_SUCCESS) {
         free_matrix(matrix);
         return status;
     }
+    
+    if (first_column_is_bias) {
+        for (uint32_t i = 0; i < m->rows; i++)
+            m->data[get_index_2d_matrix(m, i, 0)] = 1.0f;
+    }
+
     return RES_EXIT_SUCCESS;
 }
 
