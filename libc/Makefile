@@ -5,6 +5,7 @@ SRC_DIR  := src
 INC_DIR  := include
 OUT_DIR  := build
 OBJ_DIR  := $(OUT_DIR)/objects
+LDLIBS	 := -lopenblas
 SPEC_DIR := specs
 
 
@@ -58,7 +59,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(H_FILES)
 # Linkage final : on rassemble tous les .o pour créer la DLL
 $(TARGET): $(OBJ_FILES)
 	@echo "  LINK    $@"
-	@$(CC) $(FLAG) -o $@ $^
+	@$(CC) $(FLAG) -o $@ $^ $(LDLIBS)
 
 
 # ===== Génération des JSON specs =====
