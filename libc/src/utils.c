@@ -8,7 +8,7 @@ const char* get_status_message(unsigned char code) {
         case ERR_INVALID_PTR:               return "Invalid Pointer";
         case ERR_MATH_DIV_BY_ZERO:          return "Division by Zero";
         case ERR_LENGTH_ZERO:               return "Length is Zero";
-        case ERR_ALLOCATION_FAILED:         return "Memory Allocation Failed";
+        case ERR_MEMORY_ALLOCATION:         return "Memory Allocation Failed";
         case ERR_OUT_OF_BOUNDS:             return "Index Out of Bounds";
         case ERR_INVALID_MATRIX_DIMENSIONS: return "Invalid Matrix Dimensions";
         case ERR_INVALID_MATRIX_SQUARE:     return "Matrices must be square and have the same dimensions";

@@ -17,14 +17,14 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     if (!res_model || *res_model) return ERR_INVALID_PTR;
     
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
-    if (!model) return ERR_ALLOCATION_FAILED;
+    if (!model) return ERR_MEMORY_ALLOCATION;
     
     // Allouer de la mémoire pour les poids + le biais
     model->length = input_dim + 1; // (+ 1 pour le biais)
     model->weights = (float*) malloc((model->length) * sizeof(float));
     if (!model->weights) {
         free_linear_model(res_model);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
     
     *res_model = model;

@@ -11,7 +11,7 @@ unsigned char allocate_2d_matrix_float32_without_data(uint32_t rows, uint32_t co
     if (rows == 0 || columns == 0) return ERR_LENGTH_ZERO;
 
     Matrix* matrix = (Matrix*) malloc(sizeof(Matrix));
-    if (!matrix) return ERR_ALLOCATION_FAILED;
+    if (!matrix) return ERR_MEMORY_ALLOCATION;
     
     matrix->data = NULL;
     matrix->owns_data = false;
@@ -34,7 +34,7 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
     matrix->data = (float*) malloc(rows * columns * sizeof(float));
     if (!matrix->data) {
         free_matrix(res_matrix);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
     matrix->owns_data = true;
     
@@ -240,7 +240,7 @@ unsigned char inverse_2d_matrix(Matrix* A) {
     // 1. Allocation du vecteur de pivot requis par LAPACKE
     // Pour n = 1729, cela ne prend que ~7 Ko en RAM (négligeable)
     int32_t* ipiv = (int32_t*)calloc(n, sizeof(int32_t));
-    if (!ipiv) return ERR_INVALID_PTR;
+    if (!ipiv) return ERR_MEMORY_ALLOCATION;
 
     // 2. Étape 1 : Factorisation LU en place directement dans A->data
     // Cette fonction transforme la matrice et prépare l'inversion rapide
