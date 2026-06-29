@@ -281,3 +281,69 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
 
     return RES_EXIT_SUCCESS;
 }
+
+
+// Save et load du modèle MLP
+
+/*
+    Sauvegarder les poids W du modèle 
+*/
+
+unsigned char save_mlp(MLP* model, const char* filename) {
+    if (!model || !filename) return ERR_INVALID_PTR;
+    
+    FILE* file = fopen(filename, "wb");
+    if (!file) return ERR_FILE_OPEN_FAILED;
+
+    uint32_t npl_size = model->L + 1;
+    fwrite(&npl_size, sizeof(uint32_t), 1, file);
+    fwrite(model->d, sizeof(uint32_t), npl_size, file);
+
+    for (uint32_t l = 0; l < model->L; l++) {
+        uint32_t rows = model->d[l] + 1;
+        uint32_t cols = model->d[l + 1];
+        for (uint32_t i = 0; i < rows; i++) {
+            fwrite(model->W[l][i], sizeof(float), cols, file);
+        }
+    }
+
+    fclose(file);
+    return RES_EXIT_SUCCESS;
+}
+
+unsigned char load_mlp(const char* filename, MLP** res_model) {
+    if (!filename || !res_model) return ERR_INVALID_PTR;
+
+    FILE* file = fopen(filename, "rb");
+    if (!file) return ERR_FILE_OPEN_FAILED;
+
+    uint32_t npl_size;
+    fread(&npl_size, sizeof(uint32_t), 1, file);
+
+    uint32_t* d = (uint32_t*) malloc(npl_size * sizeof(uint32_t));
+    if (!d) {
+        fclose(file);
+        return ERR_ALLOCATION_FAILED;
+    }
+    fread(d, sizeof(uint32_t), npl_size, file);
+
+    unsigned char status = create_mlp(d, npl_size, res_model);
+    free(d);
+    if (status != RES_EXIT_SUCCESS) {
+        fclose(file);
+        return status;
+    }
+
+    MLP* model = *res_model;
+
+    for (uint32_t l = 0; l < model->L; l++) {
+        uint32_t rows = model->d[l] + 1;
+        uint32_t cols = model->d[l + 1];
+        for (uint32_t i = 0; i < rows; i++) {
+            fread(model->W[l][i], sizeof(float), cols, file);
+        }
+    }
+
+    fclose(file);
+    return RES_EXIT_SUCCESS;
+}
