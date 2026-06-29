@@ -7,15 +7,15 @@
 #include "array.h"
 
 typedef struct {
-    float* weights;     // weights[0] = bias, weights[1] = w1, weights[2] = w2, ...
+    float* weights;     // weights[0] = poids du bias, weights[1] = w1, weights[2] = w2, ...
     uint32_t length;    // length = input_dim + 1 (nombre de poids + biais)
 } LinearModel;
 
 // =============================
 // Allocation et libération
 // =============================
-DLLEXPORT unsigned char create_linear_model(uint32_t input_dim, char add_a_bias, LinearModel** res_model);
-DLLEXPORT unsigned char create_linear_model_randomly(uint32_t input_dim, char add_a_bias, LinearModel** res_model);
+DLLEXPORT unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model);
+DLLEXPORT unsigned char create_linear_model_randomly(uint32_t input_dim, LinearModel** res_model);
 DLLEXPORT unsigned char create_linear_model_from_init_weights(float* weights, uint32_t input_dim, float bias, LinearModel** res_model);
 DLLEXPORT unsigned char free_linear_model(LinearModel** model_ptr);
 
