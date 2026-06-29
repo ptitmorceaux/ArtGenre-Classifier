@@ -258,3 +258,153 @@ unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs,
     }
     return RES_EXIT_SUCCESS;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+/*
+    Grace aux strides on ne charge en RAM qu'une seule fois le dataset, on ne fait pas de copie
+
+    [X (m, n)]  -->  [X+ (n, m)]
+
+    m=rows et n=columns
+  
+    Cas  ///  Pseudo-inverse :
+    - m >= n  ///  X+ = (X^T * X)^-1 * X^T
+    - m < n   ///  X+ = X^T * (X * X^T)^-1
+*/
+unsigned char pseudo_inverse_2d_matrix(Matrix* X, Matrix** res) {
+    if (!X || !X->data || !res || *res != NULL) return ERR_INVALID_PTR;
+
+    unsigned char status = RES_EXIT_SUCCESS;
+
+    status = allocate_2d_matrix_float32(X->columns, X->rows, res);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    Matrix X_transpose = {
+        .data = X->data,
+        .rows = X->columns,
+        .columns = X->rows,
+        .row_stride = X->col_stride,
+        .col_stride = X->row_stride
+    };
+
+    /////////////////////////////////////////
+
+    Matrix* tmp = NULL;
+    if (X->rows >= X->columns)
+        // m >= n  ///  allouer pour X^T * X
+        status = allocate_2d_matrix_float32(X->columns, X->columns, &tmp);
+    else
+        // m < n   ///  allouer pour X * X^T
+        status = allocate_2d_matrix_float32(X->rows, X->rows, &tmp);
+    
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(res);
+        return status;
+    }
+
+    /////////////////////////////////////////
+
+    if (X->rows >= X->columns)
+        // m >= n  ///  X^T * X
+        status = multiply_2d_matrix(&X_transpose, X, &tmp);
+
+    else
+        // m < n   ///  X * X^T
+        status = multiply_2d_matrix(X, &X_transpose, &tmp);
+    
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&tmp);
+        free_matrix(res);
+        return status;
+    }
+
+    /////////////////////////////////////////
+
+    // inverser la matrice tmp (X^T * X)^-1 ou (X * X^T)^-1
+    status = inverse_2d_matrix(tmp);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&tmp);
+        free_matrix(res);
+        return status;
+    }
+
+    /////////////////////////////////////////
+
+    if (X->rows >= X->columns)
+        // m >= n  ///  ((X^T * X)^-1) * (X^T)
+        status = multiply_2d_matrix(tmp, &X_transpose, res);
+    else
+        // m < n   ///  (X^T) * ((X * X^T)^-1)
+        status = multiply_2d_matrix(&X_transpose, tmp, res);
+
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&tmp);
+        free_matrix(res);
+        return status;
+    }
+    
+    /////////////////////////////////////////
+
+    free_matrix(&tmp);
+    return status;
+}
+
+
+/*
+    Utilisation de la pseudo inverse pour calculer W en un coup
+
+    IMPORTANT :
+    - Le dataset d'entrée doit déjà contenir la colonne du biais (1.0f) dans la première colonne -> input_with_bias (m, n)
+    - La matrice expected_outputs doit être de dimension (m, 1)
+
+    En sortie : W -> (n, 1)
+    En sortie -> LinearModel* (il faut penser à free_linear_model() après utilisation)
+*/
+unsigned char get_linear_regression_weights(Matrix* dataset_inputs_with_bias, Matrix* dataset_expected_outputs, LinearModel** res_model) {
+    
+    if (!res_model || *res_model != NULL) return ERR_INVALID_PTR;
+
+    if (!dataset_inputs_with_bias || !dataset_inputs_with_bias->data ||
+        !dataset_expected_outputs || !dataset_expected_outputs->data
+    ) return ERR_INVALID_PTR;
+    
+    if (dataset_inputs_with_bias->rows == 0 || dataset_inputs_with_bias->columns == 0 ||
+        dataset_expected_outputs->rows == 0 || dataset_expected_outputs->columns == 0
+    ) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status = RES_EXIT_SUCCESS;
+
+    Matrix* pseudo_inverse = NULL;
+    status = pseudo_inverse_2d_matrix(dataset_inputs_with_bias, &pseudo_inverse);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    LinearModel* weights = NULL;
+    status = create_linear_model(pseudo_inverse->rows - 1, &weights);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&pseudo_inverse);
+        return status;
+    }
+
+    Matrix W = {
+        .data = weights->weights,
+        .rows = weights->length,
+        .columns = 1,
+        .row_stride = 1,
+        .col_stride = 1
+    };
+
+    // X+ * Y = W
+    // (n, m) * (m, 1) = (n, 1)
+    status = multiply_2d_matrix(pseudo_inverse, dataset_expected_outputs, &W);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&pseudo_inverse);
+        free_linear_model(&weights);
+        return status;
+    }
+
+    free_matrix(&pseudo_inverse);
+    *res_model = weights;
+    return status;
+}
