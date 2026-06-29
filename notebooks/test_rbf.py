@@ -137,7 +137,28 @@ def run_tests():
     )
     
     # Dessin du résultat
-    print("Affichage de la frontière de décision...")
+    print("\nAffichage des 15 premières prédictions (sur 500) :")
+    correct_predictions = 0
+    
+    for i in range(len(X_cross)):
+        pred = rbf_cross.predict(X_cross[i].tolist())
+        
+        # On vérifie si la prédiction est correcte
+        if pred == int(Y_cross[i]):
+            correct_predictions += 1
+            
+        # On limite l'affichage aux 15 premiers points pour la lisibilité
+        if i < 15:
+            # Formatage pour n'afficher que 2 décimales pour les entrées
+            entree_formatee = f"[{X_cross[i][0]:.2f}, {X_cross[i][1]:.2f}]"
+            print(f"Entrée: {entree_formatee:>14} | Attendu: {Y_cross[i]:.0f} | Prédit: {pred}")
+
+    accuracy = (correct_predictions / len(X_cross)) * 100
+    print(f"\nPrécision globale sur le dataset Cross : {accuracy:.2f}% ({correct_predictions}/500)")
+    # -----------------------------------------------------------
+
+    # Dessin du résultat
+    print("\nAffichage de la frontière de décision...")
     plot_decision_boundary(rbf_cross, X_cross, Y_cross, title="RBF - Résolution du Cross")
 
 
