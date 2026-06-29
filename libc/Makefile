@@ -77,6 +77,8 @@ endif
 # ===== Utils =====
 clean:
 	@rm -rf $(OUT_DIR) && rm -rf $(SPEC_DIR)/*.json
+	@mkdir -p $(OUT_DIR)
+	@touch $(OUT_DIR)/.gitkeep
 
 info:
 	@echo "================================"
