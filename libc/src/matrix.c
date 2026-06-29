@@ -81,6 +81,8 @@ unsigned char fill_from_list_2d_matrix(float* values, char add_the_bias_in_first
     }
     
     Matrix* m = *matrix;
+
+    uint32_t real_index = 0;
     
     for (uint32_t i = 0; i < m->rows; i++) {
         for (uint32_t j = 0; j < m->columns; j++) {
@@ -89,7 +91,7 @@ unsigned char fill_from_list_2d_matrix(float* values, char add_the_bias_in_first
                 set_element_2d_matrix(m, i, j, 1.0f);
             
             else
-                set_element_2d_matrix(m, i, j, values[i * m->columns + j]);
+                set_element_2d_matrix(m, i, j, values[real_index++]);
         }
     }
     
