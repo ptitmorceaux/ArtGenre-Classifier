@@ -9,7 +9,7 @@ libc/specs/*.json
 
 drawio/
 
-.vscode/
+.vscode/*
 
 !libc/build/.gitkeep
 
@@ -285,5 +285,22 @@ marimo/_lsp/
 __marimo__/
 
 
-# Front end modules
+########################
+# Node / Frontend (Vue.js, Vite)
+########################
+node_modules/
 interface/frontend/node_modules/
+
+# Dossier de build (production)
+dist/
+interface/frontend/dist/
+
+# Logs npm / yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Fichiers de cache locaux de Vite
+.vite/
+.vite-inspect/
