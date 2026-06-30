@@ -55,7 +55,8 @@ class _LibLoader: # Singleton Pattern Design
             lib_name = lib_name[:-6]
         return lib_name
 
-    def _set_path(self, path: str) -> str:
+    @staticmethod
+    def _set_path(path: str) -> str:
         path = path.strip()
         path = os.path.abspath(path)
         
@@ -153,7 +154,7 @@ class _LibLoader: # Singleton Pattern Design
 
     #====== Méthode public - Init ======#
 
-    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int | None = None) -> None:
+    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, dependencies_bin_folder: str | None = None, seed: int | None = None) -> None:
         
         if _LibLoader._isLoaded:
             raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
@@ -171,11 +172,19 @@ class _LibLoader: # Singleton Pattern Design
         self._lib_folder = self._set_path(lib_folder)
         self._build_folder = self._set_path(build_folder)
         self._specs_folder = self._set_path(specs_folder)
+        self._dependencies_bin_folder = None
         
         if sys.platform.startswith("win"):
             self.ext = "dll"
+            # Gestion des DLL Windows pour OpenBLAS / LAPACK
+            if dependencies_bin_folder is None:
+                raise ValueError("_LibLoader.loadLibrary(): `dependencies_bin_folder` must be provided on Windows platforms.")
+            self._dependencies_bin_folder = self._set_path(dependencies_bin_folder)
+            os.add_dll_directory(self._dependencies_bin_folder)
+
         elif sys.platform.startswith("darwin"):
             self.ext = "dylib"
+
         else:
             self.ext = "so"
 
