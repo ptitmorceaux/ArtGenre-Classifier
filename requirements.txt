@@ -11,3 +11,4 @@ datafilter
 pillow
 scikit-learn
 opencv-python
+ipykernel
