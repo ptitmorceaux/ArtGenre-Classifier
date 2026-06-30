@@ -47,12 +47,15 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential make libopenblas-dev
+          sudo apt-get install -y build-essential make libopenblas-dev liblapacke-dev
           
-          # Solution pour l'arborescence de #include <openblas/cblas.h>
+          # Crée une arborescence virtuelle pour mapper la syntaxe <openblas/xxxx.h>
           mkdir -p ${{ github.workspace }}/openblas_include/openblas
-          CBLAS_PATH=$(find /usr/include -name "cblas.h" -o -name "cblas-openblas.h" | head -n 1)
+          CBLAS_PATH=$(find /usr/include -name "cblas.h" | head -n 1)
+          LAPACKE_PATH=$(find /usr/include -name "lapacke.h" | head -n 1)
           ln -s "$CBLAS_PATH" ${{ github.workspace }}/openblas_include/openblas/cblas.h
+          ln -s "$LAPACKE_PATH" ${{ github.workspace }}/openblas_include/openblas/lapacke.h
+          
           echo "C_INCLUDE_PATH=${{ github.workspace }}/openblas_include" >> $GITHUB_ENV
 
       - name: Install build deps (macOS)
@@ -60,14 +63,12 @@ jobs:
         run: |
           brew install make openblas
           
-          # Solution pour l'arborescence de #include <openblas/cblas.h>
-          mkdir -p ${{ github.workspace }}/openblas_include/openblas
-          OPENBLAS_PREFIX=$(brew --prefix openblas)
-          ln -s "$OPENBLAS_PREFIX/include/cblas.h" ${{ github.workspace }}/openblas_include/openblas/cblas.h
+          # Lien symbolique du dossier d'inclusion complet (règle l'erreur du openblas_config.h manquant)
+          mkdir -p ${{ github.workspace }}/openblas_include
+          ln -s "$(brew --prefix openblas)/include" ${{ github.workspace }}/openblas_include/openblas
           
-          # Expose les dossiers d'en-têtes et de bibliothèque au compilateur/linker natif
           echo "C_INCLUDE_PATH=${{ github.workspace }}/openblas_include" >> $GITHUB_ENV
-          echo "LIBRARY_PATH=$OPENBLAS_PREFIX/lib" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$(brew --prefix openblas)/lib" >> $GITHUB_ENV
 
       - name: Install build deps (Windows / MSYS2)
         if: runner.os == 'Windows'
@@ -81,12 +82,17 @@ jobs:
             make
             mingw-w64-x86_64-openblas
 
-      - name: Expose MSYS2 to global PATH (Windows)
+      - name: Configure environment variables (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          # Donne la priorité au compilateur MSYS2 Mingw64 face aux autres outils du runner
+          # Crucial pour conftest.py : expose le compilateur (mingw64) ET l'utilitaire 'make' (usr/bin) au PATH natif de Windows
           echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
+          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
+          
+          # Indique à l'environnement global où trouver OpenBLAS sous Windows
+          echo "C_INCLUDE_PATH=C:/msys64/mingw64/include" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=C:/msys64/mingw64/lib" >> $GITHUB_ENV
 
       # -------- Build --------
       - name: Build libc (Unix)

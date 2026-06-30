@@ -5,8 +5,12 @@ SRC_DIR  := src
 INC_DIR  := include
 OUT_DIR  := build
 OBJ_DIR  := $(OUT_DIR)/objects
-LDLIBS	 := -lopenblas
 SPEC_DIR := specs
+
+
+# ===== Flags =====
+CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2 -std=c17 -pedantic
+LDLIBS := -lopenblas
 
 
 # ===== Détection Python =====
@@ -42,9 +46,6 @@ C_FILES   := $(wildcard $(SRC_DIR)/*.c)
 H_FILES   := $(wildcard $(INC_DIR)/*.h)
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 TARGET    := $(OUT_DIR)/$(LIB_NAME).$(EXT)
-
-# ===== Flags =====
-CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2 -std=c17 -pedantic
 
 
 # ===== Règle par défaut =====
