@@ -5,15 +5,20 @@
  * ========================================== **/
 /*
     # Architecture d'un réseau de neurones à fonctions de base radiale (RBF) : 
-        - input_dim : Dimension de chaque vecteur d'entrée.
-        - num_centers : Nombre de centres.
-        - gamma : Variance de la fonction gaussienne.
-        - centers : Tableau des centres [num_centers * input_dim].
+        - input_dim : Dimension de chaque vecteur d'entrée (ex: nombre de pixels).
+        - num_centers : Nombre de centres (neurones cachés).
+        - gamma : Paramètre de variance (rayon d'action) de la fonction gaussienne.
+        - centers : Tableau aplati des coordonnées des centres [num_centers * input_dim].
+        - output_layer : Un modèle linéaire classique (Perceptron) utilisé comme couche de sortie.
 
-    # Implémentation en C :
-        
+    # Principe mathématique :
+        Au lieu de séparer l'espace avec des droites, le RBF mesure la distance 
+        entre une donnée d'entrée X et des "points de repère" (les centres C).
+        La sortie est une somme pondérée des activations gaussiennes :
+        Sortie = Somme( Poids_i * exp(-gamma * distance(X, C_i)^2) ) + Biais
 */
 
+// Calcule la distance euclidienne entre deux points de dimension `dim`
 unsigned char euclidean_distance(float* a, float* b, uint32_t dim, float* result) {
     float sum = 0.0f;
     for (uint32_t i = 0; i < dim; i++) {
@@ -25,8 +30,24 @@ unsigned char euclidean_distance(float* a, float* b, uint32_t dim, float* result
     return RES_EXIT_SUCCESS;
 }
 
-// Alogorithme de K-Means
+/** ==============================================
+ * Algorithme de K-Means (Apprentissage Non Supervisé)
+ * ===============================================
+**/
+/*
+    # Objectif : 
+        Trouver `k` centres représentatifs de la distribution des données d'entrée.
+    
+    # Algorithme de Lloyd :
+        1. Initialisation : Prendre les `k` premiers points du dataset comme centres initiaux.
+        2. Répéter jusqu'à convergence (ou max_iters) :
+            - Étape 1 (Assignation) : Pour chaque point, trouver le centre le plus proche.
+            - Étape 2 (Mise à jour) : Recalculer la position de chaque centre en 
+                                      prenant la moyenne des points qui lui sont assignés.
+*/
+
 unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim, uint32_t k, float* out_centers, uint32_t max_iters) {
+    // Tableaux pour stocker l'index du cluster de chaque point et la taille de chaque cluster
     uint32_t* assignments = (uint32_t*)malloc(num_points * sizeof(uint32_t));
     uint32_t* cluster_sizes = (uint32_t*)malloc(k * sizeof(uint32_t));
 
@@ -36,6 +57,7 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
         return ERR_ALLOCATION_FAILED;
     }
 
+    // Initialisation naïve : on place les centres sur les k premiers points
     for (uint32_t i = 0; i < k; i++) {
         for (uint32_t d = 0; d < input_dim; d++) {
             out_centers[i * input_dim + d] = points[i * input_dim + d];
@@ -47,14 +69,14 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
 
     while (!converged && iter < max_iters) {
         converged = 1;
+        
+        /** ==========================================================
+         * Etape 1 : Assigner chaque point à son centre le plus proche
+         * =========================================================== 
+        **/
         for (uint32_t i = 0; i < num_points; i++) {
             float min_dist = MAX_FLOAT;
             uint32_t closest_center = 0;
-
-            /** ==========================================================
-             * Etape 1 : Assigner chaque point à son centre le plus proche
-             * =========================================================== 
-            **/
 
             for (uint32_t j = 0; j < k; j++) {
                 float dist = 0.0f;
@@ -72,6 +94,7 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
                 }
             }
 
+            // Si un point change de cluster, on n'a pas encore convergé
             if (assignments[i] != closest_center) {
                 converged = 0;
                 assignments[i] = closest_center;
@@ -80,10 +103,12 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
 
         if (converged) break;
 
-            /** ==============================================
-             *  Etape 2 : Recalculer les centres des clusters
-             * ===============================================
-            **/
+        /** ==============================================
+         * Etape 2 : Recalculer les centres des clusters (Moyennes)
+         * ===============================================
+        **/
+        
+        // Remise à zéro avant de faire les sommes
         for (uint32_t i = 0; i < k * input_dim; i++) {
             out_centers[i] = 0.0f;
         }
@@ -92,7 +117,7 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
             cluster_sizes[i] = 0;
         }
 
-        // Somme des points
+        // Somme des coordonnées de tous les points pour chaque cluster
         for (uint32_t i = 0; i < num_points; i++) {
             uint32_t cluster_id = assignments[i];
             cluster_sizes[cluster_id]++;
@@ -101,6 +126,7 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
             }
         }
 
+        // Division par la taille du cluster pour obtenir la vraie moyenne géométrique
         for (uint32_t j = 0; j < k; j++) {
             if (cluster_sizes[j] > 0) {
                 for (uint32_t d = 0; d < input_dim; d++) {
@@ -118,8 +144,8 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
 }
 
 /** ==============================================
- *  Creation d'un réseau RBF
- *  ===============================================
+ * Creation d'un réseau RBF
+ * ===============================================
 **/
 
 unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, RBF** res_model) {
@@ -132,14 +158,14 @@ unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, 
     model->num_centers = num_centers;
     model->gamma = gamma;
 
-    // Allocation des centres
+    // Allocation du tableau plat pour les centres
     model->centers = (float*) calloc(num_centers * input_dim, sizeof(float));
     if (!model->centers) {
         free(model);
         return ERR_ALLOCATION_FAILED;
     }
 
-    // Création de la couche de sortie (modèle linéaire)
+    // Création de la couche de sortie : un modèle linéaire dont l'entrée est de taille `num_centers`
     model->output_layer = NULL;
     unsigned char status = create_linear_model_randomly(num_centers, &(model->output_layer));
     if (status != RES_EXIT_SUCCESS) {
@@ -154,8 +180,8 @@ unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, 
 
 
 /** ==============================================
- *  Libération de la mémoire d'un réseau RBF
- *  ===============================================
+ * Libération de la mémoire d'un réseau RBF
+ * ===============================================
 */
 
 unsigned char free_rbf(RBF** model_ptr) {
@@ -181,18 +207,25 @@ unsigned char free_rbf(RBF** model_ptr) {
 }
 
 
-
 /** ==============================================
- *  Prédiction avec un réseau RBF et entrainement
- *  ===============================================
+ * Fonction de Prédiction (Forward Pass)
+ * ===============================================
 */
-
+/*
+    # Comment le RBF prédit-il un résultat ?
+        1. Transformer l'entrée : On calcule l'activation de chaque neurone caché (centre)
+           avec la fonction gaussienne : activation = exp(-gamma * distance^2).
+        2. Modèle linéaire : On donne ces activations au modèle de régression/classification 
+           linéaire qui fera une somme pondérée (W * activations + biais).
+*/
 unsigned char predict_rbf(RBF* model, float* input, int32_t* outputs) {
     if (!model || !outputs) return ERR_INVALID_PTR;
 
+    // Tableau pour stocker l'activation de chaque centre (de taille `num_centers`)
     float* hidden_activations = (float*) malloc(model->num_centers * sizeof(float));
     if (!hidden_activations) return ERR_ALLOCATION_FAILED;
 
+    // Étape 1 : Calcul des activations gaussiennes
     for (uint32_t i = 0; i < model->num_centers; i++) {
         float dist = 0.0f;
         unsigned char status = euclidean_distance(&input[0], &model->centers[i * model->input_dim], model->input_dim, &dist);
@@ -203,21 +236,47 @@ unsigned char predict_rbf(RBF* model, float* input, int32_t* outputs) {
         hidden_activations[i] = expf(-model->gamma * dist * dist);
     }
 
+    // Étape 2 : On passe le relais à la couche de classification linéaire
     unsigned char status = predict_linear_classification(model->output_layer, hidden_activations, outputs);
     
     free(hidden_activations);
     return status;
 }
 
+
+/** ==============================================
+ * Fonction d'entraînement global
+ * ===============================================
+*/
+/*
+    # Algorithme d'apprentissage hybride en 3 phases :
+        - Phase 1 (Non Supervisé) : Utilisation des K-Means pour placer judicieusement 
+          les centres (balises) là où les données sont denses.
+        
+        - Phase 2 (Heuristique) : Calcul dynamique de Gamma (rayon d'action). 
+          On cherche la distance maximale entre deux centres pour ajuster la variance 
+          des gaussiennes afin qu'elles se chevauchent de manière optimale.
+          Puis, transformation de tout le dataset d'entrée dans le nouvel espace des distances.
+
+        - Phase 3 (Supervisé) : Apprentissage des poids de la couche de sortie. 
+          Les données transformées sont envoyées à l'algorithme de Rosenblatt du modèle linéaire.
+*/
 unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expected_outputs,
         uint32_t dataset_size, float alpha, uint32_t epochs) {
+    
     if (!model || !dataset_inputs || !dataset_expected_outputs) return ERR_INVALID_PTR;
 
-    // PHASE 1 : Entraînement non supervisé (Placer les centres avec K-means)
+    // ==============================================================================
+    // PHASE 1 : Entraînement non supervisé (Trouver la position des centres)
+    // ==============================================================================
     rbf_kmeans(dataset_inputs, dataset_size, model->input_dim, model->num_centers, model->centers, 100);
 
-    // Calcul automatique du gamma : on utilise l'heuristique classique 
-    // gamma = 1 / (2 * sigma^2) où sigma est basée sur la distance max entre 2 centres
+    // ==============================================================================
+    // PHASE 2 : Ajustement de Gamma et Transformation du dataset
+    // ==============================================================================
+    
+    // a. Calcul heuristique du Gamma : gamma = 1 / (2 * sigma^2)
+    //    où sigma est calculé à partir de la distance maximale (dmax) entre deux centres.
     float dmax = 0.0f;
     for (uint32_t i = 0; i < model->num_centers; i++) {
         for (uint32_t j = i + 1 ; j < model->num_centers; j++) {
@@ -231,7 +290,8 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
     float sigma = (dmax == 0.0f) ? 1.0f : (dmax / sqrtf(2.0f * (float)model->num_centers));
     model->gamma = 1.0f / (2.0f * sigma * sigma);
 
-    // PHASE 2: Entrainement supervisé
+    // b. Transformation de l'espace (Matrice Phi)
+    //    On transforme la matrice [dataset_size * input_dim] en [dataset_size * num_centers]
     float* transformed_inputs = (float*) malloc(dataset_size * model->num_centers * sizeof(float));
     if (!transformed_inputs) return ERR_ALLOCATION_FAILED;
 
@@ -243,11 +303,14 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
                 free(transformed_inputs);
                 return status;
             }
+            // Application de la fonction d'activation de base radiale
             transformed_inputs[i * model->num_centers + j] = expf(-model->gamma * dist * dist);
         }
     }
 
-    // PHASE 3: Entraintement supervisé
+    // ==============================================================================
+    // PHASE 3 : Entraînement supervisé (Règle de Rosenblatt sur la couche de sortie)
+    // ==============================================================================
     unsigned char status = train_linear_classification(
         model->output_layer,
         transformed_inputs,
