@@ -76,23 +76,14 @@ jobs:
         with:
           msystem: MINGW64
           update: false
+          # MODIFICATION : On installe le Python et le Pip natifs à l'écosystème MinGW64 d'MSYS2
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-binutils
-            make
+            mingw-w64-x86_64-make
             mingw-w64-x86_64-openblas
-
-      - name: Configure environment variables (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          # Crucial pour conftest.py : expose le compilateur (mingw64) ET l'utilitaire 'make' (usr/bin) au PATH natif de Windows
-          echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
-          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
-          
-          # Indique à l'environnement global où trouver OpenBLAS sous Windows
-          echo "C_INCLUDE_PATH=C:/msys64/mingw64/include" >> $GITHUB_ENV
-          echo "LIBRARY_PATH=C:/msys64/mingw64/lib" >> $GITHUB_ENV
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
 
       # -------- Build --------
       - name: Build libc (Unix)
@@ -102,36 +93,46 @@ jobs:
       - name: Build libc (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
-        run: make -C libc
+        run: |
+          # Crée un alias 'make' pour que le conftest.py puisse l'invoquer sans problème
+          cp /mingw64/bin/mingw32-make.exe /mingw64/bin/make.exe
+          make -C libc
 
       # -------- Python setup --------
-      - name: Setup Python
+      - name: Setup Python (Unix)
+        if: runner.os != 'Windows'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      - name: Install Python dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       # -------- Environment Setup for Tests --------
-      - name: Setup Library Paths
+      - name: Setup Library Paths (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           BUILD_DIR="${{ github.workspace }}/libc/build"
-          
-          # Ajoute le dossier build au PATH (Pour Windows DLL et executables)
           echo "$BUILD_DIR" >> $GITHUB_PATH
           
-          # Pour Linux
           if [ "${{ runner.os }}" == "Linux" ]; then
             echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
           fi
           
-          # Pour macOS
           if [ "${{ runner.os }}" == "macOS" ]; then
             OPENBLAS_LIB="$(brew --prefix openblas)/lib"
             echo "DYLD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
@@ -139,5 +140,11 @@ jobs:
           fi
 
       # -------- Tests --------
-      - name: Run pytest
+      - name: Run pytest (Unix)
+        if: runner.os != 'Windows'
+        run: pytest -v
+
+      - name: Run pytest (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
         run: pytest -v
