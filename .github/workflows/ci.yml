@@ -47,11 +47,11 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential make
+          sudo apt-get install -y build-essential make libopenblas-dev
 
       - name: Install build deps (macOS)
         if: runner.os == 'macOS'
-        run: brew install make
+        run: brew install make openblas
 
       - name: Install build deps (Windows / MSYS2)
         if: runner.os == 'Windows'
@@ -63,6 +63,7 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-binutils
             make
+            mingw-w64-x86_64-openblas
 
       # -------- Build --------
       - name: Build libc (Unix)
@@ -109,4 +110,4 @@ jobs:
 
       # -------- Tests --------
       - name: Run pytest
-        run: pytest pytest -v
+        run: pytest -v
