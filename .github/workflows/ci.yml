@@ -48,10 +48,26 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential make libopenblas-dev
+          
+          # Solution pour l'arborescence de #include <openblas/cblas.h>
+          mkdir -p ${{ github.workspace }}/openblas_include/openblas
+          CBLAS_PATH=$(find /usr/include -name "cblas.h" -o -name "cblas-openblas.h" | head -n 1)
+          ln -s "$CBLAS_PATH" ${{ github.workspace }}/openblas_include/openblas/cblas.h
+          echo "C_INCLUDE_PATH=${{ github.workspace }}/openblas_include" >> $GITHUB_ENV
 
       - name: Install build deps (macOS)
         if: runner.os == 'macOS'
-        run: brew install make openblas
+        run: |
+          brew install make openblas
+          
+          # Solution pour l'arborescence de #include <openblas/cblas.h>
+          mkdir -p ${{ github.workspace }}/openblas_include/openblas
+          OPENBLAS_PREFIX=$(brew --prefix openblas)
+          ln -s "$OPENBLAS_PREFIX/include/cblas.h" ${{ github.workspace }}/openblas_include/openblas/cblas.h
+          
+          # Expose les dossiers d'en-têtes et de bibliothèque au compilateur/linker natif
+          echo "C_INCLUDE_PATH=${{ github.workspace }}/openblas_include" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$OPENBLAS_PREFIX/lib" >> $GITHUB_ENV
 
       - name: Install build deps (Windows / MSYS2)
         if: runner.os == 'Windows'
@@ -64,6 +80,13 @@ jobs:
             mingw-w64-x86_64-binutils
             make
             mingw-w64-x86_64-openblas
+
+      - name: Expose MSYS2 to global PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # Donne la priorité au compilateur MSYS2 Mingw64 face aux autres outils du runner
+          echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
 
       # -------- Build --------
       - name: Build libc (Unix)
@@ -104,8 +127,9 @@ jobs:
           
           # Pour macOS
           if [ "${{ runner.os }}" == "macOS" ]; then
-            echo "DYLD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
-            echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
+            OPENBLAS_LIB="$(brew --prefix openblas)/lib"
+            echo "DYLD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
           fi
 
       # -------- Tests --------
