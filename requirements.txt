@@ -1,2 +1,9 @@
 numpy
 matplotlib
+django
+django-cors-headers
+djangorestframework
+datafilter
+pillow
+pandas
+ipykernel
