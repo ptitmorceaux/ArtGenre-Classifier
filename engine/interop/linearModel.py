@@ -17,9 +17,10 @@ class LinearModel:
         self.ptr = None
         self.input_dim = input_dim
     
+    # input_dim = longueur des poids (len(W))
     @classmethod
     def init_random(cls, input_dim: int) -> 'LinearModel':
-        """Initialise un modèle de régression linéaire avec des poids aléatoires."""        
+        """Initialise un modèle de régression linéaire avec des poids aléatoires."""
         instance = cls(input_dim)
 
         # On crée un pointeur vide (void*) qui recevra l'adresse du modèle C.
@@ -190,7 +191,12 @@ class LinearModel:
         Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
         """
 
-        all_data_length, y_size, row_count = LinearModel._check_training_data(dataset_inputs, dataset_expected_outputs, "LinearModel.train()")
+        all_data_length, y_size, row_count = LinearModel._check_training_data(
+            self.input_dim,
+            dataset_inputs,
+            dataset_expected_outputs,
+            "LinearModel.train()"
+        )
 
         # On vérifie les types des arguments
         Loader.check_primitive_values_range(row_count, ctypes.c_uint32, "LinearModel.train()")
