@@ -6,7 +6,8 @@ requests
 undetected-chromedriver
 django
 django-cors-headers
-rest_framework
 djangorestframework
 datafilter
 pillow
+scikit-learn
+opencv-python
