@@ -6,7 +6,7 @@
 #include "array.h"
 
 // For matrix inversion, we will use the LAPACK library
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64) || defined(__APPLE__)
     #include <openblas/cblas.h>   // get CblasRowMajor
     #include <openblas/lapacke.h> // header for inversion functions
 #else
