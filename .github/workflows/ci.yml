@@ -20,8 +20,7 @@ jobs:
       - run: ruff check --output-format=github .
 
   build-and-test:
-    # name: Build + Pytest (${{ matrix.os }})
-    name: Build (${{ matrix.os }})
+    name: Build + Pytest (${{ matrix.os }})
     needs: lint
     runs-on: ${{ matrix.runner }}
 
