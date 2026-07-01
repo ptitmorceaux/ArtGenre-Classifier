@@ -76,62 +76,57 @@ jobs:
         with:
           msystem: MINGW64
           update: false
-          # AJOUT : Installation de numpy et pytest via pacman pré-compilés
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-binutils
             mingw-w64-x86_64-make
             mingw-w64-x86_64-openblas
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-python-pip
-            mingw-w64-x86_64-python-numpy
-            mingw-w64-x86_64-python-pytest
 
-      # -------- Build --------
-      - name: Build libc (Unix)
-        if: runner.os != 'Windows'
-        run: make -C libc
-
-      - name: Build libc (Windows)
+      - name: Configure MSYS2 for native Windows use
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
-          # Crée un alias 'make' pour que le conftest.py puisse l'invoquer sans problème
+          # Crée un exécutable nommé 'make' à partir de mingw32-make pour que conftest.py le trouve
           cp /mingw64/bin/mingw32-make.exe /mingw64/bin/make.exe
-          make -C libc
+          
+          # Astuce de sioux : on crée un lien symbolique récursif 'openblas' dans le dossier include de MSYS2.
+          # Ainsi, la syntaxe <openblas/cblas.h> se résoudra naturellement en /mingw64/include/cblas.h !
+          ln -sf /mingw64/include /mingw64/include/openblas
+
+      - name: Expose MSYS2 to global PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # On reproduit à l'identique ta configuration locale dans l'environnement global de Windows
+          echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
+          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
+
+      # -------- Build --------
+      - name: Build libc
+        run: make -C libc
 
       # -------- Python setup --------
-      - name: Setup Python (Unix)
-        if: runner.os != 'Windows'
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Python dependencies (Unix)
-        if: runner.os != 'Windows'
+      - name: Install Python dependencies
         shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Install Python dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: msys2 {0}
-        run: |
-          # --break-system-packages permet de contourner le blocage de sécurité MSYS2 de manière sûre ici
-          if [ -f requirements.txt ]; then pip install -r requirements.txt --break-system-packages; fi
-
       # -------- Environment Setup for Tests --------
-      - name: Setup Library Paths (Unix)
-        if: runner.os != 'Windows'
+      - name: Setup Library Paths
         shell: bash
         run: |
           BUILD_DIR="${{ github.workspace }}/libc/build"
           echo "$BUILD_DIR" >> $GITHUB_PATH
           
           if [ "${{ runner.os }}" == "Linux" ]; then
-            echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=$BUILD_ENV" >> $GITHUB_ENV
           fi
           
           if [ "${{ runner.os }}" == "macOS" ]; then
@@ -141,11 +136,5 @@ jobs:
           fi
 
       # -------- Tests --------
-      - name: Run pytest (Unix)
-        if: runner.os != 'Windows'
-        run: pytest -v
-
-      - name: Run pytest (Windows)
-        if: runner.os == 'Windows'
-        shell: msys2 {0}
+      - name: Run pytest
         run: pytest -v
