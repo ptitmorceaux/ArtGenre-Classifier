@@ -49,7 +49,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential make libopenblas-dev liblapacke-dev
           
-          # Crée une arborescence virtuelle pour mapper la syntaxe <openblas/xxxx.h>
+          # Crée une arborescence virtuelle pour mapper la syntaxe <openblas/xxxx.h> requise sur Linux
           mkdir -p ${{ github.workspace }}/openblas_include/openblas
           CBLAS_PATH=$(find /usr/include -name "cblas.h" | head -n 1)
           LAPACKE_PATH=$(find /usr/include -name "lapacke.h" | head -n 1)
@@ -63,7 +63,7 @@ jobs:
         run: |
           brew install make openblas
           
-          # Lien symbolique du dossier d'inclusion complet (règle l'erreur du openblas_config.h manquant)
+          # Lien symbolique du dossier d'inclusion complet pour la syntaxe <openblas/xxxx.h>
           mkdir -p ${{ github.workspace }}/openblas_include
           ln -s "$(brew --prefix openblas)/include" ${{ github.workspace }}/openblas_include/openblas
           
@@ -82,22 +82,14 @@ jobs:
             mingw-w64-x86_64-make
             mingw-w64-x86_64-openblas
 
-      - name: Configure MSYS2 for native Windows use
-        if: runner.os == 'Windows'
-        shell: msys2 {0}
-        run: |
-          # Crée un exécutable nommé 'make' à partir de mingw32-make pour que conftest.py le trouve
-          cp /mingw64/bin/mingw32-make.exe /mingw64/bin/make.exe
-          
-          # Astuce de sioux : on crée un lien symbolique récursif 'openblas' dans le dossier include de MSYS2.
-          # Ainsi, la syntaxe <openblas/cblas.h> se résoudra naturellement en /mingw64/include/cblas.h !
-          ln -sf /mingw64/include /mingw64/include/openblas
-
-      - name: Expose MSYS2 to global PATH (Windows)
+      - name: Configure MSYS2 Paths for Windows
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          # On reproduit à l'identique ta configuration locale dans l'environnement global de Windows
+          # Crée un alias 'make' à partir de mingw32-make pour que conftest.py le trouve nativement
+          cp /c/msys64/mingw64/bin/mingw32-make.exe /c/msys64/mingw64/bin/make.exe
+          
+          # Copie EXACTEMENT ta configuration locale dans le PATH global de la machine de CI
           echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
           echo "C:\msys64\usr\bin" >> $GITHUB_PATH
 
@@ -126,7 +118,7 @@ jobs:
           echo "$BUILD_DIR" >> $GITHUB_PATH
           
           if [ "${{ runner.os }}" == "Linux" ]; then
-            echo "LD_LIBRARY_PATH=$BUILD_ENV" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
           fi
           
           if [ "${{ runner.os }}" == "macOS" ]; then
