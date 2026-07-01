@@ -12,10 +12,6 @@ SPEC_DIR := specs
 CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2 -std=c17 -pedantic
 LDLIBS := -lopenblas
 
-# AJOUT : Sur Linux (Ubuntu), LAPACKE nécessite d'être lié explicitement
-ifeq ($(UNAME_S),Linux)
-    LDLIBS += -llapacke
-endif
 
 # ===== Détection Python =====
 PYTHON := $(shell which python3 2>/dev/null || which python 2>/dev/null || which py 2>/dev/null || echo "")
@@ -41,6 +37,7 @@ else
     else
         EXT  := so
         FLAG := -shared -fPIC
+		LDLIBS += -llapacke
     endif
 endif
 

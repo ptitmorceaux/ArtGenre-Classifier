@@ -76,7 +76,7 @@ jobs:
         with:
           msystem: MINGW64
           update: false
-          # MODIFICATION : On installe le Python et le Pip natifs à l'écosystème MinGW64 d'MSYS2
+          # AJOUT : Installation de numpy et pytest via pacman pré-compilés
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-binutils
@@ -84,6 +84,8 @@ jobs:
             mingw-w64-x86_64-openblas
             mingw-w64-x86_64-python
             mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-python-numpy
+            mingw-w64-x86_64-python-pytest
 
       # -------- Build --------
       - name: Build libc (Unix)
@@ -117,9 +119,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # --break-system-packages permet de contourner le blocage de sécurité MSYS2 de manière sûre ici
+          if [ -f requirements.txt ]; then pip install -r requirements.txt --break-system-packages; fi
 
       # -------- Environment Setup for Tests --------
       - name: Setup Library Paths (Unix)
