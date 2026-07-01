@@ -198,6 +198,8 @@ class LinearModel:
             "LinearModel.train()"
         )
 
+        c_loss_history = (ctypes.c_float * epochs)() 
+
         # On vérifie les types des arguments
         Loader.check_primitive_values_range(row_count, ctypes.c_uint32, "LinearModel.train()")
         Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train()")
@@ -210,5 +212,7 @@ class LinearModel:
             ctypes.c_uint32(row_count),
             ctypes.c_float(alpha),
             ctypes.c_uint32(epochs),
+            c_loss_history,
             prefix_errmsg="LinearModel.train()"
         )
+        return list(c_loss_history)
