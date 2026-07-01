@@ -98,35 +98,35 @@ jobs:
       - name: Build libc
         run: make -C libc
 
-      # -------- Python setup --------
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # # -------- Python setup --------
+      # - name: Setup Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: "3.11"
 
-      - name: Install Python dependencies
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          # pip install pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      # - name: Install Python dependencies
+      #   shell: bash
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     # pip install pytest
+      #     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # -------- Environment Setup for Tests --------
-      - name: Setup Library Paths
-        shell: bash
-        run: |
-          BUILD_DIR="${{ github.workspace }}/libc/build"
-          echo "$BUILD_DIR" >> $GITHUB_PATH
+      # # -------- Environment Setup for Tests --------
+      # - name: Setup Library Paths
+      #   shell: bash
+      #   run: |
+      #     BUILD_DIR="${{ github.workspace }}/libc/build"
+      #     echo "$BUILD_DIR" >> $GITHUB_PATH
           
-          if [ "${{ runner.os }}" == "Linux" ]; then
-            echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
-          fi
+      #     if [ "${{ runner.os }}" == "Linux" ]; then
+      #       echo "LD_LIBRARY_PATH=$BUILD_DIR" >> $GITHUB_ENV
+      #     fi
           
-          if [ "${{ runner.os }}" == "macOS" ]; then
-            OPENBLAS_LIB="$(brew --prefix openblas)/lib"
-            echo "DYLD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
-            echo "LD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
-          fi
+      #     if [ "${{ runner.os }}" == "macOS" ]; then
+      #       OPENBLAS_LIB="$(brew --prefix openblas)/lib"
+      #       echo "DYLD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
+      #       echo "LD_LIBRARY_PATH=$BUILD_DIR:$OPENBLAS_LIB" >> $GITHUB_ENV
+      #     fi
 
       # # -------- Tests --------
       # - name: Run pytest
