@@ -7,3 +7,4 @@ datafilter
 pillow
 pandas
 ipykernel
+scikit-learn
