@@ -151,7 +151,7 @@ unsigned char predict_linear_classification(LinearModel* model, float* input, in
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1) (car le biais on le multiplie par 1)
 */
 unsigned char train_linear_classification(LinearModel* model, float* dataset_inputs,
-        float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history) {   
+        float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history, float* accuracy_history) {   
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par la règle de Rosenblatt.
@@ -165,6 +165,7 @@ unsigned char train_linear_classification(LinearModel* model, float* dataset_inp
     // On boucle sur le nombre d'époques
     for (uint32_t i = 0; i < epochs; i++) {
         float epoch_loss = 0.0f;
+        uint32_t correct_predictions = 0;
         // On boucle sur le nombre d'exemple dans le dataset
         for (uint32_t j = 0; j < dataset_size; j++) {
             /* 
@@ -192,12 +193,13 @@ unsigned char train_linear_classification(LinearModel* model, float* dataset_inp
             float error = Y_expected - g;
 
             epoch_loss += (error * error); // On accumule l'erreur pour calculer la perte moyenne à la fin de l'époque
-            
-            if (error != 0) {
-                // Mise à jour du biais
-                model->weights[0] += alpha * error;
 
-                // Mise à jour des poids
+            // Si l'erreur est nulle, on compte la prédiction comme correcte
+            if (error == 0.0f) {
+                correct_predictions++;
+            } else {
+                // S'il s'est trompé, on met à jour les poids
+                model->weights[0] += alpha * error;
                 for (uint32_t k = 0; k < input_dim; k++) {
                     model->weights[k + 1] += alpha * error * image[k];
                 }
@@ -206,6 +208,10 @@ unsigned char train_linear_classification(LinearModel* model, float* dataset_inp
         // Calcul de la perte moyenne pour cette époque
         if (loss_history != NULL) {
             loss_history[i] = epoch_loss / dataset_size;
+        }
+        // Calcul de l'accuracy pour cette époque
+        if (accuracy_history != NULL) {
+            accuracy_history[i] = (float)correct_predictions / (float)dataset_size;
         }
     }
     return RES_EXIT_SUCCESS;

@@ -185,7 +185,7 @@ class LinearModel:
             alpha: float,
             epochs: int,
             is_classification: bool
-            ) -> None:
+            ) -> tuple[list[float], list[float]]:
         """
         Si is_classification = True: Entraîne le modèle de classification binaire signée (-1 / 1) en utilisant la règle de Rosenblatt.
         Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
@@ -198,7 +198,8 @@ class LinearModel:
             "LinearModel.train()"
         )
 
-        c_loss_history = (ctypes.c_float * epochs)() 
+        c_loss_history = (ctypes.c_float * epochs)()
+        c__accuracy_history = (ctypes.c_float * epochs)() if is_classification else None
 
         # On vérifie les types des arguments
         Loader.check_primitive_values_range(row_count, ctypes.c_uint32, "LinearModel.train()")
@@ -213,6 +214,7 @@ class LinearModel:
             ctypes.c_float(alpha),
             ctypes.c_uint32(epochs),
             c_loss_history,
+            c__accuracy_history,
             prefix_errmsg="LinearModel.train()"
         )
-        return list(c_loss_history)
+        return list(c_loss_history), list(c__accuracy_history)
