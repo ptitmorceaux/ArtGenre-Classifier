@@ -49,14 +49,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential make libopenblas-dev liblapacke-dev
           
-          # Crée une arborescence virtuelle pour mapper la syntaxe <openblas/xxxx.h> requise sur Linux
-          mkdir -p ${{ github.workspace }}/openblas_include/openblas
-          CBLAS_PATH=$(find /usr/include -name "cblas.h" | head -n 1)
-          LAPACKE_PATH=$(find /usr/include -name "lapacke.h" | head -n 1)
-          ln -s "$CBLAS_PATH" ${{ github.workspace }}/openblas_include/openblas/cblas.h
-          ln -s "$LAPACKE_PATH" ${{ github.workspace }}/openblas_include/openblas/lapacke.h
+          # # Crée une arborescence virtuelle pour mapper la syntaxe <openblas/xxxx.h> requise sur Linux
+          # mkdir -p ${{ github.workspace }}/openblas_include/openblas
+          # CBLAS_PATH=$(find /usr/include -name "cblas.h" | head -n 1)
+          # LAPACKE_PATH=$(find /usr/include -name "lapacke.h" | head -n 1)
+          # ln -s "$CBLAS_PATH" ${{ github.workspace }}/openblas_include/openblas/cblas.h
+          # ln -s "$LAPACKE_PATH" ${{ github.workspace }}/openblas_include/openblas/lapacke.h
           
-          echo "C_INCLUDE_PATH=${{ github.workspace }}/openblas_include" >> $GITHUB_ENV
+          # echo "C_INCLUDE_PATH=${{ github.workspace }}/openblas_include" >> $GITHUB_ENV
 
       - name: Install build deps (macOS)
         if: runner.os == 'macOS'
