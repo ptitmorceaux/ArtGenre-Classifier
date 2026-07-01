@@ -84,14 +84,14 @@ jobs:
 
       - name: Configure MSYS2 Paths for Windows
         if: runner.os == 'Windows'
-        shell: bash
+        shell: msys2 {0}
         run: |
-          # Crée un alias 'make' à partir de mingw32-make pour que conftest.py le trouve nativement
-          cp /c/msys64/mingw64/bin/mingw32-make.exe /c/msys64/mingw64/bin/make.exe
+          # 1. Crée l'alias 'make' à l'intérieur d'MSYS2 pour conftest.py
+          cp /mingw64/bin/mingw32-make.exe /mingw64/bin/make.exe
           
-          # Copie EXACTEMENT ta configuration locale dans le PATH global de la machine de CI
-          echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
-          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
+          # 2. Récupère dynamiquement les vrais chemins Windows de la CI et les injecte dans le PATH global
+          echo "$(cygpath -w /mingw64/bin)" >> $GITHUB_PATH
+          echo "$(cygpath -w /usr/bin)" >> $GITHUB_PATH
 
       # -------- Build --------
       - name: Build libc
