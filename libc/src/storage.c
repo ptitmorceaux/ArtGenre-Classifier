@@ -4,21 +4,19 @@
 /*  UTILS   */
 
 const char* get_current_datetime_string() {
+    static char buffer[21];
     time_t now = time(NULL);
-    
-    // ".YYYY-MM-DD_HH:MM:SS" + '\0'
-    // = 20 + 1 = 21
-    char buffer[21];
+    struct tm tm;
 
 #if defined(_WIN32)
-    struct tm tm;
     localtime_s(&tm, &now);
 #else
-    struct tm tm;
     localtime_r(&now, &tm);
 #endif
 
-    strftime(&buffer, 21, ".%Y-%m-%d_%H:%M:%S", &tm);
+    if (strftime(buffer, sizeof(buffer), ".%Y-%m-%d_%H:%M:%S", &tm) == 0)
+        return NULL;
+
     return buffer;
 }
 
