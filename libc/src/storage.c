@@ -4,7 +4,7 @@
 /*  UTILS   */
 
 const char* get_current_datetime_string() {
-    static char buffer[21];
+    static char buffer[20]; // "YYYY-MM-DD_HH:MM:SS" (19 + '\0' = 20)
     time_t now = time(NULL);
     struct tm tm;
 
@@ -14,7 +14,7 @@ const char* get_current_datetime_string() {
     localtime_r(&now, &tm);
 #endif
 
-    if (strftime(buffer, sizeof(buffer), ".%Y-%m-%d_%H:%M:%S", &tm) == 0)
+    if (strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H:%M:%S", &tm) == 0)
         return NULL;
 
     return buffer;
@@ -33,7 +33,7 @@ unsigned char init_filename(ModelType model_type, NormalizationMethod normalizat
     char* filename = (char*) calloc(needed, sizeof(char));
     if (!filename) return ERR_MEMORY_ALLOCATION;
 
-    snprintf(filename, needed, "%s_%s_%s.bin", model_str, norm_str, date_str);
+    snprintf(filename, needed, "%s_%s.%s.bin", model_str, norm_str, date_str);
 
     *res_filename = filename;
     return RES_EXIT_SUCCESS;
