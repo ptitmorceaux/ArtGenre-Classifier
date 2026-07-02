@@ -1,4 +1,3 @@
-
 #include "../include/normalization.h"
 
 const char* get_normalization_method_string(NormalizationMethod normalization_method) {
