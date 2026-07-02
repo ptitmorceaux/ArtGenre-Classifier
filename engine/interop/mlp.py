@@ -2,6 +2,17 @@ import ctypes
 from engine.interop.loader import Loader
 
 
+class _CMLP(ctypes.Structure):
+    _fields_ = [
+        ("model_type", ctypes.c_int),  # ModelType
+        ("d", ctypes.POINTER(ctypes.c_uint32)),  # Tableau des dimensions des couches (d[0] = input_dim, d[L] = output_dim)
+        ("L", ctypes.c_uint32),  # Nombre de couches (sans compter la couche d'entrée)
+        ("W", ctypes.POINTER(ctypes.POINTER(ctypes.POINTER(ctypes.c_float)))),  # Tableau de pointeurs vers les poids de chaque couche
+        ("X", ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+        ("deltas", ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+    ]
+
+
 class MLP:
     """
     Wrapper Python pour MLP en C.
@@ -10,7 +21,7 @@ class MLP:
 
     #====== Constructeurs ======#
 
-    def __init__(self, npl: list[int]) -> None:
+    def __init__(self, npl: list[int], init_without_create: bool = False) -> None:
         if len(npl) < 2:
             raise ValueError("MLP.__init__(): Le réseau doit avoir au moins 2 couches (entrée et sortie).")
         self.npl = npl
@@ -25,6 +36,10 @@ class MLP:
         c_npl_array = (ctypes.c_uint32 * npl_size)(*npl)
         self.ptr = ctypes.c_void_p()
 
+        if init_without_create:
+            self.ptr = None
+            return
+
         Loader.call(
             "create_mlp",
             c_npl_array,
@@ -32,6 +47,25 @@ class MLP:
             ctypes.byref(self.ptr),
             prefix_errmsg="MLP.__init__()"
         )
+    
+    @classmethod
+    def _init_from_model_ptr(cls, model_ptr) -> "MLP":
+        """Initialise un MLP à partir d'un pointeur vers un modèle C existant."""
+
+        if model_ptr is None or model_ptr.value is None:
+            raise ValueError("MLP._init_from_model_ptr(): model_ptr is NULL.")
+
+        model_struct = ctypes.cast(
+            model_ptr,
+            ctypes.POINTER(_CMLP)
+        ).contents
+
+        npl = list(model_struct.d[:model_struct.L + 1])
+
+        instance = cls(npl, init_without_create=True)
+        instance.ptr = model_ptr
+        
+        return instance
 
     def close(self) -> None:
         """Libère la mémoire allouée pour le MLP côté C."""

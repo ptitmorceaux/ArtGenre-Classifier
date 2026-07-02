@@ -2,7 +2,15 @@ import ctypes
 from engine.interop.loader import Loader
 
 
-class LinearModel:
+class _CLinearModel(ctypes.Structure):
+    _fields_ = [
+        ("model_type", ctypes.c_int),  # ModelType
+        ("weights", ctypes.POINTER(ctypes.c_float)),
+        ("length", ctypes.c_uint32),
+    ]
+
+
+class LinearModel(ctypes.Structure):
     """
     Wrapper Python pour LinearModel en C.
     Cette classe permet de gérer le pointeur mémoire côté C.
@@ -19,7 +27,7 @@ class LinearModel:
     
     # input_dim = longueur des poids (len(W))
     @classmethod
-    def init_random(cls, input_dim: int) -> 'LinearModel':
+    def init_random(cls, input_dim: int) -> "LinearModel":
         """Initialise un modèle de régression linéaire avec des poids aléatoires."""
         instance = cls(input_dim)
 
@@ -35,7 +43,7 @@ class LinearModel:
         return instance
 
     @classmethod
-    def init_from_weights(cls, weights: list[float], bias: float) -> 'LinearModel':
+    def init_from_weights(cls, weights: list[float], bias: float) -> "LinearModel":
         """Initialise un modèle de régression linéaire avec des poids et un biais donnés."""
         if not isinstance(weights, list) or len(weights) == 0:
             raise ValueError("LinearModel.init_from_weights(): `weights` must be a non-empty list of floats.")
@@ -60,7 +68,7 @@ class LinearModel:
             cls,
             dataset_inputs_without_bias: list[float],
             dataset_expected_outputs: list[float]
-            ) -> 'LinearModel':
+            ) -> "LinearModel":
         """
         Initialise un modèle de régression linéaire et ses poids à partir de listes d'entrées et de sorties attendues.
         Renvoie un modèle entraîné via la pseudo-inverse.
