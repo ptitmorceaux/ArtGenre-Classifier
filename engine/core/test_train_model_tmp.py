@@ -4,32 +4,41 @@ import subprocess
 import random
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
 from PIL import Image
 from math import tanh
-import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
+
+# --- GESTION DYNAMIQUE DES CHEMINS ET IMPORTS ---
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
 
 # --- CONFIGURATION GLOBALE ---
 
 CONFIG = {
     "lib": {
         "lib_name": "libc",
-        "lib_folder": os.path.join("libc"),
-        "build_folder": os.path.join("libc", "build"),
-        "specs_folder": os.path.join("libc", "specs"),
+        "lib_folder": os.path.join(ROOT_DIR, "libc"),
+        "build_folder": os.path.join(ROOT_DIR, "libc", "build"),
+        "specs_folder": os.path.join(ROOT_DIR, "libc", "specs"),
         "dependencies_folder": None,
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
         "seed": None,
     },
     "dataset": {
-        "csv_path": os.path.join("..", "dataset"),
-        "data_folder_path": os.path.join("..", "dataset", "64x64"),
-        "limit_per_category": 1000,
+        "csv_path": os.path.join(ROOT_DIR, "dataset"),
+        "data_folder_path": os.path.join(ROOT_DIR, "dataset", "64x64"),
+        "limit_per_category": -1,
         "train_test_split_ratio": 0.7,
     },
     "model": {
-        "alpha": 0.01,
-        "epochs": 1000,
+        "alpha": 0.001,
+        "epochs": 100,
     },
     "global": {
         "unknown_category": "unknown",
@@ -195,6 +204,7 @@ def load_images_from_filepaths(df_X_filepaths):
             df_X[step].append(img_array)
         print()
 
+    # On fusionne le tout, SANS faire de .tolist()
     df_X["train"] = np.concatenate(df_X["train"])
     return df_X
 
@@ -226,8 +236,8 @@ def train_models(df_X, df_Y):
     models_per_category = dict()
     
     # Préparation de TensorBoard
-    current_time = datetime.datetime.now().strftime("Art_%Y%m%d-%H%M%S")
-    log_dir = os.path.join("logs", "artgenre_linear", current_time)
+    current_time = datetime.datetime.now().strftime("Train_%d/%m-%H:%M")
+    log_dir = os.path.join("logs", "Linear_Classification",current_time)
     summary_writer = tf.summary.create_file_writer(log_dir)
     print(f"\n[*] TensorBoard Logs directory: {log_dir}")
 
@@ -259,14 +269,21 @@ def train_models(df_X, df_Y):
 def evaluate_models(models_per_category, df_X, df_Y):
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
+    total_images = len(df_X["test"])
 
     for category in CATEGORIES:
         print(f"Evaluating model for category: {category}")
-        
         predictions[category] = dict()
-        predictions[category]["values"] = [
-            models_per_category[category].predict(x, is_classification=False) for x in df_X["test"]
-        ]
+        
+        # Remplacement de la list comprehension par une boucle avec barre de progression
+        values = []
+        for i, x in enumerate(df_X["test"]):
+            if i % 500 == 0 or i == total_images - 1:
+                print(f"\rProgression : {i+1}/{total_images} ({100*(i+1)/total_images:.1f}%)", end="", flush=True)
+            values.append(models_per_category[category].predict(x, is_classification=False))
+        print()  # Saut de ligne une fois la catégorie finie
+        
+        predictions[category]["values"] = values
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
