@@ -33,6 +33,8 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     MLP* model = (MLP*) malloc(sizeof(MLP));
     if (!model) return ERR_MEMORY_ALLOCATION;
 
+    model->model_type = ModelType_MLP;
+
     // Configuration de d et L
     model->L = npl_size - 1;
     model->d = (uint32_t*) malloc(npl_size * sizeof(uint32_t));
