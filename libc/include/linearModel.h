@@ -3,10 +3,12 @@
 
 
 #include "global.h"
+#include "model.h"
 #include "matrix.h"
 #include "array.h"
 
 typedef struct {
+    ModelType model_type; // ModelType_LINEAR
     float* weights;     // weights[0] = poids du bias, weights[1] = w1, weights[2] = w2, ...
     uint32_t length;    // length = input_dim + 1 (nombre de poids + biais)
 } LinearModel;
