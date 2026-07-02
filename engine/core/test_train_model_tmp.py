@@ -17,7 +17,7 @@ CONFIG = {
         "lib_folder": os.path.join("libc"),
         "build_folder": os.path.join("libc", "build"),
         "specs_folder": os.path.join("libc", "specs"),
-        "dependencies_folder": r"C:\msys64\mingw64\bin",
+        "dependencies_folder": None,
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
         "seed": None,
     },
@@ -218,22 +218,41 @@ def standardize_data(df_X) -> tuple[dict, float, float]:
 
 
 def train_models(df_X, df_Y):
-    """Entraîne un modèle linéaire par catégorie (One-vs-All)."""
+    """Entraîne un modèle linéaire par catégorie et envoie les logs vers TensorBoard."""
     from engine.interop.linearModel import LinearModel
+    import tensorflow as tf
+    import datetime
+    
     models_per_category = dict()
+    
+    # Préparation de TensorBoard
+    current_time = datetime.datetime.now().strftime("Art_%Y%m%d-%H%M%S")
+    log_dir = os.path.join("logs", "artgenre_linear", current_time)
+    summary_writer = tf.summary.create_file_writer(log_dir)
+    print(f"\n[*] TensorBoard Logs directory: {log_dir}")
 
     for category in CATEGORIES:
         print(f"Training model for category: {category}")
         models_per_category[category] = LinearModel.init_random(input_dim=CONFIG["dataset"]["W_length"])
-        models_per_category[category].train(
+        
+        # Récupération de la Loss et de l'Accuracy depuis le C
+        loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=df_X["train"],
             dataset_expected_outputs=df_Y["train"][category],
             is_classification=True,
             alpha=CONFIG["model"]["alpha"],
             epochs=CONFIG["model"]["epochs"]
         )
-        print(f"Model for category '{category}' trained successfully.\n")
         
+        # Écriture dans TensorBoard
+        with summary_writer.as_default():
+            for epoch in range(CONFIG["model"]["epochs"]):
+                tf.summary.scalar(f"Loss/{category}", loss_history[epoch], step=epoch)
+                tf.summary.scalar(f"Accuracy/{category}", acc_history[epoch], step=epoch)
+                
+        print(f"Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
+    
+    summary_writer.flush()
     return models_per_category
 
 
