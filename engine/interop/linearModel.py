@@ -24,6 +24,23 @@ class LinearModel():
             raise ValueError("LinearModel.__init__(): `input_dim` must be > 0")
         self.ptr = None
         self.input_dim = input_dim
+
+    @classmethod
+    def _init_from_model_ptr(cls, model_ptr) -> "LinearModel":
+        """Initialise un LinearModel à partir d'un pointeur vers un modèle C existant."""
+        if model_ptr is None or model_ptr.value is None:
+            raise ValueError("LinearModel._init_from_model_ptr(): model_ptr is NULL.")
+
+        model_struct = ctypes.cast(
+            model_ptr,
+            ctypes.POINTER(_CLinearModel)
+        ).contents
+
+        # length = input_dim + 1 (le +1 correspond au biais)
+        instance = cls(model_struct.length - 1)
+        instance.ptr = model_ptr
+
+        return instance
     
     # input_dim = longueur des poids (len(W))
     @classmethod

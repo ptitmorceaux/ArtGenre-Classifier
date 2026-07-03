@@ -1,5 +1,6 @@
 import ctypes
 import numpy as np
+from engine.interop.loader import Loader
 
 
 class _CStandardScaler(ctypes.Structure):
@@ -33,6 +34,16 @@ class StandardScaler:
         std = normalization_struct.std
 
         return cls(mean, std)
+    
+    @staticmethod
+    def _free(normalization_ptr: ctypes.c_void_p):
+        """Libère la mémoire allouée pour le scaler."""
+        if normalization_ptr is not None and normalization_ptr.value is not None:
+            Loader.call(
+                "free_StandardNormalizationData",
+                ctypes.byref(normalization_ptr),
+                prefix_errmsg="StandardScaler.free()"
+            )
 
     def transform(self, X: np.ndarray) -> np.ndarray:
         """Normalise les données X en utilisant la moyenne et l'écart type."""
@@ -56,6 +67,7 @@ class StandardPerColumnScaler:
         self.length = len(mean) if mean is not None else 0
         self.mean = mean
         self.std = std
+        self.ptr
     
     @classmethod
     def _init_from_normalization_ptr(cls, normalization_ptr: ctypes.c_void_p) -> "StandardPerColumnScaler":
@@ -74,7 +86,19 @@ class StandardPerColumnScaler:
         mean = list(normalization_struct.mean[:length])
         std = list(normalization_struct.std[:length])
 
+        StandardPerColumnScaler._free(normalization_ptr)
+        
         return cls(mean, std)
+
+    @staticmethod
+    def _free(normalization_ptr: ctypes.c_void_p):
+        """Libère la mémoire allouée pour le scaler."""
+        if normalization_ptr is not None and normalization_ptr.value is not None:
+            Loader.call(
+                "free_StandardPerColumnNormalizationData",
+                ctypes.byref(normalization_ptr),
+                prefix_errmsg="StandardPerColumnScaler.free()"
+            )
 
     def transform(self, X: list[float] | np.ndarray) -> np.ndarray:
         """Normalise les données X par colonne en utilisant la moyenne et l'écart type."""
