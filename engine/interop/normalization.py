@@ -33,6 +33,8 @@ class StandardScaler:
         mean = normalization_struct.mean
         std = normalization_struct.std
 
+        StandardScaler._free(normalization_ptr)
+
         return cls(mean, std)
     
     @staticmethod
@@ -67,7 +69,6 @@ class StandardPerColumnScaler:
         self.length = len(mean) if mean is not None else 0
         self.mean = mean
         self.std = std
-        self.ptr
     
     @classmethod
     def _init_from_normalization_ptr(cls, normalization_ptr: ctypes.c_void_p) -> "StandardPerColumnScaler":
