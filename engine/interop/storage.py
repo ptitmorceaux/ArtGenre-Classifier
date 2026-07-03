@@ -2,9 +2,9 @@
 import ctypes
 import os
 from engine.interop.loader import Loader
-from engine.interop.linearModel import LinearModel, _CLinearModel
-from engine.interop.mlp import MLP, _CMLP
-from engine.interop.normalization import StandardScaler, _CStandardScaler, StandardPerColumnScaler, _CStandardPerColumnScaler
+from engine.interop.linearModel import LinearModel
+from engine.interop.mlp import MLP
+from engine.interop.normalization import StandardScaler, StandardPerColumnScaler
 
 
 def _init_normalization_from_ptr(normalization_ptr: ctypes.c_void_p, normalization_type: str) -> StandardScaler | StandardPerColumnScaler:
@@ -77,41 +77,25 @@ def _get_normalization_type(normalization: StandardScaler | StandardPerColumnSca
     """
     Renvoie le NormalizationMethod de la normalisation C.
     """
-    if normalization.ptr is None or normalization.ptr.value is None:
-        raise ValueError("StandardScaler.get_normalization_type(): normalization is not initialized.")
-    
     if isinstance(normalization, StandardScaler):
-        struct_normalization = ctypes.POINTER(_CStandardScaler)
+        return ctypes.c_int(0)
     
     elif isinstance(normalization, StandardPerColumnScaler):
-        struct_normalization = ctypes.POINTER(_CStandardPerColumnScaler)
+        return ctypes.c_int(1)
 
-    normalization = ctypes.cast(
-        normalization.ptr,
-        struct_normalization
-    ).contents
-
-    return normalization.method
+    raise ValueError(f"get_normalization_type(): unknown normalization type '{type(normalization)}'.")
 
 def _get_model_type(model: LinearModel | MLP) -> ctypes.c_int:
-        """
-        Renvoie le ModelType du modèle C.
-        """
-        if model.ptr is None or model.ptr.value is None:
-            raise ValueError("LinearModel.get_model_type(): model is not initialized.")
+    """
+    Renvoie le ModelType du modèle C.
+    """
+    if isinstance(model, LinearModel):
+        return ctypes.c_int(0)
         
-        if isinstance(model, LinearModel):
-            struct_model = ctypes.POINTER(_CLinearModel)
-        
-        elif isinstance(model, MLP):
-            struct_model = ctypes.POINTER(_CMLP)
+    elif isinstance(model, MLP):
+        return ctypes.c_int(1)
 
-        model = ctypes.cast(
-            model.ptr,
-            struct_model
-        ).contents
-
-        return model.model_type
+    raise ValueError(f"get_model_type(): unknown model type '{type(model)}'.")
 
 
 def save_model_and_normalization_to_binary_file(
