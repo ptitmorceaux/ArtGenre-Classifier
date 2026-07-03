@@ -5,7 +5,6 @@ import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import concurrent.futures
 
 from PIL import Image
 from math import tanh
@@ -29,8 +28,6 @@ CONFIG = {
         "specs_folder": os.path.join(ROOT_DIR, "libc", "specs"),
         "dependencies_folder": None,
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
-        "num_seeds_to_run": 3,
-        "max_parallel_workers": 2,
         "seed": None,
     },
     "dataset": {
@@ -337,72 +334,31 @@ def plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X):
     )
 
     plt.tight_layout()
-    filename = f"confusion_matrix_seed_{seed}.png"
-    plt.savefig(filename)
-    print(f"\n[SEED {seed}] Matrice sauvegardée sous {filename}")
-    plt.close()
-
-
-def run_single_seed(seed):
-    """Fonction exécutée par chaque sous-processus pour un seed donné."""
-    # 1. On force la config globale de ce processus avec le seed attribué
-    CONFIG["lib"]["seed"] = seed
-    
-    try:
-        print(f"\n[*] [SEED {seed}] Démarrage du processus...")
-        
-        # 2. Chargement de la librairie C (isolé dans ce processus)
-        load_c_library()
-
-        # 3. Préparation des données
-        df_X_filepaths, df_Y = load_and_prepare_csv()
-        df_X = load_images_from_filepaths(df_X_filepaths)
-        df_X, X_train_mean, X_train_std = standardize_data(df_X)
-
-        # 4. Entraînement
-        models_per_category = train_models(df_X, df_Y)
-
-        # 5. Évaluation et Visualisation
-        df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
-        
-        # Pense bien à passer le seed en argument ici pour le nom du fichier !
-        plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, seed)
-        
-        return True
-    except Exception as e:
-        print(f"\n[!] [SEED {seed}] Erreur critique : {e}")
-        return False
+    plt.show()
 
 
 def main():
+    # Gestion de l'aléa
+    if CONFIG["lib"]["seeds_choice"] is not None:
+        CONFIG["lib"]["seed"] = random.choice(CONFIG["lib"]["seeds_choice"])
+    print(f"Seed sélectionné : {CONFIG['lib']['seed']}")
+
+    # 1. Compilation et chargement de l'interopérabilité
     compile_c_library()
-    
-    num_seeds = CONFIG["lib"].get("num_seeds_to_run", 3)
-    available_seeds = CONFIG["lib"]["seeds_choice"]
+    load_c_library()
 
-    while len(available_seeds) < num_seeds:
-        available_seeds.append(random.randint(10000, 99999))
-        
-    # Sélection des seeds pour cette exécution
-    chosen_seeds = random.sample(available_seeds, k=num_seeds)
-    print(f"\n========================================================")
-    print(f" Lancement de {num_seeds} modèles sur les seeds : {chosen_seeds}")
-    print(f"========================================================\n")
+    # 2. Préparation des données
+    df_X_filepaths, df_Y = load_and_prepare_csv()
+    df_X = load_images_from_filepaths(df_X_filepaths)
+    df_X, X_train_mean, X_train_std = standardize_data(df_X)
 
-    # Lancmement en parralèle
-    max_workers = CONFIG["lib"].get("max_parallel_workers", 2)
-    
-    # ProcessPoolExecutor crée des processus distincts (contourne le GIL Python et isole la RAM)
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        # On soumet toutes les tâches au pool
-        futures = {executor.submit(run_single_seed, seed): seed for seed in chosen_seeds}
-        
-        # On attend les résultats au fur et à mesure de leur complétion
-        for future in concurrent.futures.as_completed(futures):
-            seed = futures[future]
-            success = future.result()
-            if success:
-                print(f"[+] Run complètement terminé avec succès pour le SEED {seed}.")
+    # 3. Entraînement
+    models_per_category = train_models(df_X, df_Y)
+
+    # 4. Évaluation et Visualisation
+    df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
+    plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X)
+
 
 if __name__ == "__main__":
     main()
