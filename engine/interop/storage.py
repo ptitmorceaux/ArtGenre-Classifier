@@ -58,14 +58,14 @@ def load_model_and_normalization_from_binary_file(filepath: str) -> None | tuple
         model_type,
         prefix_errmsg="load_model_from_binary_file.get_model_type_string()",
         no_status_check=True
-    )
+    ).decode('utf-8')
 
     normalization_type = Loader.call(
         "get_normalization_method_string",
         normalization_type,
         prefix_errmsg="load_model_from_binary_file.get_normalization_method_string()",
         no_status_check=True
-    )
+    ).decode('utf-8')
 
     model = _init_model_from_ptr(model_ptr, model_type)
     normalization = _init_normalization_from_ptr(normalization_ptr, normalization_type)

@@ -52,7 +52,7 @@ class _CStandardPerColumnScaler(ctypes.Structure):
 class StandardPerColumnScaler:
     """Classe pour la normalisation des données par colonne en utilisant la méthode StandardScaler."""
     
-    def __init__(self, mean: None | np.ndarray, std: None | np.ndarray):
+    def __init__(self, mean: None | list[float], std: None | list[float]):
         self.length = len(mean) if mean is not None else 0
         self.mean = mean
         self.std = std
@@ -71,14 +71,17 @@ class StandardPerColumnScaler:
         ).contents
 
         length = normalization_struct.length
-        mean = np.ctypeslib.as_array(normalization_struct.mean, shape=(length,))
-        std = np.ctypeslib.as_array(normalization_struct.std, shape=(length,))
+        mean = list(normalization_struct.mean[:length])
+        std = list(normalization_struct.std[:length])
 
         return cls(mean, std)
 
-    def transform(self, X: np.ndarray) -> np.ndarray:
+    def transform(self, X: list[float] | np.ndarray) -> np.ndarray:
         """Normalise les données X par colonne en utilisant la moyenne et l'écart type."""
         self.length = len(self.mean) if self.mean is not None else 0
+
+        if not isinstance(X, np.ndarray):
+            X = np.array(X, dtype=np.float32)
         
         if self.mean is None or self.std is None:
             raise ValueError("StandardPerColumnScaler.transform(): scaler is not initialized.")
