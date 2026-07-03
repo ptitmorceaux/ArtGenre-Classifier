@@ -71,7 +71,7 @@ def load_model_and_normalization_from_binary_file(filepath: str) -> None | tuple
     return model, normalization
 
 
-def _get_normalization_type(normalization: StandardScaler | StandardPerColumnScaler) -> str:
+def _get_normalization_type(normalization: StandardScaler | StandardPerColumnScaler) -> ctypes.c_int:
     """
     Renvoie le NormalizationMethod de la normalisation C.
     """
