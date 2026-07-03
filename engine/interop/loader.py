@@ -260,7 +260,7 @@ class _LibLoader: # Singleton Pattern Design
 
 
     @require_loaded
-    def call(self, func_name: str, *args, prefix_errmsg: str = "") -> None:
+    def call(self, func_name: str, *args, prefix_errmsg: str = "", no_status_check: bool = False) -> None:
         """Appel une fonction C et vérifie automatiquement son status code"""
         prefix_err = f"{prefix_errmsg}: _LibLoader.call(`{func_name}`)" if prefix_errmsg else f"_LibLoader.call(`{func_name}`)"
         
@@ -273,13 +273,14 @@ class _LibLoader: # Singleton Pattern Design
             raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the library: {e}")
 
         try:
-            status = func(*args)
+            res = func(*args)
         except Exception as e:
             raise RuntimeError(f"{prefix_err}: {e}")
         
-        self.check_status(status, prefix_err)
+        if not no_status_check:
+            self.check_status(res, prefix_err)
 
-        return status
+        return res
 
 
     @require_loaded

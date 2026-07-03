@@ -10,7 +10,7 @@ class _CLinearModel(ctypes.Structure):
     ]
 
 
-class LinearModel(ctypes.Structure):
+class LinearModel():
     """
     Wrapper Python pour LinearModel en C.
     Cette classe permet de gérer le pointeur mémoire côté C.

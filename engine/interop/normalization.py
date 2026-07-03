@@ -2,7 +2,7 @@ import ctypes
 import numpy as np
 
 
-class _CStandardScaler:
+class _CStandardScaler(ctypes.Structure):
     _fields_ = [
         ("method", ctypes.c_int),
         ("mean", ctypes.c_float),
@@ -29,8 +29,8 @@ class StandardScaler:
             ctypes.POINTER(_CStandardScaler)
         ).contents
 
-        mean = normalization_struct.mean.value
-        std = normalization_struct.std.value
+        mean = normalization_struct.mean
+        std = normalization_struct.std
 
         return cls(mean, std)
 
@@ -41,8 +41,8 @@ class StandardScaler:
         return (X - self.mean) / self.std
 
 
-class _CStandardPerColumnScaler:
-    __fields__ = [
+class _CStandardPerColumnScaler(ctypes.Structure):
+    _fields_ = [
         ("method", ctypes.c_int),
         ("mean", ctypes.POINTER(ctypes.c_float)),
         ("std", ctypes.POINTER(ctypes.c_float)),
@@ -70,7 +70,7 @@ class StandardPerColumnScaler:
             ctypes.POINTER(_CStandardPerColumnScaler)
         ).contents
 
-        length = normalization_struct.length.value
+        length = normalization_struct.length
         mean = np.ctypeslib.as_array(normalization_struct.mean, shape=(length,))
         std = np.ctypeslib.as_array(normalization_struct.std, shape=(length,))
 

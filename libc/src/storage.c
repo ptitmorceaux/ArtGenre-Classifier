@@ -155,9 +155,7 @@ unsigned char save_linear_model(FILE* file, LinearModel* model) {
     fwrite(&(model->length), sizeof(uint32_t), 1, file);
 
     // weights (float32 array)
-    fwrite(&(model->weights), sizeof(float), model->length, file);
-
-    // 
+    fwrite(model->weights, sizeof(float), model->length, file);
 
     return RES_EXIT_SUCCESS;
 }
@@ -261,8 +259,12 @@ unsigned char save_binary_file(char* output_folder_path, char* filename, ModelTy
         return ERR_MEMORY_ALLOCATION;
     }
 
+    // on ajoute l'extension .tmp pour le fichier temporaire
+    snprintf(tmp_filepath, strlen(filepath) + 5, "%s.tmp", filepath);
+
     FILE* file = fopen(tmp_filepath, "wb");
     if (!file) {
+        remove(tmp_filepath);
         free(tmp_filepath);
         free(filepath);
         return ERR_FILE_OPEN_TMP;
@@ -271,6 +273,7 @@ unsigned char save_binary_file(char* output_folder_path, char* filename, ModelTy
     status = save_header(file, model_type, normalization_method);
     if (status != RES_EXIT_SUCCESS) {
         fclose(file);
+        remove(tmp_filepath);
         free(tmp_filepath);
         free(filepath);
         return status;
@@ -279,6 +282,7 @@ unsigned char save_binary_file(char* output_folder_path, char* filename, ModelTy
     status = save_normalization_data(file, normalization_method, normalization_data);
     if (status != RES_EXIT_SUCCESS) {
         fclose(file);
+        remove(tmp_filepath);
         free(tmp_filepath);
         free(filepath);
         return status;
@@ -287,6 +291,7 @@ unsigned char save_binary_file(char* output_folder_path, char* filename, ModelTy
     status = save_model_data(file, model_type, model);
     if (status != RES_EXIT_SUCCESS) {
         fclose(file);
+        remove(tmp_filepath);
         free(tmp_filepath);
         free(filepath);
         return status;
