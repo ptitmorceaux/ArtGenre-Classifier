@@ -15,7 +15,7 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
     models_per_category = dict()
 
     for category in CATEGORIES:
-        print(f"Training LinearModel for category: {category}")
+        print(f"> Training LinearModel for category: {category}")
         models_per_category[category] = LinearModel.init_random(input_dim=CONFIG["dataset"]["W_length"])
         models_per_category[category].train(
             dataset_inputs=df_X["train"],
@@ -24,7 +24,7 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
             alpha=CONFIG["model"]["alpha"],
             epochs=CONFIG["model"]["epochs"]
         )
-        print(f"Model for category '{category}' trained successfully.")
+        print(f"    Model for category '{category}' trained successfully.")
 
     return models_per_category
 
@@ -35,7 +35,7 @@ def train_mlp_models(df_X: dict, df_Y: dict) -> dict[str, MLP]:
     npl = _build_mlp_npl()
 
     for category in CATEGORIES:
-        print(f"Training MLP {npl} for category: {category}")
+        print(f"> Training MLP {npl} for category: {category}")
         models_per_category[category] = MLP(npl)
         models_per_category[category].train(
             dataset_inputs=df_X["train"],
@@ -45,7 +45,7 @@ def train_mlp_models(df_X: dict, df_Y: dict) -> dict[str, MLP]:
             epochs=CONFIG["model"]["epochs"],
             is_classification=True,
         )
-        print(f"Model for category '{category}' trained successfully.")
+        print(f"    Model for category '{category}' trained successfully.")
 
     return models_per_category
 
