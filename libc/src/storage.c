@@ -4,7 +4,7 @@
 /*  UTILS   */
 
 const char* get_current_datetime_string() {
-    static char buffer[20]; // "YYYY-MM-DD_HH:MM:SS" (19 + '\0' = 20)
+    static char buffer[20]; // "YYYY-MM-DD_HH-MM-SS" (19 + '\0' = 20)
     time_t now = time(NULL);
     struct tm tm;
 
@@ -14,7 +14,7 @@ const char* get_current_datetime_string() {
     localtime_r(&now, &tm);
 #endif
 
-    if (strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H:%M:%S", &tm) == 0)
+    if (strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", &tm) == 0)
         return NULL;
 
     return buffer;
