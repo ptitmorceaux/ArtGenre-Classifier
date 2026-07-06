@@ -114,8 +114,14 @@ class _LibLoader: # Singleton Pattern Design
         pointer_count = type.count('*')
         type = type.replace("*", "").strip()
         
-        if type in self._specs["__typedef__"]:
-            return "void" + "*" * pointer_count
+        if  type in self._specs["__typedef__"]:
+            typef_type = self._specs["__typedef__"][type]
+            if typef_type == "enum":
+                return "unsignedchar" + "*" * pointer_count
+            elif typef_type == "struct":
+                return "void" + "*" * pointer_count
+            else:
+                raise ValueError(f"_LibLoader._normalize_str_type(): Unknown typedef kind '{typef_type}' for type '{type}'")
         else:
             return type + "*" * pointer_count
 
@@ -140,15 +146,17 @@ class _LibLoader: # Singleton Pattern Design
             # Configuration des types d'arguments
             func.argtypes = []
             for arg_type in info["argtypes"]:
-                ctype = self._get_ctype(arg_type)
-                if ctype is None:
-                    raise TypeError(f"_LibLoader.attribute_types(): Unknow argtype for `{name}` : {arg_type}")
+                try:
+                    ctype = self._get_ctype(arg_type)
+                except TypeError as e:
+                    raise TypeError(f"_LibLoader.attribute_types(): Unknown argtype for `{name}` : {arg_type}") from e
                 func.argtypes.append(ctype)
             
             # Configuration du type de retour
-            func.restype = self._get_ctype(info["restype"])
-            if func.restype is None:
-                raise TypeError(f"_LibLoader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
+            try:
+                func.restype = self._get_ctype(info["restype"])
+            except TypeError as e:
+                raise TypeError(f"_LibLoader.attribute_types(): Unknown restype for `{name}` : {info['restype']}") from e
 
 
 
@@ -166,7 +174,7 @@ class _LibLoader: # Singleton Pattern Design
         self._specs = dict()
         
         self._specs["__function__"] = dict()
-        self._specs["__typedef__"] = set()
+        self._specs["__typedef__"] = dict()
 
         self._lib_name = self._set_lib_name(lib_name)
         self._lib_folder = self._set_path(lib_folder)
@@ -260,7 +268,7 @@ class _LibLoader: # Singleton Pattern Design
 
 
     @require_loaded
-    def call(self, func_name: str, *args, prefix_errmsg: str = "") -> None:
+    def call(self, func_name: str, *args, prefix_errmsg: str = "", no_status_check: bool = False) -> None:
         """Appel une fonction C et vérifie automatiquement son status code"""
         prefix_err = f"{prefix_errmsg}: _LibLoader.call(`{func_name}`)" if prefix_errmsg else f"_LibLoader.call(`{func_name}`)"
         
@@ -273,13 +281,14 @@ class _LibLoader: # Singleton Pattern Design
             raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the library: {e}")
 
         try:
-            status = func(*args)
+            res = func(*args)
         except Exception as e:
             raise RuntimeError(f"{prefix_err}: {e}")
         
-        self.check_status(status, prefix_err)
+        if not no_status_check:
+            self.check_status(res, prefix_err)
 
-        return status
+        return res
 
 
     @require_loaded

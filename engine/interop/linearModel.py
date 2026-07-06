@@ -3,7 +3,15 @@ import numpy as np
 from engine.interop.loader import Loader
 
 
-class LinearModel:
+class _CLinearModel(ctypes.Structure):
+    _fields_ = [
+        ("model_type", ctypes.c_int),  # ModelType
+        ("weights", ctypes.POINTER(ctypes.c_float)),
+        ("length", ctypes.c_uint32),
+    ]
+
+
+class LinearModel():
     """
     Wrapper Python pour LinearModel en C.
     Cette classe permet de gérer le pointeur mémoire côté C.
@@ -17,10 +25,27 @@ class LinearModel:
             raise ValueError("LinearModel.__init__(): `input_dim` must be > 0")
         self.ptr = None
         self.input_dim = input_dim
+
+    @classmethod
+    def _init_from_model_ptr(cls, model_ptr) -> "LinearModel":
+        """Initialise un LinearModel à partir d'un pointeur vers un modèle C existant."""
+        if model_ptr is None or model_ptr.value is None:
+            raise ValueError("LinearModel._init_from_model_ptr(): model_ptr is NULL.")
+
+        model_struct = ctypes.cast(
+            model_ptr,
+            ctypes.POINTER(_CLinearModel)
+        ).contents
+
+        # length = input_dim + 1 (le +1 correspond au biais)
+        instance = cls(model_struct.length - 1)
+        instance.ptr = model_ptr
+
+        return instance
     
     # input_dim = longueur des poids (len(W))
     @classmethod
-    def init_random(cls, input_dim: int) -> 'LinearModel':
+    def init_random(cls, input_dim: int) -> "LinearModel":
         """Initialise un modèle de régression linéaire avec des poids aléatoires."""
         instance = cls(input_dim)
 
@@ -36,7 +61,7 @@ class LinearModel:
         return instance
 
     @classmethod
-    def init_from_weights(cls, weights: list[float], bias: float) -> 'LinearModel':
+    def init_from_weights(cls, weights: list[float], bias: float) -> "LinearModel":
         """Initialise un modèle de régression linéaire avec des poids et un biais donnés."""
         if not isinstance(weights, list) or len(weights) == 0:
             raise ValueError("LinearModel.init_from_weights(): `weights` must be a non-empty list of floats.")
@@ -61,7 +86,7 @@ class LinearModel:
             cls,
             dataset_inputs_without_bias: list[float],
             dataset_expected_outputs: list[float]
-            ) -> 'LinearModel':
+            ) -> "LinearModel":
         """
         Initialise un modèle de régression linéaire et ses poids à partir de listes d'entrées et de sorties attendues.
         Renvoie un modèle entraîné via la pseudo-inverse.
@@ -228,4 +253,13 @@ class LinearModel:
             c__accuracy_history,
             prefix_errmsg="LinearModel.train()"
         )
-        return list(c_loss_history), list(c__accuracy_history)
+    
+    #===== Méthode publique - GETTER ======#
+
+    def get_weights(self) -> list[float]:
+        """Renvoie la liste des poids du modèle (weights[0] = biais, weights[1:] = w1, w2, ...)."""
+        if self.ptr is None or self.ptr.value is None:
+            raise ValueError("LinearModel.get_weights(): model is not initialized.")
+
+        model_struct = ctypes.cast(self.ptr, ctypes.POINTER(_CLinearModel)).contents
+        return list(model_struct.weights[:model_struct.length])
