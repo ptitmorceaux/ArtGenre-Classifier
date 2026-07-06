@@ -14,14 +14,18 @@ from engine.core.persistence import save_trained_models
 from engine.core.evaluation import evaluate_models, plot_confusion_matrix
 
 
-def main():
-    # Gestion de l'aléa
+def select_seed():
     if CONFIG["lib"]["seed"] is None:
         if CONFIG["lib"]["seeds_choice"] is None:
             raise ValueError("CONFIG['lib']['seeds_choice'] doit être défini si CONFIG['lib']['seed'] est None.")
         CONFIG["lib"]["seed"] = random.choice(CONFIG["lib"]["seeds_choice"])
     if not isinstance(CONFIG["lib"]["seed"], int):
         raise ValueError("CONFIG['lib']['seed'] doit être un entier ou None.")
+
+
+def main():
+    # 0. Gestion de l'aléa
+    select_seed()
     print(f"Seed sélectionnée : {CONFIG['lib']['seed']}")
 
     # 1. Compilation et chargement de l'interopérabilité
