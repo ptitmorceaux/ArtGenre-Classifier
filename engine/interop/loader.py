@@ -114,8 +114,14 @@ class _LibLoader: # Singleton Pattern Design
         pointer_count = type.count('*')
         type = type.replace("*", "").strip()
         
-        if type in self._specs["__typedef__"]:
-            return "void" + "*" * pointer_count
+        if  type in self._specs["__typedef__"]:
+            typef_type = self._specs["__typedef__"][type]
+            if typef_type == "enum":
+                return "unsignedchar" + "*" * pointer_count
+            elif typef_type == "struct":
+                return "void" + "*" * pointer_count
+            else:
+                raise ValueError(f"_LibLoader._normalize_str_type(): Unknown typedef kind '{typef_type}' for type '{type}'")
         else:
             return type + "*" * pointer_count
 
@@ -168,7 +174,7 @@ class _LibLoader: # Singleton Pattern Design
         self._specs = dict()
         
         self._specs["__function__"] = dict()
-        self._specs["__typedef__"] = set()
+        self._specs["__typedef__"] = dict()
 
         self._lib_name = self._set_lib_name(lib_name)
         self._lib_folder = self._set_path(lib_folder)

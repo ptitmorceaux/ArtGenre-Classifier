@@ -11,7 +11,7 @@ def save_to_json(data: dict, output_file_path: str) -> bool:
     result = dict()
 
     if data['__typedef__']:
-        result['__typedef__'] = sorted(list(data['__typedef__']))
+        result['__typedef__'] = data['__typedef__']
 
     if data['__function__']:
         result['__function__'] = dict()
@@ -70,7 +70,7 @@ def parse_input_file(input_file_path: str, start_line: str) -> dict:
     with open(input_file_path, 'r') as f:
         lines = f.readlines()
 
-    data = {"__function__": [], "__typedef__": set()}
+    data = {"__function__": [], "__typedef__": dict()}
     start_line_len = len(start_line)
     typedef_step = 0
     
@@ -79,6 +79,12 @@ def parse_input_file(input_file_path: str, start_line: str) -> dict:
         
         if line.startswith('typedef'):
             typedef_step = 1
+            if 'enum' in line:
+                current_typedef = "enum"
+            elif 'struct' in line:
+                current_typedef = "struct"
+            else:
+                raise ValueError(f"parse_input_file: Found a typedef that is neither an enum nor a struct: {line}")
 
         if typedef_step and line.startswith(start_line):
             raise ValueError(f"parse_input_file: Found a function declaration starting with '{start_line}' inside a typedef block, which is not supported: {line}")
@@ -97,7 +103,9 @@ def parse_input_file(input_file_path: str, start_line: str) -> dict:
             typedef_step = 0
             parsed_data = parse_line_typedef(line)
             if parsed_data:
-                data['__typedef__'].add(parsed_data)
+                if parsed_data in data['__typedef__']:
+                    raise ValueError(f"parse_input_file: Duplicate typedef found: {parsed_data}")
+                data['__typedef__'][parsed_data] = current_typedef
     
     return data
 
