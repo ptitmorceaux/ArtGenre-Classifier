@@ -2,8 +2,11 @@ from math import tanh
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
 
-from engine.core.config import CONFIG, CATEGORIES
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from engine.core.config import CONFIG, CATEGORIES
 
 def _predict_scalar(model, x) -> float:
     """
@@ -51,30 +54,54 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
 def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict) -> None:
     """Génère et affiche la matrice de confusion."""
+    
+    fig, ax = plt.subplots(figsize=(10, 5.5))
+
     ConfusionMatrixDisplay.from_predictions(
         df_predictions_expected,
         df_predictions_test,
         labels=list(CATEGORIES.keys()) + [CONFIG["global"]["unknown_category"]],
         cmap="Blues",
-        xticks_rotation=45
+        xticks_rotation=45,
+        ax=ax
     )
 
     length_X_test = len(df_X["test"])
     length_X_train = CONFIG["dataset"]["count_total_dataset"]["total"] - length_X_test
 
-    plt.title("Matrix de Confusion")
+    plt.title("Confusion Matrix")
+
     plt.suptitle(
-        f"Model: Classification {CONFIG['model']['type']} | "
-        f"Normalization: {CONFIG['dataset']['normalization_method']} | "
-        f"Seed: {CONFIG['lib']['seed']} | "
-        f"Alpha: {CONFIG['model']['alpha']} | "
-        f"Epochs: {CONFIG['model']['epochs']}\n\n"
-        f"Dataset: {length_X_train} train, {length_X_test} test "
-        f"(total = {CONFIG['dataset']['count_total_dataset']['total']}, "
-        f"{CONFIG['dataset']['train_test_split_ratio'] * 100}% ratio)",
-        fontsize=10,
-        y=1.02
+        f"Model: {CONFIG['model']['type']} | Norm: {CONFIG['dataset']['normalization_method']} | Seed: {CONFIG['lib']['seed']}\n"
+        f"Alpha: {CONFIG['model']['alpha']} | Epochs: {CONFIG['model']['epochs']}\n"
+        f"Train: {length_X_train}, Test: {length_X_test}",
+        fontsize=9,
+        y=0.95
     )
 
-    plt.tight_layout()
+    plt.subplots_adjust(top=0.82, bottom=0.12)
     plt.show()
+
+if __name__ == "__main__":
+
+    sample_df_X = {
+        "train": [[0.1, 0.2, 0.3],
+                  [0.4, 0.5, 0.6]],
+        "test": [[0.7, 0.8, 0.9]]
+    }
+    sample_df_Y = {
+        "train": {
+            "impressionism": [1, 0],
+            "realism": [0, 1],
+            "romanticism": [0, 0]
+        },
+        "test": {
+            "impressionism": [0],
+            "realism": [1],
+            "romanticism": [0]
+        }
+    }
+    sample_df_predictions_expected = ["impressionism", "realism"]
+    sample_df_predictions_test = ["impressionism", "realism"]
+    CONFIG["dataset"]["count_total_dataset"] = {"total": 3}
+    plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)

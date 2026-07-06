@@ -24,7 +24,7 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
             alpha=CONFIG["model"]["alpha"],
             epochs=CONFIG["model"]["epochs"]
         )
-        print(f"Model for category '{category}' trained successfully.\n")
+        print(f"Model for category '{category}' trained successfully.")
 
     return models_per_category
 
@@ -45,7 +45,7 @@ def train_mlp_models(df_X: dict, df_Y: dict) -> dict[str, MLP]:
             epochs=CONFIG["model"]["epochs"],
             is_classification=True,
         )
-        print(f"Model for category '{category}' trained successfully.\n")
+        print(f"Model for category '{category}' trained successfully.")
 
     return models_per_category
 
