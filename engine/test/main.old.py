@@ -10,15 +10,18 @@ from math import tanh
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
 from engine.interop.loader import Loader
 from engine.interop.storage import Storage
-from engine.interop.normalization import StandardScaler, StandardPerColumnScaler
+from engine.interop.normalization import StandardScaler, StandardPerColumnScaler, fit_and_normalize_by_columns
 from engine.interop.linearModel import LinearModel
 
 # --- CONFIGURATION GLOBALE ---
 
 CONFIG = {
     "lib": {
+        "compile": True,
         "lib_name": "libc",
         "lib_folder": os.path.join("libc"),
         "build_folder": os.path.join("libc", "build"),
@@ -28,14 +31,20 @@ CONFIG = {
         "seed": None,
     },
     "dataset": {
-        "csv_path": os.path.join("..", "dataset"),
-        "data_folder_path": os.path.join("..", "dataset", "64x64"),
-        "limit_per_category": 1000,
+        "csv_path": os.path.join("dataset"),
+        "data_folder_path": os.path.join("dataset", "64x64"),
+        "limit_per_category": 500,
         "train_test_split_ratio": 0.7,
+        # "global"     -> une seule moyenne/écart-type sur tous les pixels
+        # "per_column" -> une moyenne/écart-type par canal (r, g, b)
+        "normalization_method": "per_column",
+    },
+    "output": {
+        "models_folder": os.path.join("trained_models"),
     },
     "model": {
         "alpha": 0.01,
-        "epochs": 1000,
+        "epochs": 300,
     },
     "global": {
         "unknown_category": "unknown",
@@ -60,6 +69,9 @@ CATEGORIES = {
 
 def compile_c_library():
     """Compile la bibliothèque C à l'aide de make."""
+    if CONFIG["lib"]["compile"] is False:
+        print("Compilation de la bibliothèque C désactivée dans CONFIG.")
+        return
     print("Compilation de la bibliothèque C...")
 
     try:
@@ -200,41 +212,61 @@ def load_images_from_filepaths(df_X_filepaths):
             df_X[step].append(img_array)
         print()
 
+    # Le train est concaténé en un seul vecteur 1D (row-major) pour nourrir directement
+    # LinearModel.train(). Le test reste une liste d'images séparées, car on prédit
+    # image par image dans evaluate_models().
     df_X["train"] = np.concatenate(df_X["train"])
     return df_X
 
 
-def standard_scaler(df_X, scaler) -> tuple[dict, float, float]:
-    """Applique une standardisation standard (X - moyenne) / ecart_type."""
-    X_train_mean = np.mean(df_X["train"])
-    X_train_std = np.std(df_X["train"])
+def standard_scaler(df_X: dict) -> tuple[dict, StandardScaler]:
+    """
+    Standardisation GLOBALE : (X - moyenne) / ecart_type, une seule paire mean/std
+    pour tout le dataset. FIT sur le train uniquement, TRANSFORM sur train + test.
+    """
+    scaler = StandardScaler.from_data(df_X["train"])
 
-    # Protection contre la division par zéro si un pixel est constant
-    if np.any(X_train_std == 0):
-        print("Warning: Some features have zero standard deviation. They will not be standardized.")
-        X_train_std = 1
-
-    scaler = StandardScaler(mean=X_train_mean, std=X_train_std)
     df_X["train"] = scaler.transform(df_X["train"])
 
     for i, X_test in enumerate(df_X["test"]):
-        df_X["test"][i] = scaler.transform([X_test])
-        
+        # Pas de `[X_test]` ici : ça emballerait l'image dans une liste supplémentaire
+        # et casserait predict() (mauvaise longueur détectée).
+        df_X["test"][i] = scaler.transform(X_test)
+
     return df_X, scaler
 
-def standard_column_scaler(df_X, scaler) -> tuple[dict, list[float], list[float]]:
-    """Applique une standardisation par colonne (X - moyenne_colonne) / ecart_type_colonne."""
 
-    mean = []
-    std = []
+def standard_column_scaler(df_X: dict) -> tuple[dict, StandardPerColumnScaler]:
+    """
+    Standardisation PAR CANAL (r, g, b) : chaque canal a sa propre moyenne/écart-type.
+    FIT sur le train uniquement (jamais sur le test, pour éviter la fuite de données),
+    puis TRANSFORM sur train + test avec ces mêmes stats.
+    """
+    # FIT + TRANSFORM du train en une passe : mean/std calculés PAR CANAL,
+    # puis appliqués immédiatement au train (reshape (-1, 3) -> normalise -> reflatten).
+    train_normalized, means, stds = fit_and_normalize_by_columns(df_X["train"], n_columns=3)
 
-    # 3 cannaux (r,g,b)
-    for _ in range(3):
-        channel_data = df_X["train"][:, _, ::3].flatten()
-        mean.append(np.mean(channel_data))
-        std.append(np.std(channel_data))
-        
+    scaler = StandardPerColumnScaler(mean=means, std=stds)
+    df_X["train"] = train_normalized
+
+    # TRANSFORM du test avec les stats du train (jamais recalculées sur le test).
+    for i, X_test in enumerate(df_X["test"]):
+        df_X["test"][i] = scaler.transform(X_test)
+
     return df_X, scaler
+
+
+def standardize_data(df_X: dict) -> tuple[dict, StandardScaler | StandardPerColumnScaler]:
+    """Dispatch vers la méthode de normalisation choisie dans CONFIG."""
+    method = CONFIG["dataset"]["normalization_method"]
+
+    if method == "global":
+        return standard_scaler(df_X)
+    elif method == "per_column":
+        return standard_column_scaler(df_X)
+    else:
+        raise ValueError(f"standardize_data(): unknown normalization_method '{method}'.")
+
 
 def train_models(df_X, df_Y):
     """Entraîne un modèle linéaire par catégorie (One-vs-All)."""
@@ -253,6 +285,27 @@ def train_models(df_X, df_Y):
         print(f"Model for category '{category}' trained successfully.\n")
         
     return models_per_category
+
+
+def save_trained_models(
+        models_per_category: dict[str, LinearModel],
+        scaler: StandardScaler | StandardPerColumnScaler,
+        output_folder: str
+    ) -> None:
+    """Sauvegarde chaque modèle entraîné (un par catégorie) avec le scaler partagé utilisé pour l'entraînement."""
+    os.makedirs(output_folder, exist_ok=True)
+
+    for category, model in models_per_category.items():
+        filename = f"{category}.bin"
+        filepath = os.path.join(output_folder, filename)
+
+        # On écrase l'ancien modèle si le script est relancé (Storage refuse
+        # sinon d'écrire par-dessus un fichier existant).
+        if os.path.isfile(filepath):
+            os.remove(filepath)
+
+        Storage["save"](model, scaler, output_folder, filename)
+        print(f"Modèle '{category}' sauvegardé : {filepath}")
 
 
 def evaluate_models(models_per_category, df_X, df_Y):
@@ -337,7 +390,11 @@ def main():
     # 3. Entraînement
     models_per_category = train_models(df_X, df_Y)
 
-    # 4. Évaluation et Visualisation
+    # 4. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
+    #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
+    save_trained_models(models_per_category, scaler, CONFIG["output"]["models_folder"])
+
+    # 5. Évaluation et Visualisation
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X)
 
