@@ -148,10 +148,10 @@ class MLP:
         L = model_struct.L
 
         weights = []
-        for l in range(L):
-            rows = d[l] + 1   # +1 pour le biais
-            cols = d[l + 1]
-            layer = [list(model_struct.W[l][i][:cols]) for i in range(rows)]
+        for layer_index in range(L):
+            rows = d[layer_index] + 1   # +1 pour le biais
+            cols = d[layer_index + 1]
+            layer = [list(model_struct.W[layer_index][i][:cols]) for i in range(rows)]
             weights.append(layer)
         return weights
 
@@ -164,9 +164,9 @@ class MLP:
         d = list(model_struct.d[:model_struct.L + 1])
         L = model_struct.L
 
-        for l in range(L):
-            rows = d[l] + 1
-            cols = d[l + 1]
+        for layer_index in range(L):
+            rows = d[layer_index] + 1
+            cols = d[layer_index + 1]
             for i in range(rows):
                 for j in range(cols):
-                    model_struct.W[l][i][j] = weights[l][i][j]
+                    model_struct.W[layer_index][i][j] = weights[layer_index][i][j]

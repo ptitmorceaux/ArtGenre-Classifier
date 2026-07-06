@@ -59,8 +59,8 @@ def assert_weights_close(actual: list[float], expected: list[float], tol: float 
 
 def assert_mlp_weights_close(actual: list, expected: list, tol: float = 1e-5):
     assert len(actual) == len(expected), f"Nombre de couches différent : {len(actual)} != {len(expected)}"
-    for l, (layer_a, layer_e) in enumerate(zip(actual, expected)):
-        assert len(layer_a) == len(layer_e), f"Couche {l}: nombre de lignes différent"
+    for layer_index, (layer_a, layer_e) in enumerate(zip(actual, expected)):
+        assert len(layer_a) == len(layer_e), f"Couche {layer_index}: nombre de lignes différent"
         for i, (row_a, row_e) in enumerate(zip(layer_a, layer_e)):
             assert_weights_close(row_a, row_e, tol)
 
@@ -347,7 +347,7 @@ def test_mlp_per_column():
     assert_mlp_weights_close(loaded_weights, original_weights)
 
     print(f"OK - rechargé : mean={loaded_scaler.mean}, std={loaded_scaler.std}")
-    print(f"OK - poids identiques")
+    print("OK - poids identiques")
 
 
 # ---------------------------------------------------------------------------
@@ -380,7 +380,7 @@ def test_mlp_auto_filename():
     loaded_model, _ = Storage["load"](filepath)
     assert loaded_model.npl == model.npl
     assert_mlp_weights_close(loaded_model.get_weights(), original_weights)
-    print(f"OK - poids identiques après rechargement")
+    print("OK - poids identiques après rechargement")
 
 
 # ---------------------------------------------------------------------------
@@ -461,9 +461,9 @@ def test_train_and_save_linear_model():
 
     assert_predictions_close(predictions_after_load, predictions_before_save)
 
-    print(f"OK - poids identiques après reload")
+    print("OK - poids identiques après reload")
     print(f"OK - normalisation identique après reload : mean={loaded_scaler.mean}, std={loaded_scaler.std}")
-    print(f"OK - prédictions sur le test set identiques avant/après reload")
+    print("OK - prédictions sur le test set identiques avant/après reload")
 
 
 # ---------------------------------------------------------------------------
@@ -536,9 +536,9 @@ def test_train_and_save_mlp():
 
     assert_predictions_close(predictions_after_load, predictions_before_save)
 
-    print(f"OK - poids identiques après reload")
+    print("OK - poids identiques après reload")
     print(f"OK - normalisation identique après reload : mean={loaded_scaler.mean}, std={loaded_scaler.std}")
-    print(f"OK - prédictions sur le test set identiques avant/après reload")
+    print("OK - prédictions sur le test set identiques avant/après reload")
 
 
 if __name__ == "__main__":
