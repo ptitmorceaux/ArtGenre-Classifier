@@ -40,6 +40,7 @@ typedef enum {
     ERR_FILE_OPEN_TMP,
     ERR_FILE_RENAME_TMP,
     ERR_FILE_OPEN_RB,
+    ERR_FILE_READ,
 } StatusCode;
 
 

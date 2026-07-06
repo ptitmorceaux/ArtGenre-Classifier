@@ -21,6 +21,7 @@ const char* get_status_message(unsigned char code) {
         case ERR_FILE_RENAME_TMP:                       return "Failed to rename the temporary binary file";
         case ERR_NOT_IMPLEMENTED:                       return "Function not implemented yet";
         case ERR_FILE_OPEN_RB:                          return "Failed to open the binary file for reading";
+        case ERR_FILE_READ:                             return "Failed to read from the binary file";
         default:                                        return "Unknown Error";
     }
 }

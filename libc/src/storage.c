@@ -181,16 +181,18 @@ unsigned char save_mlp_model(FILE* file, MLP* model) {
     // d (uint32_t array)
     fwrite(model->d, sizeof(uint32_t), model->L + 1, file);
 
-    // JE NE COMPRENDS PAS W (a voir avec les collegues) !!!!
-    // TODO: à implémenter plus tard
-    return ERR_NOT_IMPLEMENTED;
-
     // W (float32 array)
+    // len(model->W) = model->L
     for (uint32_t l = 0; l < model->L; l++) {
-        uint32_t rows = model->d[l + 1]; // nombre de neurones dans la couche l+1
-        uint32_t cols = model->d[l] + 1; // nombre de neurones dans la couche l + 1 pour le biais
+        
+        uint32_t rows = model->d[l] + 1; // +1 car la couche de départ DE CHAQUE TRANSITION a un biais
+        uint32_t cols = model->d[l + 1]; // Pas de +1, la couche d'arrivée n'a pas de biais
 
-        fwrite(model->W[l], sizeof(float), rows * cols, file);
+        for (uint32_t i = 0; i < rows; i++) {
+            for (uint32_t j = 0; j < cols; j++) {
+                fwrite(&(model->W[l][i][j]), sizeof(float), 1, file);
+            }
+        }
     }
 
     return RES_EXIT_SUCCESS;
@@ -438,31 +440,44 @@ typedef struct {
     float** deltas;         // Deltas (Deltas[l] aura les erreurs de la couche l)
 } MLP;
 */
-unsigned char load_mlp_model(FILE* file, MLP** model) {
-    if (!file || !model || *model != NULL) return ERR_INVALID_PTR;
+unsigned char load_mlp_model(FILE* file, MLP** res_model) {
+    if (!file || !res_model) return ERR_INVALID_PTR;
 
-    MLP* data = (MLP*) malloc(sizeof(MLP));
-    if (!data) return ERR_MEMORY_ALLOCATION;
+    uint32_t L;
+    // L (uint32_t) -> len(W)
+    if (fread(&L, sizeof(uint32_t), 1, file) != 1) return ERR_FILE_READ;
 
-    // L (uint32_t)
-    fread(&(data->L), sizeof(uint32_t), 1, file);
-
-    // d (uint32_t array)
-    data->d = (uint32_t*) malloc((data->L + 1) * sizeof(uint32_t));
-    if (!data->d) {
-        free(data);
-        return ERR_MEMORY_ALLOCATION;
+    // d (uint32_t array) -> len(d) = L + 1
+    uint32_t* d = (uint32_t*) malloc((L + 1) * sizeof(uint32_t));
+    if (!d) return ERR_MEMORY_ALLOCATION;
+    
+    if (fread(d, sizeof(uint32_t), L + 1, file) != L + 1) {
+        free(d);
+        return ERR_FILE_READ;
     }
-    fread(data->d, sizeof(uint32_t), data->L + 1, file);
 
-    // JE NE COMPRENDS PAS W (a voir avec les collegues) !!!!
-    // TODO: à implémenter plus tard (certainenement un gros double for)
-    free(data->d);
-    free(data);
-    return ERR_NOT_IMPLEMENTED;
+    // Allocation mlp model
+    MLP* model = NULL;
+    unsigned char status = create_mlp(d, L + 1, &model);
+    free(d); // On peut libérer d car create_mlp en fait une copie profonde
+    if (status != RES_EXIT_SUCCESS) return status;
+
     // W (float32 array)
+    for (uint32_t l = 0; l < model->L; l++) {
+        uint32_t rows = model->d[l] + 1;
+        uint32_t cols = model->d[l + 1];
 
-    *model = data;
+        for (uint32_t i = 0; i < rows; i++) {
+            for (uint32_t j = 0; j < cols; j++) {
+                if (fread(&(model->W[l][i][j]), sizeof(float), 1, file) != 1) {
+                    free_mlp(&model);
+                    return ERR_FILE_READ;
+                }
+            }
+        }
+    }
+
+    *res_model = model;
     return RES_EXIT_SUCCESS;
 }
     
