@@ -13,6 +13,9 @@ drawio/
 
 !libc/build/.gitkeep
 
+*.bin
+*.tmp
+
 ########################
 
 # Prerequisites

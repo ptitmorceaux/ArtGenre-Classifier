@@ -18,6 +18,8 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
     if (!model) return ERR_MEMORY_ALLOCATION;
+
+    model->model_type = ModelType_LINEAR;
     
     // Allouer de la mémoire pour les poids + le biais
     model->length = input_dim + 1; // + 1 pour le biais

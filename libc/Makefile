@@ -9,7 +9,7 @@ SPEC_DIR := specs
 
 
 # ===== Flags =====
-CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2 -std=c17 -pedantic
+CFLAGS := -I$(INC_DIR) -Wall -Wextra -O3 -std=c17 -pedantic
 LDLIBS := -lopenblas
 
 
