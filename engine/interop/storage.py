@@ -37,10 +37,10 @@ def _init_model_from_ptr(model_ptr: ctypes.c_void_p, model_type: str) -> LinearM
 
 def load_model_and_normalization_from_binary_file(filepath: str) -> None | tuple[LinearModel | MLP, StandardScaler | StandardPerColumnScaler]:
     """Load a LinearModel from a binary file."""
-    model_type = ctypes.c_int()
+    model_type = ctypes.c_ubyte()
     model_ptr = ctypes.c_void_p()
 
-    normalization_type = ctypes.c_int()
+    normalization_type = ctypes.c_ubyte()
     normalization_ptr = ctypes.c_void_p()
 
     Loader.call(
@@ -73,27 +73,27 @@ def load_model_and_normalization_from_binary_file(filepath: str) -> None | tuple
     return model, normalization
 
 
-def _get_normalization_type(normalization: StandardScaler | StandardPerColumnScaler) -> ctypes.c_int:
+def _get_normalization_type(normalization: StandardScaler | StandardPerColumnScaler) -> ctypes.c_ubyte:
     """
     Renvoie le NormalizationMethod de la normalisation C.
     """
     if isinstance(normalization, StandardScaler):
-        return ctypes.c_int(0)
+        return ctypes.c_ubyte(0)
     
     elif isinstance(normalization, StandardPerColumnScaler):
-        return ctypes.c_int(1)
+        return ctypes.c_ubyte(1)
 
     raise ValueError(f"get_normalization_type(): unknown normalization type '{type(normalization)}'.")
 
-def _get_model_type(model: LinearModel | MLP) -> ctypes.c_int:
+def _get_model_type(model: LinearModel | MLP) -> ctypes.c_ubyte:
     """
     Renvoie le ModelType du modèle C.
     """
     if isinstance(model, LinearModel):
-        return ctypes.c_int(0)
+        return ctypes.c_ubyte(0)
         
     elif isinstance(model, MLP):
-        return ctypes.c_int(1)
+        return ctypes.c_ubyte(1)
 
     raise ValueError(f"get_model_type(): unknown model type '{type(model)}'.")
 
