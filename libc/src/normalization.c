@@ -35,16 +35,18 @@ unsigned char free_StandardNormalizationData(StandardNormalizationData** data) {
 
 unsigned char create_StandardPerColumnNormalizationData(float* mean, float* std, uint32_t* length, StandardPerColumnNormalizationData** data) {
     if (data == NULL) return ERR_INVALID_PTR;
+
+    return ERR_NOT_IMPLEMENTED;
     
     *data = (StandardPerColumnNormalizationData*) malloc(sizeof(StandardPerColumnNormalizationData));
     if (*data == NULL) return ERR_MEMORY_ALLOCATION;
 
-    // TODO: demander a claude si mean et std changent quand on change sur python (pcque le tableau est alloue sur python)
+    // TODO: verifier si mean et std changent quand on change sur python (pcque le tableau est alloue sur python)
      
     (*data)->method = STANDARD_PER_COLUMN;
     (*data)->mean = mean;
     (*data)->std = std;
-    (*data)->length = length;
+    (*data)->length = *length;
     
     return RES_EXIT_SUCCESS;
 }
