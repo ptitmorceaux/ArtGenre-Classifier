@@ -64,8 +64,9 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
 
     plt.title("Matrix de Confusion")
     plt.suptitle(
+        f"Model: Classification {CONFIG['model']['type']} | "
+        f"Normalization: {CONFIG['dataset']['normalization_method']} | "
         f"Seed: {CONFIG['lib']['seed']} | "
-        f"Model: Classification Linéaire | "
         f"Alpha: {CONFIG['model']['alpha']} | "
         f"Epochs: {CONFIG['model']['epochs']}\n\n"
         f"Dataset: {length_X_train} train, {length_X_test} test "

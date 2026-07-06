@@ -1,5 +1,7 @@
 import os
+from datetime import datetime
 
+from engine.core.config import CONFIG
 from engine.interop.storage import Storage
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
@@ -14,8 +16,10 @@ def save_trained_models(
     """Sauvegarde chaque modèle entraîné (un par catégorie) avec le scaler partagé utilisé pour l'entraînement."""
     os.makedirs(output_folder, exist_ok=True)
 
+    date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")[:-3]
+
     for category, model in models_per_category.items():
-        filename = f"{category}.bin"
+        filename = f"{category}_{CONFIG['model']['type']}_{date}.bin"
         filepath = os.path.join(output_folder, filename)
 
         # On écrase l'ancien modèle si le script est relancé (Storage refuse
