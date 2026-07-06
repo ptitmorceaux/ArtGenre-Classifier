@@ -26,7 +26,7 @@ CONFIG = {
     "model": {
         # "linear" -> LinearModel (One-vs-All)
         # "mlp"    -> MLP (One-vs-All)
-        "type": "linear",
+        "type": "mlp",
         "alpha": 0.00001,
         "epochs": 300,
         # Utilisé seulement si type == "mlp" : couches cachées, sans compter
