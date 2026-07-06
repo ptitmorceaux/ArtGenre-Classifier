@@ -2,7 +2,15 @@ import ctypes
 from engine.interop.loader import Loader
 
 
-class LinearModel:
+class _CLinearModel(ctypes.Structure):
+    _fields_ = [
+        ("model_type", ctypes.c_int),  # ModelType
+        ("weights", ctypes.POINTER(ctypes.c_float)),
+        ("length", ctypes.c_uint32),
+    ]
+
+
+class LinearModel():
     """
     Wrapper Python pour LinearModel en C.
     Cette classe permet de gérer le pointeur mémoire côté C.
@@ -16,15 +24,32 @@ class LinearModel:
             raise ValueError("LinearModel.__init__(): `input_dim` must be > 0")
         self.ptr = None
         self.input_dim = input_dim
-    
+
     @classmethod
-    def init_random(cls, input_dim: int) -> 'LinearModel':
-        """Initialise un modèle de régression linéaire avec des poids aléatoires."""        
+    def _init_from_model_ptr(cls, model_ptr) -> "LinearModel":
+        """Initialise un LinearModel à partir d'un pointeur vers un modèle C existant."""
+        if model_ptr is None or model_ptr.value is None:
+            raise ValueError("LinearModel._init_from_model_ptr(): model_ptr is NULL.")
+
+        model_struct = ctypes.cast(
+            model_ptr,
+            ctypes.POINTER(_CLinearModel)
+        ).contents
+
+        # length = input_dim + 1 (le +1 correspond au biais)
+        instance = cls(model_struct.length - 1)
+        instance.ptr = model_ptr
+
+        return instance
+    
+    # input_dim = longueur des poids (len(W))
+    @classmethod
+    def init_random(cls, input_dim: int) -> "LinearModel":
+        """Initialise un modèle de régression linéaire avec des poids aléatoires."""
         instance = cls(input_dim)
 
         # On crée un pointeur vide (void*) qui recevra l'adresse du modèle C.
         instance.ptr = ctypes.c_void_p()
-        instance.input_dim = input_dim
 
         Loader.call(
             "create_linear_model_randomly",
@@ -35,25 +60,76 @@ class LinearModel:
         return instance
 
     @classmethod
-    def init_from_weights(cls, weights: list[float], bias: float) -> 'LinearModel':
+    def init_from_weights(cls, weights: list[float], bias: float) -> "LinearModel":
         """Initialise un modèle de régression linéaire avec des poids et un biais donnés."""
         if not isinstance(weights, list) or len(weights) == 0:
             raise ValueError("LinearModel.init_from_weights(): `weights` must be a non-empty list of floats.")
 
         Loader.check_primitive_values_range(bias, ctypes.c_float, "LinearModel.init_from_weights()")
 
-        instance = cls(len(weights))
+        instance = cls(len(weights))  # add_a_bias is set to True for this constructor
         instance.ptr = ctypes.c_void_p()
 
         Loader.call(
             "create_linear_model_from_init_weights",
             (ctypes.c_float * instance.input_dim)(*weights),
-            ctypes.c_uint32(instance.input_dim),
+            ctypes.c_uint32(instance.input_dim), # the library needs to know the length without the "bias" column
             ctypes.c_float(bias),
             ctypes.byref(instance.ptr),
             prefix_errmsg="LinearModel.init_from_weights()"
         )
         return instance
+    
+    @classmethod
+    def init_and_calculate_best_weights_with_pseudo_inverse(
+            cls,
+            dataset_inputs_without_bias: list[float],
+            dataset_expected_outputs: list[float]
+            ) -> "LinearModel":
+        """
+        Initialise un modèle de régression linéaire et ses poids à partir de listes d'entrées et de sorties attendues.
+        Renvoie un modèle entraîné via la pseudo-inverse.
+        """
+        if not dataset_expected_outputs:
+            raise ValueError("LinearModel.init_and_calculate_best_weights_with_pseudo_inverse(): `dataset_expected_outputs` cannot be empty.")
+            
+        # 1. Déduction dynamique de la dimension d'entrée (input_dim = n = colonnes)
+        # On calcule d'abord le nombre de lignes (m) qui est égal au nombre de sorties attendues
+        row_count = len(dataset_expected_outputs)
+        all_data_length = len(dataset_inputs_without_bias)
+        
+        if row_count == 0 or all_data_length % row_count != 0:
+            raise ValueError("LinearModel.init_and_calculate_best_weights_with_pseudo_inverse(): Invalid dataset dimensions.")
+            
+        col_count = all_data_length // row_count
+
+        # 2. Utilisation propre de ta fonction de validation centralisée
+        # On lui passe bien explicitement la dimension calculée en premier paramètre !
+        all_data_length, y_size, row_count = LinearModel._check_training_data(
+            col_count,
+            dataset_inputs_without_bias, 
+            dataset_expected_outputs, 
+            "LinearModel.init_and_calculate_best_weights_with_pseudo_inverse()"
+        )
+
+        # On crée un pointeur vide (void*) qui recevra l'adresse du modèle C.
+        model_ptr = ctypes.c_void_p()
+
+        # 3. Appel à la bibliothèque C avec les bonnes dimensions validées
+        Loader.call(
+            "get_linear_regression_weights_from_list",
+            (ctypes.c_float * all_data_length)(*dataset_inputs_without_bias),
+            (ctypes.c_float * y_size)(*dataset_expected_outputs),
+            ctypes.c_uint32(row_count), # row = m
+            ctypes.c_uint32(col_count), # col = n
+            ctypes.byref(model_ptr),
+            prefix_errmsg="LinearModel.init_and_calculate_best_weights_with_pseudo_inverse()"
+        )
+
+        # 4. Instanciation de l'objet Python avec la bonne dimension d'entrée
+        model_instance = cls(col_count)
+        model_instance.ptr = model_ptr
+        return model_instance
     
     #====== Méthode privée - Utils ======#
     
@@ -77,8 +153,9 @@ class LinearModel:
     
     #====== Méthode privée - Entraînement ======#
 
+    @staticmethod
     def _check_training_data(
-            self,
+            input_dim: int,
             dataset_inputs: list[float],
             dataset_expected_outputs: list[float],
             errmsg: str
@@ -91,18 +168,18 @@ class LinearModel:
         if all_data_length == 0:
             raise ValueError(f"{errmsg}: `dataset_inputs` cannot be empty.")
 
-        if all_data_length % self.input_dim != 0:
-            raise ValueError(f"{errmsg}: `dataset_inputs` length must be a multiple of model's input_dim ({self.input_dim}).")
+        if all_data_length % input_dim != 0:
+            raise ValueError(f"{errmsg}: `dataset_inputs` length must be a multiple of model's input_dim ({input_dim}).")
 
-        data_size = all_data_length // self.input_dim
+        row_count = all_data_length // input_dim
 
         if y_size == 0:
             raise ValueError(f"{errmsg}: `dataset_expected_outputs` cannot be empty.")
 
-        if y_size != data_size:
-            raise ValueError(f"{errmsg}: `dataset_expected_outputs` length must equal dataset_size ({data_size}).")
+        if y_size != row_count:
+            raise ValueError(f"{errmsg}: `dataset_expected_outputs` length must equal dataset_size ({row_count}).")
         
-        return all_data_length, y_size, data_size
+        return all_data_length, y_size, row_count
     
     #====== Méthode publique - Prédiction ======#
 
@@ -139,10 +216,15 @@ class LinearModel:
         Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
         """
 
-        all_data_length, y_size, data_size = self._check_training_data(dataset_inputs, dataset_expected_outputs, "LinearModel.train()")
+        all_data_length, y_size, row_count = LinearModel._check_training_data(
+            self.input_dim,
+            dataset_inputs,
+            dataset_expected_outputs,
+            "LinearModel.train()"
+        )
 
         # On vérifie les types des arguments
-        Loader.check_primitive_values_range(data_size, ctypes.c_uint32, "LinearModel.train()")
+        Loader.check_primitive_values_range(row_count, ctypes.c_uint32, "LinearModel.train()")
         Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train()")
         Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train()")
         Loader.call(
@@ -150,8 +232,18 @@ class LinearModel:
             self.ptr,
             (ctypes.c_float * all_data_length)(*dataset_inputs),
             (ctypes.c_float * y_size)(*dataset_expected_outputs),
-            ctypes.c_uint32(data_size),
+            ctypes.c_uint32(row_count),
             ctypes.c_float(alpha),
             ctypes.c_uint32(epochs),
             prefix_errmsg="LinearModel.train()"
         )
+    
+    #===== Méthode publique - GETTER ======#
+
+    def get_weights(self) -> list[float]:
+        """Renvoie la liste des poids du modèle (weights[0] = biais, weights[1:] = w1, w2, ...)."""
+        if self.ptr is None or self.ptr.value is None:
+            raise ValueError("LinearModel.get_weights(): model is not initialized.")
+
+        model_struct = ctypes.cast(self.ptr, ctypes.POINTER(_CLinearModel)).contents
+        return list(model_struct.weights[:model_struct.length])

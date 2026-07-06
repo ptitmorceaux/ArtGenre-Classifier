@@ -31,5 +31,6 @@ def pytest_configure(config):
         lib_folder=os.path.join(project_root, "libc"),
         build_folder=os.path.join(project_root, "libc/build"),
         specs_folder=os.path.join(project_root, "libc/specs"),
+        dependencies_bin_folder=r"C:\msys64\mingw64\bin",
         seed=None
     )

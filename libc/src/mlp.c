@@ -31,14 +31,16 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
     if (!res_model || !npl || npl_size < 2) return ERR_INVALID_PTR;
     
     MLP* model = (MLP*) malloc(sizeof(MLP));
-    if (!model) return ERR_ALLOCATION_FAILED;
+    if (!model) return ERR_MEMORY_ALLOCATION;
+
+    model->model_type = ModelType_MLP;
 
     // Configuration de d et L
     model->L = npl_size - 1;
     model->d = (uint32_t*) malloc(npl_size * sizeof(uint32_t));
     if (!model->d) {
         free_mlp(&model);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
 
     for (uint32_t i = 0; i < npl_size; i++) {
@@ -52,7 +54,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
 
     if (!model->W || !model->X || !model->deltas) {
         free_mlp(&model);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
 
     // Initialiser les pointeurs à NULL
@@ -72,7 +74,7 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
 
         if (!model->X[l] || !model->deltas[l]) {
             free_mlp(&model);
-            return ERR_ALLOCATION_FAILED;
+            return ERR_MEMORY_ALLOCATION;
         }
 
         for (uint32_t j = 0; j < model->d[l] + 1; j++) {
@@ -93,14 +95,14 @@ unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_model) {
         model->W[l] = (float**) malloc(rows * sizeof(float*));
         if (!model->W[l]) {
             free_mlp(&model);
-            return ERR_ALLOCATION_FAILED;
+            return ERR_MEMORY_ALLOCATION;
         }
         for (uint32_t i = 0; i < rows; i++) {
             model->W[l][i] = (float*) malloc(cols * sizeof(float));
             
             if (!model->W[l][i]) {
                 free_mlp(&model);
-                return ERR_ALLOCATION_FAILED;
+                return ERR_MEMORY_ALLOCATION;
             }
 
             // On remplit les lignes des poids aléatoirements entre -1.0 et 1.0
