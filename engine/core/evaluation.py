@@ -5,6 +5,16 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from engine.core.config import CONFIG, CATEGORIES
 
 
+def _predict_scalar(model, x) -> float:
+    """
+    Renvoie la sortie scalaire du modèle, quel que soit son type.
+    LinearModel.predict() renvoie un scalaire, MLP.predict() renvoie une liste
+    (même à une seule sortie) — sans ce helper, tanh(value) planterait sur un MLP.
+    """
+    output = model.predict(x, is_classification=False)
+    return output[0] if isinstance(output, list) else output
+
+
 def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list]:
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
@@ -14,7 +24,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
         predictions[category] = dict()
         predictions[category]["values"] = [
-            models_per_category[category].predict(x, is_classification=False) for x in df_X["test"]
+            _predict_scalar(models_per_category[category], x) for x in df_X["test"]
         ]
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
 

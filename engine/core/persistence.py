@@ -2,11 +2,12 @@ import os
 
 from engine.interop.storage import Storage
 from engine.interop.linearModel import LinearModel
+from engine.interop.mlp import MLP
 from engine.interop.normalization import StandardScaler, StandardPerColumnScaler
 
 
 def save_trained_models(
-        models_per_category: dict[str, LinearModel],
+        models_per_category: dict[str, LinearModel | MLP],
         scaler: StandardScaler | StandardPerColumnScaler,
         output_folder: str
     ) -> None:
