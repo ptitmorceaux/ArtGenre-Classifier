@@ -19,7 +19,7 @@ def save_trained_models(
     date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")[:-3]
 
     for category, model in models_per_category.items():
-        filename = f"{category}_{CONFIG['model']['type']}_{date}.bin"
+        filename = f"{CONFIG['model']['type']}__{category}__{date}.bin"
         filepath = os.path.join(output_folder, filename)
 
         # On écrase l'ancien modèle si le script est relancé (Storage refuse
