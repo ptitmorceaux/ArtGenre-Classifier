@@ -106,18 +106,18 @@ def save_model_and_normalization_to_binary_file(
     """
     Save a LinearModel and its normalization to a binary file.
     """
-    if model.ptr is None or model.ptr.value is None:
-        raise ValueError("LinearModel.save_to_binary_file(): model is not initialized.")
-    
-    if normalization.ptr is None or normalization.ptr.value is None:
-        raise ValueError("StandardScaler.save_to_binary_file(): normalization is not initialized.")
-    
     os.makedirs(output_folder, exist_ok=True)
     
     if filename is not None:
+
+        if filename.strip() == "":
+            raise ValueError("LinearModel.save_to_binary_file(): filename cannot be empty or whitespace.")
+
         filepath = os.path.join(output_folder, filename)
         if os.path.isfile(filepath):
             raise ValueError(f"LinearModel.save_to_binary_file(): file '{filepath}' already exists.")
+        
+        filename = filename.encode('utf-8')
 
     normalization_type = _get_normalization_type(normalization)
     model_type = _get_model_type(model)
@@ -125,7 +125,7 @@ def save_model_and_normalization_to_binary_file(
     Loader.call(
         "save_binary_file",
         output_folder.encode('utf-8'),
-        filename.encode('utf-8') if filename is not None else None,
+        filename,
         model_type,
         model.ptr,
         normalization_type,
