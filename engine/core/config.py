@@ -9,14 +9,14 @@ CONFIG = {
         "specs_folder": os.path.join("libc", "specs"),
         "dependencies_folder": r"C:\msys64\mingw64\bin",
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
-        "seed": None,
+        "seed": 2024,
     },
     "dataset": {
         "csv_path": os.path.join("dataset"),
         "data_folder_path": os.path.join("dataset", "64x64"),
         "limit_per_category": 1000,
         "train_test_split_ratio": 0.7,
-        # "global"     -> une seule moyenne/écart-type sur tous les pixels
+        # "standard"     -> une seule moyenne/écart-type sur tous les pixels
         # "per_column" -> une moyenne/écart-type par canal (r, g, b)
         "normalization_method": "per_column",
     },
@@ -35,7 +35,9 @@ CONFIG = {
         "mlp_hidden_layers": [64, 32],
     },
     "global": {
-        "unknown_category": "unknown",
+        # Si vide ou None, on force la meilleure catégorie parmi celles connues. Sinon, on renvoie "unknown" si aucune catégorie n'est prédite.
+        # Exemple : "unknown" / "autre" ou encore None / "" (vide) pour forcer la meilleure catégorie connue.
+        "unknown_category": None,
     }
 }
 

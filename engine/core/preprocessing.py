@@ -47,7 +47,7 @@ def standardize_data(df_X: dict) -> tuple[dict, StandardScaler | StandardPerColu
     """Dispatch vers la méthode de normalisation choisie dans CONFIG."""
     method = CONFIG["dataset"]["normalization_method"]
 
-    if method == "global":
+    if method == "standard":
         return standard_scaler(df_X)
     elif method == "per_column":
         return standard_column_scaler(df_X)

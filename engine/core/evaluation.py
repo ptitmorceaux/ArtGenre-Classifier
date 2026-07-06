@@ -38,10 +38,12 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     for i in range(len(predictions[first_cat]["prediction"])):
         category_predicted = max(CATEGORIES.keys(), key=lambda c: predictions[c]["values"][i])
 
-        if predictions[category_predicted]["prediction"][i]:
-            df_predictions_test.append(category_predicted)
-        else:
+        unknown_is_valid = CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != ""
+
+        if unknown_is_valid and not predictions[category_predicted]["prediction"][i]:
             df_predictions_test.append(CONFIG["global"]["unknown_category"])
+        else:
+            df_predictions_test.append(category_predicted)
 
     # Détermination de la catégorie attendue
     df_predictions_expected = []
@@ -57,10 +59,14 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     
     fig, ax = plt.subplots(figsize=(10, 5.5))
 
+    labels = list(CATEGORIES.keys())
+    if CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != "":
+        labels.append(CONFIG["global"]["unknown_category"])
+
     ConfusionMatrixDisplay.from_predictions(
         df_predictions_expected,
         df_predictions_test,
-        labels=list(CATEGORIES.keys()) + [CONFIG["global"]["unknown_category"]],
+        labels=labels,
         cmap="Blues",
         xticks_rotation=45,
         ax=ax
