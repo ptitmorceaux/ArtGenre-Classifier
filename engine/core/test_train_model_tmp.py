@@ -1,4 +1,4 @@
-# noqa
+# ruff: noqa
 import sys
 import os
 import subprocess
