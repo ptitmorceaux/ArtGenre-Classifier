@@ -161,7 +161,7 @@ unsigned char save_linear_model(FILE* file, LinearModel* model) {
 }
 
 /*
-NOTE: Pas besoin de save X et deltas
+NOTE: Pas besoin de save/load X et deltas
 
 typedef struct {
     uint32_t* d;            // Tableau de dimensions (nombre de neuronnes par couche)
@@ -397,7 +397,7 @@ unsigned char load_standard_per_column_normalization(FILE* file, StandardPerColu
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-/*  SAVE - MODEL  */
+/*  LOAD - MODEL  */
 
 /*
 typedef struct {
@@ -427,7 +427,7 @@ unsigned char load_linear_model(FILE* file, LinearModel** model) {
 }
 
 /*
-NOTE: Pas besoin de save X et deltas
+NOTE: Pas besoin de save/load X et deltas
 
 typedef struct {
     uint32_t* d;            // Tableau de dimensions (nombre de neuronnes par couche)
