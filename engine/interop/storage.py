@@ -4,7 +4,7 @@ import os
 from engine.interop.loader import Loader
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
-from engine.interop.normalization import StandardScaler, StandardPerColumnScaler
+from engine.interop.normalization import StandardScaler, _CStandardScaler, StandardPerColumnScaler, _CStandardPerColumnScaler
 
 
 def _init_normalization_from_ptr(normalization_ptr: ctypes.c_void_p, normalization_type: str) -> StandardScaler | StandardPerColumnScaler:
@@ -98,38 +98,69 @@ def _get_model_type(model: LinearModel | MLP) -> ctypes.c_ubyte:
     raise ValueError(f"get_model_type(): unknown model type '{type(model)}'.")
 
 
+def _build_c_normalization_struct(normalization: StandardScaler | StandardPerColumnScaler) -> _CStandardScaler | _CStandardPerColumnScaler:
+    """
+    Construit une struct C temporaire, en mémoire Python, à partir des valeurs
+    du scaler. Cette struct n'est jamais allouée côté C (pas de malloc), donc
+    elle n'a pas besoin d'être libérée explicitement : le garbage collector
+    Python s'en charge dès qu'elle sort de portée, une fois save_binary_file()
+    revenu (la fonction C ne fait que LIRE les champs, elle n'en prend jamais
+    possession).
+    """
+    if isinstance(normalization, StandardScaler):
+        return _CStandardScaler(
+            method=0,  # STANDARD
+            mean=normalization.mean,
+            std=normalization.std,
+        )
+
+    elif isinstance(normalization, StandardPerColumnScaler):
+        length = len(normalization.mean)
+        c_mean = (ctypes.c_float * length)(*normalization.mean)
+        c_std = (ctypes.c_float * length)(*normalization.std)
+        c_struct = _CStandardPerColumnScaler(
+            method=1,  # STANDARD_PER_COLUMN
+            mean=ctypes.cast(c_mean, ctypes.POINTER(ctypes.c_float)),
+            std=ctypes.cast(c_std, ctypes.POINTER(ctypes.c_float)),
+            length=length,
+        )
+        # c_mean/c_std doivent rester en vie aussi longtemps que c_struct
+        # (la struct ne fait que pointer dessus, elle ne les possède pas)
+        c_struct._arrays_keep_alive = (c_mean, c_std)
+        return c_struct
+
+    raise ValueError(f"_build_c_normalization_struct(): unknown normalization type '{type(normalization)}'.")
+
+
 def save_model_and_normalization_to_binary_file(
         model: LinearModel | MLP,
         normalization: StandardScaler | StandardPerColumnScaler,
         output_folder: str, filename: str | None
     ) -> None:
-    """
-    Save a LinearModel and its normalization to a binary file.
-    """
+    if model.ptr is None or model.ptr.value is None:
+        raise ValueError("LinearModel.save_to_binary_file(): model is not initialized.")
+
     os.makedirs(output_folder, exist_ok=True)
-    
+
     if filename is not None:
-
-        if filename.strip() == "":
-            raise ValueError("LinearModel.save_to_binary_file(): filename cannot be empty or whitespace.")
-
         filepath = os.path.join(output_folder, filename)
         if os.path.isfile(filepath):
             raise ValueError(f"LinearModel.save_to_binary_file(): file '{filepath}' already exists.")
-        
-        filename = filename.encode('utf-8')
 
     normalization_type = _get_normalization_type(normalization)
     model_type = _get_model_type(model)
 
+    c_struct = _build_c_normalization_struct(normalization)
+    normalization_ptr = ctypes.cast(ctypes.pointer(c_struct), ctypes.c_void_p)
+
     Loader.call(
         "save_binary_file",
         output_folder.encode('utf-8'),
-        filename,
+        filename.encode('utf-8') if filename is not None else None,
         model_type,
         model.ptr,
         normalization_type,
-        normalization.ptr,
+        normalization_ptr,
         prefix_errmsg="LinearModel.save_to_binary_file()"
     )
 
