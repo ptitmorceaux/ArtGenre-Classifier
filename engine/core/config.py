@@ -9,7 +9,7 @@ CONFIG = {
         "specs_folder": os.path.join("libc", "specs"),
         "dependencies_folder": r"C:\msys64\mingw64\bin",
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
-        "seed": 2024,
+        "seed": None, # Si None, une seed aléatoire sera choisie parmi seeds_choice
     },
     "dataset": {
         "csv_path": os.path.join("dataset"),
