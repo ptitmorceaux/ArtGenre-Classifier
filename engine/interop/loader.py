@@ -140,15 +140,17 @@ class _LibLoader: # Singleton Pattern Design
             # Configuration des types d'arguments
             func.argtypes = []
             for arg_type in info["argtypes"]:
-                ctype = self._get_ctype(arg_type)
-                if ctype is None:
-                    raise TypeError(f"_LibLoader.attribute_types(): Unknow argtype for `{name}` : {arg_type}")
+                try:
+                    ctype = self._get_ctype(arg_type)
+                except TypeError as e:
+                    raise TypeError(f"_LibLoader.attribute_types(): Unknown argtype for `{name}` : {arg_type}") from e
                 func.argtypes.append(ctype)
             
             # Configuration du type de retour
-            func.restype = self._get_ctype(info["restype"])
-            if func.restype is None:
-                raise TypeError(f"_LibLoader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
+            try:
+                func.restype = self._get_ctype(info["restype"])
+            except TypeError as e:
+                raise TypeError(f"_LibLoader.attribute_types(): Unknown restype for `{name}` : {info['restype']}") from e
 
 
 
