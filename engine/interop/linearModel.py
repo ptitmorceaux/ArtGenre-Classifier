@@ -237,3 +237,13 @@ class LinearModel():
             ctypes.c_uint32(epochs),
             prefix_errmsg="LinearModel.train()"
         )
+    
+    #===== Méthode publique - GETTER ======#
+
+    def get_weights(self) -> list[float]:
+        """Renvoie la liste des poids du modèle (weights[0] = biais, weights[1:] = w1, w2, ...)."""
+        if self.ptr is None or self.ptr.value is None:
+            raise ValueError("LinearModel.get_weights(): model is not initialized.")
+
+        model_struct = ctypes.cast(self.ptr, ctypes.POINTER(_CLinearModel)).contents
+        return list(model_struct.weights[:model_struct.length])
