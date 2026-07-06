@@ -134,3 +134,39 @@ class MLP:
             c_is_classification,
             prefix_errmsg="MLP.train()"
         )
+
+
+    # ===== GETTER / SETTER ======#
+
+    def get_weights(self) -> list[list[list[float]]]:
+        """Renvoie les poids sous forme de liste imbriquée : weights[l][i][j]."""
+        if self.ptr is None or self.ptr.value is None:
+            raise ValueError("MLP.get_weights(): model is not initialized.")
+
+        model_struct = ctypes.cast(self.ptr, ctypes.POINTER(_CMLP)).contents
+        d = list(model_struct.d[:model_struct.L + 1])
+        L = model_struct.L
+
+        weights = []
+        for l in range(L):
+            rows = d[l] + 1   # +1 pour le biais
+            cols = d[l + 1]
+            layer = [list(model_struct.W[l][i][:cols]) for i in range(rows)]
+            weights.append(layer)
+        return weights
+
+    def set_weights(self, weights: list[list[list[float]]]) -> None:
+        """Écrit des poids donnés dans le modèle C (weights[l][i][j])."""
+        if self.ptr is None or self.ptr.value is None:
+            raise ValueError("MLP.set_weights(): model is not initialized.")
+
+        model_struct = ctypes.cast(self.ptr, ctypes.POINTER(_CMLP)).contents
+        d = list(model_struct.d[:model_struct.L + 1])
+        L = model_struct.L
+
+        for l in range(L):
+            rows = d[l] + 1
+            cols = d[l + 1]
+            for i in range(rows):
+                for j in range(cols):
+                    model_struct.W[l][i][j] = weights[l][i][j]
