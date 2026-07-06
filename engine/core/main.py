@@ -18,7 +18,7 @@ def main():
     # Gestion de l'aléa
     if CONFIG["lib"]["seeds_choice"] is not None:
         CONFIG["lib"]["seed"] = random.choice(CONFIG["lib"]["seeds_choice"])
-    print(f"Seed sélectionné : {CONFIG['lib']['seed']}")
+    print(f"Seed sélectionnée : {CONFIG['lib']['seed']}")
 
     # 1. Compilation et chargement de l'interopérabilité
     print("\nEtape 1 : Compilation et chargement de l'interopérabilité...")
