@@ -9,6 +9,6 @@ typedef enum {
     ModelType_MLP,
 } ModelType;
 
-DLLEXPORT const char* get_model_type_string(ModelType model_type);
+DLLEXPORT const char* get_model_type_string(unsigned char code);
 
 #endif

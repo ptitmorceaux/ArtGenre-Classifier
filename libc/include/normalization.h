@@ -25,7 +25,7 @@ typedef struct {
 } StandardPerColumnNormalizationData;
 
 
-DLLEXPORT const char* get_normalization_method_string(NormalizationMethod normalization_method);
+DLLEXPORT const char* get_normalization_method_string(unsigned char code);
 DLLEXPORT unsigned char free_StandardNormalizationData(StandardNormalizationData** data);
 DLLEXPORT unsigned char free_StandardPerColumnNormalizationData(StandardPerColumnNormalizationData** data);
 
