@@ -1,4 +1,6 @@
 import os
+import json
+
 
 CONFIG = {
     "lib": {
@@ -56,3 +58,29 @@ CATEGORIES = {
         "csv_path": os.path.join(CONFIG["dataset"]["csv_path"], "romanticism_clean.csv")
     }
 }
+
+
+def load_config_from_json(filepath: str = "conf/config.json"):
+    """
+    Charge la configuration depuis un fichier JSON.
+    """
+    # TODO: A finir
+    raise NotImplementedError("La fonction load_config_from_json n'est pas encore implémentée.")
+    config_path = os.path.join(filepath)
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Le fichier de configuration '{config_path}' est introuvable.")
+    with open(config_path, "r") as f:
+        loaded_config = json.load(f)
+        CONFIG.update(loaded_config)
+
+def load_categories_from_json(filepath: str = "conf/categories.json"):
+    """
+    Charge les catégories depuis un fichier JSON.
+    """
+    # TODO: A finir
+    raise NotImplementedError("La fonction load_categories_from_json n'est pas encore implémentée.")
+    categories_path = os.path.join(filepath)
+    if not os.path.exists(categories_path):
+        raise FileNotFoundError(f"Le fichier de catégories '{categories_path}' est introuvable.")
+    with open(categories_path, "r") as f:
+        CATEGORIES = json.load(f)
