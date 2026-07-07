@@ -11,6 +11,11 @@ drawio/
 
 .vscode/
 
+!libc/build/.gitkeep
+
+*.bin
+*.tmp
+
 ########################
 
 # Prerequisites
@@ -81,7 +86,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+build/*
 develop-eggs/
 dist/
 downloads/

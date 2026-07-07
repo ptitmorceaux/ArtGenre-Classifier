@@ -55,7 +55,8 @@ class _LibLoader: # Singleton Pattern Design
             lib_name = lib_name[:-6]
         return lib_name
 
-    def _set_path(self, path: str) -> str:
+    @staticmethod
+    def _set_path(path: str) -> str:
         path = path.strip()
         path = os.path.abspath(path)
         
@@ -113,8 +114,14 @@ class _LibLoader: # Singleton Pattern Design
         pointer_count = type.count('*')
         type = type.replace("*", "").strip()
         
-        if type in self._specs["__typedef__"]:
-            return "void" + "*" * pointer_count
+        if  type in self._specs["__typedef__"]:
+            typef_type = self._specs["__typedef__"][type]
+            if typef_type == "enum":
+                return "unsignedchar" + "*" * pointer_count
+            elif typef_type == "struct":
+                return "void" + "*" * pointer_count
+            else:
+                raise ValueError(f"_LibLoader._normalize_str_type(): Unknown typedef kind '{typef_type}' for type '{type}'")
         else:
             return type + "*" * pointer_count
 
@@ -139,21 +146,23 @@ class _LibLoader: # Singleton Pattern Design
             # Configuration des types d'arguments
             func.argtypes = []
             for arg_type in info["argtypes"]:
-                ctype = self._get_ctype(arg_type)
-                if ctype is None:
-                    raise TypeError(f"_LibLoader.attribute_types(): Unknow argtype for `{name}` : {arg_type}")
+                try:
+                    ctype = self._get_ctype(arg_type)
+                except TypeError as e:
+                    raise TypeError(f"_LibLoader.attribute_types(): Unknown argtype for `{name}` : {arg_type}") from e
                 func.argtypes.append(ctype)
             
             # Configuration du type de retour
-            func.restype = self._get_ctype(info["restype"])
-            if func.restype is None:
-                raise TypeError(f"_LibLoader.attribute_types(): Unknow restype for `{name}` : {info['restype']}")
+            try:
+                func.restype = self._get_ctype(info["restype"])
+            except TypeError as e:
+                raise TypeError(f"_LibLoader.attribute_types(): Unknown restype for `{name}` : {info['restype']}") from e
 
 
 
     #====== Méthode public - Init ======#
 
-    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, seed: int | None = None) -> None:
+    def loadLibrary(self, lib_name: str, lib_folder: str, build_folder: str, specs_folder: str, dependencies_bin_folder: str | None = None, seed: int | None = None) -> None:
         
         if _LibLoader._isLoaded:
             raise RuntimeError("_LibLoader.loadLibrary(): Library is already loaded.")
@@ -165,17 +174,25 @@ class _LibLoader: # Singleton Pattern Design
         self._specs = dict()
         
         self._specs["__function__"] = dict()
-        self._specs["__typedef__"] = set()
+        self._specs["__typedef__"] = dict()
 
         self._lib_name = self._set_lib_name(lib_name)
         self._lib_folder = self._set_path(lib_folder)
         self._build_folder = self._set_path(build_folder)
         self._specs_folder = self._set_path(specs_folder)
+        self._dependencies_bin_folder = None
         
         if sys.platform.startswith("win"):
             self.ext = "dll"
+            # Gestion des DLL Windows pour OpenBLAS / LAPACK
+            if dependencies_bin_folder is None:
+                raise ValueError("_LibLoader.loadLibrary(): `dependencies_bin_folder` must be provided on Windows platforms.")
+            self._dependencies_bin_folder = self._set_path(dependencies_bin_folder)
+            os.add_dll_directory(self._dependencies_bin_folder)
+
         elif sys.platform.startswith("darwin"):
             self.ext = "dylib"
+
         else:
             self.ext = "so"
 
@@ -251,7 +268,7 @@ class _LibLoader: # Singleton Pattern Design
 
 
     @require_loaded
-    def call(self, func_name: str, *args, prefix_errmsg: str = "") -> None:
+    def call(self, func_name: str, *args, prefix_errmsg: str = "", no_status_check: bool = False) -> None:
         """Appel une fonction C et vérifie automatiquement son status code"""
         prefix_err = f"{prefix_errmsg}: _LibLoader.call(`{func_name}`)" if prefix_errmsg else f"_LibLoader.call(`{func_name}`)"
         
@@ -264,13 +281,14 @@ class _LibLoader: # Singleton Pattern Design
             raise AttributeError(f"{prefix_err}: Function `{func_name}` not found in the library: {e}")
 
         try:
-            status = func(*args)
+            res = func(*args)
         except Exception as e:
             raise RuntimeError(f"{prefix_err}: {e}")
         
-        self.check_status(status, prefix_err)
+        if not no_status_check:
+            self.check_status(res, prefix_err)
 
-        return status
+        return res
 
 
     @require_loaded
