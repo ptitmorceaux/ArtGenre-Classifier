@@ -13,7 +13,8 @@ RUN npm install
 COPY frontend/ .
 
 # Variable d'environnement pour l'URL de l'API
-ENV VITE_API_URL=http://localhost:8000/datafilter
+# ENV VITE_API_URL=http://localhost:8000/datafilter
+ENV VITE_API_URL=http://localhost:8000
 
 # On expose le port de Vite
 EXPOSE 5173

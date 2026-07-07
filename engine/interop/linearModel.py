@@ -1,4 +1,5 @@
 import ctypes
+import numpy as np
 from engine.interop.loader import Loader
 
 
@@ -115,11 +116,14 @@ class LinearModel():
         # On crée un pointeur vide (void*) qui recevra l'adresse du modèle C.
         model_ptr = ctypes.c_void_p()
 
+        arr_inputs = np.asarray(dataset_inputs_without_bias, dtype=np.float32)
+        arr_outputs = np.asarray(dataset_expected_outputs, dtype=np.float32)
+
         # 3. Appel à la bibliothèque C avec les bonnes dimensions validées
         Loader.call(
             "get_linear_regression_weights_from_list",
-            (ctypes.c_float * all_data_length)(*dataset_inputs_without_bias),
-            (ctypes.c_float * y_size)(*dataset_expected_outputs),
+            arr_inputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+            arr_outputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
             ctypes.c_uint32(row_count), # row = m
             ctypes.c_uint32(col_count), # col = n
             ctypes.byref(model_ptr),
@@ -192,10 +196,13 @@ class LinearModel():
             raise ValueError(f"LinearModel.predict(): `input_data` length must be equal to model's input_dim ({self.input_dim}).")
     
         result = ctypes.c_int32() if is_classification else ctypes.c_float()
+
+        arr = np.ascontiguousarray (input_data, dtype=np.float32)
+
         Loader.call(
             "predict_linear_classification" if is_classification else "predict_linear_regression",
             self.ptr,
-            (ctypes.c_float * len(input_data))(*input_data),
+            arr.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
             ctypes.byref(result),
             prefix_errmsg="LinearModel.predict()"
         )
@@ -210,7 +217,7 @@ class LinearModel():
             alpha: float,
             epochs: int,
             is_classification: bool
-            ) -> None:
+            ) -> tuple[list[float], list[float]]:
         """
         Si is_classification = True: Entraîne le modèle de classification binaire signée (-1 / 1) en utilisant la règle de Rosenblatt.
         Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
@@ -223,18 +230,27 @@ class LinearModel():
             "LinearModel.train()"
         )
 
+        c_loss_history = (ctypes.c_float * epochs)()
+        c__accuracy_history = (ctypes.c_float * epochs)() if is_classification else None
+
         # On vérifie les types des arguments
         Loader.check_primitive_values_range(row_count, ctypes.c_uint32, "LinearModel.train()")
         Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train()")
         Loader.check_primitive_values_range(epochs, ctypes.c_uint32, "LinearModel.train()")
+
+        arr_inputs = np.asarray(dataset_inputs, dtype=np.float32)
+        arr_outputs = np.asarray(dataset_expected_outputs, dtype=np.float32)
+
         Loader.call(
             "train_linear_classification" if is_classification else "train_linear_regression",
             self.ptr,
-            (ctypes.c_float * all_data_length)(*dataset_inputs),
-            (ctypes.c_float * y_size)(*dataset_expected_outputs),
+            arr_inputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+            arr_outputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
             ctypes.c_uint32(row_count),
             ctypes.c_float(alpha),
             ctypes.c_uint32(epochs),
+            c_loss_history,
+            c__accuracy_history,
             prefix_errmsg="LinearModel.train()"
         )
     

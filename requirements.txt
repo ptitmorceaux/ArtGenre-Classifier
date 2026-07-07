@@ -1,6 +1,6 @@
 numpy
 matplotlib
-django
+requests
 django-cors-headers
 djangorestframework
 datafilter
@@ -8,3 +8,5 @@ pillow
 pandas
 ipykernel
 scikit-learn
+tensorflow
+tensorboard
