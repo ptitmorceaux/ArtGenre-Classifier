@@ -1,3 +1,7 @@
+import os
+import datetime
+import tensorflow as tf
+
 from engine.core.config import CONFIG, CATEGORIES
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
@@ -14,18 +18,31 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
     """Entraîne un LinearModel par catégorie (One-vs-All)."""
     models_per_category = dict()
 
+    current_time = datetime.datetime.now().strftime("Train_%d/%m-%H_%M")
+    log_dir = os.path.join(CONFIG["output"]["logs"], "Linear_Classification", current_time)
+    summary_writer = tf.summary.create_file_writer(log_dir)
+    print(f"\n[*] TensorBoard Logs directory: {log_dir}")
+
     for category in CATEGORIES:
         print(f"> Training LinearModel for category: {category}")
         models_per_category[category] = LinearModel.init_random(input_dim=CONFIG["dataset"]["W_length"])
-        models_per_category[category].train(
+        loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=df_X["train"],
             dataset_expected_outputs=df_Y["train"][category],
             is_classification=True,
             alpha=CONFIG["model"]["alpha"],
             epochs=CONFIG["model"]["epochs"]
         )
-        print(f"    Model for category '{category}' trained successfully.")
 
+        # Écriture dans TensorBoard
+        with summary_writer.as_default():
+            for epoch in range(CONFIG["model"]["epochs"]):
+                tf.summary.scalar(f"Loss/{category}", loss_history[epoch], step=epoch)
+                tf.summary.scalar(f"Accuracy/{category}", acc_history[epoch], step=epoch)
+                
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
+    
+    summary_writer.flush()
     return models_per_category
 
 

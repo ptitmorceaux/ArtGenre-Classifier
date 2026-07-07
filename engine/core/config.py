@@ -23,12 +23,14 @@ CONFIG = {
         "normalization_method": "per_column",
     },
     "output": {
-        "models_folder": os.path.join("trained_models"),
+        "outdir": os.path.join("engine", "core", "output"),
+        "logs": os.path.join("engine", "core", "output", "logs"),
+        "models": os.path.join("engine", "core", "output", "trained_models"),
     },
     "model": {
         # "linear" -> LinearModel (One-vs-All)
         # "mlp"    -> MLP (One-vs-All)
-        "type": "mlp",
+        "type": "linear",
         "alpha": 0.00001,
         "epochs": 300,
         # Utilisé seulement si type == "mlp" : couches cachées, sans compter

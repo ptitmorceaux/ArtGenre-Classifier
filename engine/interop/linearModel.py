@@ -217,7 +217,7 @@ class LinearModel():
             alpha: float,
             epochs: int,
             is_classification: bool
-            ) -> tuple[list[float], list[float]]:
+            ) -> tuple[list[float], list[float]] | None: 
         """
         Si is_classification = True: Entraîne le modèle de classification binaire signée (-1 / 1) en utilisant la règle de Rosenblatt.
         Si is_classification = False: Entraîne le modèle de régression linéaire en utilisant la descente de gradient stochastique.
@@ -230,9 +230,6 @@ class LinearModel():
             "LinearModel.train()"
         )
 
-        c_loss_history = (ctypes.c_float * epochs)()
-        c__accuracy_history = (ctypes.c_float * epochs)() if is_classification else None
-
         # On vérifie les types des arguments
         Loader.check_primitive_values_range(row_count, ctypes.c_uint32, "LinearModel.train()")
         Loader.check_primitive_values_range(alpha, ctypes.c_float, "LinearModel.train()")
@@ -241,19 +238,39 @@ class LinearModel():
         arr_inputs = np.asarray(dataset_inputs, dtype=np.float32)
         arr_outputs = np.asarray(dataset_expected_outputs, dtype=np.float32)
 
-        Loader.call(
-            "train_linear_classification" if is_classification else "train_linear_regression",
-            self.ptr,
-            arr_inputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
-            arr_outputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
-            ctypes.c_uint32(row_count),
-            ctypes.c_float(alpha),
-            ctypes.c_uint32(epochs),
-            c_loss_history,
-            c__accuracy_history,
-            prefix_errmsg="LinearModel.train()"
-        )
+        if is_classification:
+            c_loss_history = (ctypes.c_float * epochs)()
+            c_accuracy_history = (ctypes.c_float * epochs)()
+
+            Loader.call(
+                "train_linear_classification",
+                self.ptr,
+                arr_inputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+                arr_outputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+                ctypes.c_uint32(row_count),
+                ctypes.c_float(alpha),
+                ctypes.c_uint32(epochs),
+                c_loss_history,
+                c_accuracy_history,
+                prefix_errmsg="LinearModel.train()"
+            )
+
+            return (c_loss_history[:epochs], c_accuracy_history[:epochs]) if is_classification else None
+        else:
+            Loader.call(
+                "train_linear_regression",
+                self.ptr,
+                arr_inputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+                arr_outputs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+                ctypes.c_uint32(row_count),
+                ctypes.c_float(alpha),
+                ctypes.c_uint32(epochs),
+                prefix_errmsg="LinearModel.train()"
+            )
     
+        
+
+
     #===== Méthode publique - GETTER ======#
 
     def get_weights(self) -> list[float]:
