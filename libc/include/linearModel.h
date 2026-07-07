@@ -30,8 +30,8 @@ DLLEXPORT unsigned char predict_linear_regression(LinearModel* model, float* inp
 // =============================
 // Entraînements
 // =============================
-DLLEXPORT unsigned char train_linear_classification(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
-DLLEXPORT unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs);
+DLLEXPORT unsigned char train_linear_classification(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history, float* accuracy_history);
+DLLEXPORT unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history);
 
 // =============================
 // Calcul des poids via la pseudo-inverse

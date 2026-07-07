@@ -2,18 +2,19 @@
 #define __GLOBAL_H__
 
 
+#ifdef _WIN32
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLEXPORT
+#define _POSIX_C_SOURCE 200809L
+#endif
+
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
-
-
-#ifdef _WIN32
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLEXPORT
-#endif
 
 
 #define true 1

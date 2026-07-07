@@ -320,10 +320,12 @@ unsigned char load_header(FILE* file, NormalizationMethod* normalization_method,
     if (!file || !normalization_method || !model_type) return ERR_INVALID_PTR;
 
     // NormalizationMethod (1 octet)
-    fread(normalization_method, sizeof(unsigned char), 1, file);
+    if (fread(normalization_method, sizeof(unsigned char), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     // ModelType (1 octet)
-    fread(model_type, sizeof(unsigned char), 1, file);
+    if (fread(model_type, sizeof(unsigned char), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     return RES_EXIT_SUCCESS;
 }
@@ -345,13 +347,16 @@ unsigned char load_standard_normalization(FILE* file, StandardNormalizationData*
     if (!data) return ERR_MEMORY_ALLOCATION;
 
     // method (1 octet)
-    fread(&(data->method), sizeof(unsigned char), 1, file);
+    if (fread(&(data->method), sizeof(unsigned char), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     // mean (float32)
-    fread(&(data->mean), sizeof(float), 1, file);
+    if (fread(&(data->mean), sizeof(float), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     // std (float32)
-    fread(&(data->std), sizeof(float), 1, file);
+    if (fread(&(data->std), sizeof(float), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     *normalization_data = data;
     return RES_EXIT_SUCCESS;
@@ -372,10 +377,12 @@ unsigned char load_standard_per_column_normalization(FILE* file, StandardPerColu
     if (!data) return ERR_MEMORY_ALLOCATION;
 
     // method (1 octet)
-    fread(&(data->method), sizeof(unsigned char), 1, file);
+    if (fread(&(data->method), sizeof(unsigned char), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     // length (uint32_t)
-    fread(&(data->length), sizeof(uint32_t), 1, file);
+    if (fread(&(data->length), sizeof(uint32_t), 1, file) != 1) 
+        return ERR_FILE_READ;
 
     // mean (float32 array)
     data->mean = (float*) malloc(data->length * sizeof(float));
@@ -383,7 +390,11 @@ unsigned char load_standard_per_column_normalization(FILE* file, StandardPerColu
         free(data);
         return ERR_MEMORY_ALLOCATION;
     }
-    fread(data->mean, sizeof(float), data->length, file);
+    if (fread(data->mean, sizeof(float), data->length, file) != data->length) {
+        free(data->mean);
+        free(data);
+        return ERR_FILE_READ;
+    }
 
     // std (float32 array)
     data->std = (float*) malloc(data->length * sizeof(float));
@@ -392,7 +403,12 @@ unsigned char load_standard_per_column_normalization(FILE* file, StandardPerColu
         free(data);
         return ERR_MEMORY_ALLOCATION;
     }
-    fread(data->std, sizeof(float), data->length, file);
+    if (fread(data->std, sizeof(float), data->length, file) != data->length) {
+        free(data->std);
+        free(data->mean);
+        free(data);
+        return ERR_FILE_READ;
+    }
 
     *normalization_data = data;
     return RES_EXIT_SUCCESS;
@@ -414,7 +430,10 @@ unsigned char load_linear_model(FILE* file, LinearModel** model) {
     if (!data) return ERR_MEMORY_ALLOCATION;
 
     // length (uint32_t)
-    fread(&(data->length), sizeof(uint32_t), 1, file);
+    if (fread(&(data->length), sizeof(uint32_t), 1, file) != 1) {
+        free(data);
+        return ERR_FILE_READ;
+    }
 
     // weights (float32 array)
     data->weights = (float*) malloc(data->length * sizeof(float));
@@ -422,7 +441,11 @@ unsigned char load_linear_model(FILE* file, LinearModel** model) {
         free(data);
         return ERR_MEMORY_ALLOCATION;
     }
-    fread(data->weights, sizeof(float), data->length, file);
+    if (fread(data->weights, sizeof(float), data->length, file) != data->length) {
+        free(data->weights);
+        free(data);
+        return ERR_FILE_READ;
+    }
 
     *model = data;
     return RES_EXIT_SUCCESS;
