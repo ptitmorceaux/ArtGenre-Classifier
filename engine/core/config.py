@@ -23,9 +23,9 @@ CONFIG = {
         "normalization_method": "per_column",
     },
     "output": {
-        "outdir": os.path.join("engine", "core"),
-        "logs": os.path.join("engine", "core", "logs"),
-        "models": os.path.join("engine", "core", "trained_models"),
+        "outdir": os.path.join("engine", "core", "output"),
+        "logs": os.path.join("engine", "core", "output", "logs"),
+        "models": os.path.join("engine", "core", "output", "trained_models"),
     },
     "model": {
         # "linear" -> LinearModel (One-vs-All)
