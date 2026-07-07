@@ -11,10 +11,10 @@ unsigned char allocate_2d_matrix_float32_without_data(uint32_t rows, uint32_t co
     if (rows == 0 || columns == 0) return ERR_LENGTH_ZERO;
 
     Matrix* matrix = (Matrix*) malloc(sizeof(Matrix));
-    if (!matrix) return ERR_ALLOCATION_FAILED;
+    if (!matrix) return ERR_MEMORY_ALLOCATION;
     
     matrix->data = NULL;
-    // matrix->owns_data = false;
+    matrix->owns_data = false;
     matrix->rows = rows;
     matrix->columns = columns;
     matrix->row_stride = columns;
@@ -34,9 +34,9 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
     matrix->data = (float*) malloc(rows * columns * sizeof(float));
     if (!matrix->data) {
         free_matrix(res_matrix);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
-    // matrix->owns_data = true;
+    matrix->owns_data = true;
     
     return RES_EXIT_SUCCESS; 
 }
@@ -45,7 +45,35 @@ unsigned char allocate_2d_matrix_float32(uint32_t rows, uint32_t columns, Matrix
 
 // INIT
 
-unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
+/*
+    Si `add_the_bias_in_first_column` est vrai, le premier élément de la matrice sera défini sur 1.0f (biais).
+    -> et donc la taille values doit etre [rows * (columns - 1)]
+    -> ex d'appel :
+    ------------------------------
+        float values[6] = {
+            0.5f, 0.2f,
+            0.8f, 0.1f,
+            0.9f, 0.3f
+        };
+    ------------------------------      
+        Matrix* matrix = create_2d_matrix_float32(3, 3); // -> 3 lignes, 3 colonnes (la première colonne sera le biais)
+        fill_from_list_2d_matrix(values, true, &matrix); // bias = true
+        // VIEW, matrix->data = {
+        //     1.0f, 0.5f, 0.2f,
+        //     1.0f, 0.8f, 0.1f,
+        //     1.0f, 0.9f, 0.3f
+        // };
+    ------------------------------
+        Matrix* matrix = create_2d_matrix_float32(3, 2);  // -> 3 lignes, 2 colonnes (la première colonne NE sera PAS le biais)
+        fill_from_list_2d_matrix(values, false, &matrix); // bias = false
+        // VIEW, matrix->data = {
+        //     0.5f, 0.2f,
+        //     0.8f, 0.1f,
+        //     0.9f, 0.3f
+        // };
+    ------------------------------
+*/
+unsigned char fill_from_list_2d_matrix(float* values, char add_the_bias_in_first_column, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
     if (!values) {
         free_matrix(matrix);
@@ -53,41 +81,41 @@ unsigned char fill_from_list_2d_matrix(float* values, Matrix** matrix) {
     }
     
     Matrix* m = *matrix;
+
+    uint32_t real_index = 0;
     
-    for (uint32_t i = 0; i < m->rows * m->columns; i++) {
-        m->data[i] = values[i];
+    for (uint32_t i = 0; i < m->rows; i++) {
+        for (uint32_t j = 0; j < m->columns; j++) {
+            
+            if (add_the_bias_in_first_column && j == 0)
+                set_element_2d_matrix(m, i, j, 1.0f);
+            
+            else
+                set_element_2d_matrix(m, i, j, values[real_index++]);
+        }
     }
     
     return RES_EXIT_SUCCESS;
 }
 
-unsigned char fill_randomly_2d_matrix(float min, float max, Matrix** matrix) {
+unsigned char fill_randomly_2d_matrix(float min, float max, char first_column_is_bias, Matrix** matrix) {
     if (!matrix || !(*matrix) || !(*matrix)->data) return ERR_INVALID_PTR;
+    
     Matrix* m = *matrix;
+    
     unsigned char status = fill_randomly_float_array(min, max, &m->data, m->rows * m->columns);
     if (status != RES_EXIT_SUCCESS) {
         free_matrix(matrix);
         return status;
     }
+    
+    if (first_column_is_bias) {
+        for (uint32_t i = 0; i < m->rows; i++)
+            set_element_2d_matrix(m, i, 0, 1.0f);
+    }
+
     return RES_EXIT_SUCCESS;
 }
-
-// unsigned char get_transpose_2d_matrix(Matrix* matrix, Matrix** res) {
-//     if (!matrix || !matrix->data || !res) return ERR_INVALID_PTR;
-    
-//     unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, res);
-//     if (status != RES_EXIT_SUCCESS) return status;
-    
-//     Matrix *transposed = *res;
-    
-//     transposed->data = matrix->data;
-//     transposed->owns_data = false;
-//     transposed->row_stride = matrix->col_stride;
-//     transposed->col_stride = matrix->row_stride;
-    
-//     return RES_EXIT_SUCCESS;
-// }
-
 
 /*===============================================================*/
 
@@ -112,6 +140,17 @@ unsigned char set_element_2d_matrix(Matrix* matrix, uint32_t row, uint32_t col, 
     
     uint32_t index = get_index_2d_matrix(matrix, row, col);
     matrix->data[index] = value; 
+    return RES_EXIT_SUCCESS;
+}
+
+unsigned char get_transpose(Matrix* matrix, Matrix** transpose) {
+    if (!matrix || !matrix->data || !transpose || *transpose != NULL) return ERR_INVALID_PTR;
+
+    unsigned char status = allocate_2d_matrix_float32_without_data(matrix->columns, matrix->rows, transpose);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    (*transpose)->data = matrix->data;
+    
     return RES_EXIT_SUCCESS;
 }
 
@@ -181,9 +220,10 @@ unsigned char add_2d_matrix(Matrix* a, Matrix* b, Matrix** result) {
 
     Matrix* res = *result;
     
-    for (uint32_t i = 0; i < a->rows; i++) {
+    for (uint32_t i = 0; i < a->rows * a->columns; i++) {
         res->data[i] = a->data[i] + b->data[i];
     }
+
     return RES_EXIT_SUCCESS;
 }
 
@@ -208,6 +248,42 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
     return status;
 }
 
+/**
+ * Inverse la matrice carrée A directement EN PLACE.
+ * Modifie et écrase A->data pour y stocker son inverse mathématique.
+ * * Vitesse : Maximale (optimisé par le cache CPU et les instructions vectorielles).
+ * RAM : Économe au maximum (0 réallocation de matrice).
+ */
+unsigned char inverse_2d_matrix(Matrix* A) {
+    // Vérification de sécurité réglementaire
+    if (A->rows != A->columns) {
+        return ERR_INVALID_MATRIX_SQUARE; 
+    }
+
+    int32_t n = (int32_t)A->rows;
+    int32_t info;
+
+    // 1. Allocation du vecteur de pivot requis par LAPACKE
+    // Pour n = 1729, cela ne prend que ~7 Ko en RAM (négligeable)
+    int32_t* ipiv = (int32_t*)calloc(n, sizeof(int32_t));
+    if (!ipiv) return ERR_MEMORY_ALLOCATION;
+
+    // 2. Étape 1 : Factorisation LU en place directement dans A->data
+    // Cette fonction transforme la matrice et prépare l'inversion rapide
+    info = LAPACKE_sgetrf(CblasRowMajor, n, n, A->data, n, ipiv);
+    if (info != 0) {
+        free(ipiv);
+        return ERR_INVALID_MATRIX_INVERSION_SINGULAR; // Matrice singulière (non inversible)
+    }
+
+    // 3. Étape 2 : Calcul de l'inverse à partir de LU, directement dans A->data
+    info = LAPACKE_sgetri(CblasRowMajor, n, A->data, n, ipiv);
+    
+    free(ipiv);
+    
+    return (info == 0) ? RES_EXIT_SUCCESS : ERR_INVALID_MATRIX_INVERSION;
+}
+
 /*===============================================================*/
 
 // FREE //
@@ -215,7 +291,7 @@ unsigned char scalar_operation_2d_matrix(Matrix* matrix, float scalar, char is_a
 unsigned char free_matrix(Matrix** matrix) {
     Matrix *m = *matrix;
     if (!m) return ERR_INVALID_PTR;
-    free(m->data); // if (m->data && m->owns_data) free(m->data);
+    if (m->data && m->owns_data) free(m->data);
     free(m);
     *matrix = NULL;
     return RES_EXIT_SUCCESS;

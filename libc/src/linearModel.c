@@ -17,14 +17,16 @@ unsigned char create_linear_model(uint32_t input_dim, LinearModel** res_model) {
     if (!res_model || *res_model) return ERR_INVALID_PTR;
     
     LinearModel* model = (LinearModel*) malloc(sizeof(LinearModel));
-    if (!model) return ERR_ALLOCATION_FAILED;
+    if (!model) return ERR_MEMORY_ALLOCATION;
+
+    model->model_type = ModelType_LINEAR;
     
     // Allouer de la mémoire pour les poids + le biais
-    model->length = input_dim + 1; // (+ 1 pour le biais)
+    model->length = input_dim + 1; // + 1 pour le biais
     model->weights = (float*) malloc((model->length) * sizeof(float));
     if (!model->weights) {
         free_linear_model(res_model);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
     
     *res_model = model;
@@ -88,7 +90,7 @@ unsigned char free_linear_model(LinearModel** model_ptr) {
  /** Fonction de prédiction **/
  /*
     # Implémenter 2 fonction de prédiction :
-        - `predict_linear_classification` : pour les tâches de classification, qui retourne la classe prédite (0 ou 1)
+        - `predict_linear_classification` : pour les tâches de classification, qui retourne la classe prédite (-1 ou 1)
         - `predict_linear_regression` : pour les tâches de régression, qui retourne la valeur
  */
 // Fonction de prédiction pour la regréssion
@@ -113,7 +115,7 @@ unsigned char predict_linear_regression(LinearModel* model, float* input, float*
 // Fonction de prédiction pour la classification
 unsigned char predict_linear_classification(LinearModel* model, float* input, int32_t* result) {
     /*
-    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie 0 ou 1).
+    Prédit la classe pour une entrée donnée en utilisant le modèle linéaire (renvoie -1 ou 1).
     */
     if (!model || !model->weights) return ERR_INVALID_PTR;
 
@@ -123,7 +125,7 @@ unsigned char predict_linear_classification(LinearModel* model, float* input, in
     status = predict_linear_regression(model, input, &sum);
     if (status != RES_EXIT_SUCCESS) return status;
     
-    *result = sum >= 0 ? 1 : 0;
+    *result = sum >= 0 ? 1 : -1;
     return RES_EXIT_SUCCESS;
  }
 
@@ -221,7 +223,7 @@ unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs,
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par descente de gradient stochastique.
-     * Contrairement à la classification (0 ou 1), ici on prédit une valeur continue (ex: 6.7).
+    * Contrairement à la classification (-1 ou 1), ici on prédit une valeur continue (ex: 6.7).
      * L'algorithme calcule l'écart (la distance) entre la prédiction et la vraie valeur.
      * Il va ensuite utiliser cet écart pour ajuster proportionnellement le biais et les poids.
      * Plus l'erreur est grande, plus le pas de correction sera grand. Plus on se rapproche de la valeur, plus le pas de correction sera petit.
@@ -257,4 +259,195 @@ unsigned char train_linear_regression(LinearModel* model, float* dataset_inputs,
         }
     }
     return RES_EXIT_SUCCESS;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+/*
+    Grace aux strides on ne charge en RAM qu'une seule fois le dataset, on ne fait pas de copie
+
+    [X (m, n)]  -->  [X+ (n, m)]
+
+    m=rows et n=columns
+  
+    Cas  ///  Pseudo-inverse :
+    - m >= n  ///  X+ = (X^T * X)^-1 * X^T
+    - m < n   ///  X+ = X^T * (X * X^T)^-1
+*/
+unsigned char pseudo_inverse_2d_matrix(Matrix* X, Matrix** res) {
+    if (!X || !X->data || !res || *res != NULL) return ERR_INVALID_PTR;
+
+    unsigned char status = RES_EXIT_SUCCESS;
+
+    status = allocate_2d_matrix_float32(X->columns, X->rows, res);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    Matrix X_transpose = {
+        .data = X->data,
+        .rows = X->columns,
+        .columns = X->rows,
+        .row_stride = X->col_stride,
+        .col_stride = X->row_stride
+    };
+
+    /////////////////////////////////////////
+
+    Matrix* tmp = NULL;
+    if (X->rows >= X->columns)
+        // m >= n  ///  allouer pour X^T * X
+        status = allocate_2d_matrix_float32(X->columns, X->columns, &tmp);
+    else
+        // m < n   ///  allouer pour X * X^T
+        status = allocate_2d_matrix_float32(X->rows, X->rows, &tmp);
+    
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(res);
+        return status;
+    }
+
+    /////////////////////////////////////////
+
+    if (X->rows >= X->columns)
+        // m >= n  ///  X^T * X
+        status = multiply_2d_matrix(&X_transpose, X, &tmp);
+
+    else
+        // m < n   ///  X * X^T
+        status = multiply_2d_matrix(X, &X_transpose, &tmp);
+    
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&tmp);
+        free_matrix(res);
+        return status;
+    }
+
+    /////////////////////////////////////////
+
+    // inverser la matrice tmp (X^T * X)^-1 ou (X * X^T)^-1
+    status = inverse_2d_matrix(tmp);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&tmp);
+        free_matrix(res);
+        return status;
+    }
+
+    /////////////////////////////////////////
+
+    if (X->rows >= X->columns)
+        // m >= n  ///  ((X^T * X)^-1) * (X^T)
+        status = multiply_2d_matrix(tmp, &X_transpose, res);
+    else
+        // m < n   ///  (X^T) * ((X * X^T)^-1)
+        status = multiply_2d_matrix(&X_transpose, tmp, res);
+
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&tmp);
+        free_matrix(res);
+        return status;
+    }
+    
+    /////////////////////////////////////////
+
+    free_matrix(&tmp);
+    return status;
+}
+
+
+/*
+    Utilisation de la pseudo inverse pour calculer W en un coup
+
+    IMPORTANT :
+    - Le dataset d'entrée doit déjà contenir la colonne du biais (1.0f) dans la première colonne -> input_with_bias (m, n)
+    - La matrice expected_outputs doit être de dimension (m, 1)
+
+    En sortie : W -> (n, 1)
+    En sortie -> LinearModel* (il faut penser à free_linear_model() après utilisation)
+*/
+unsigned char get_linear_regression_weights(Matrix* dataset_inputs_with_bias, Matrix* dataset_expected_outputs, LinearModel** res_model) {
+    
+    if (!res_model || *res_model != NULL) return ERR_INVALID_PTR;
+
+    if (!dataset_inputs_with_bias || !dataset_inputs_with_bias->data ||
+        !dataset_expected_outputs || !dataset_expected_outputs->data
+    ) return ERR_INVALID_PTR;
+    
+    if (dataset_inputs_with_bias->rows == 0 || dataset_inputs_with_bias->columns == 0 ||
+        dataset_expected_outputs->rows == 0 || dataset_expected_outputs->columns == 0
+    ) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status = RES_EXIT_SUCCESS;
+
+    Matrix* pseudo_inverse = NULL;
+    status = pseudo_inverse_2d_matrix(dataset_inputs_with_bias, &pseudo_inverse);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    LinearModel* weights = NULL;
+    status = create_linear_model(pseudo_inverse->rows - 1, &weights);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&pseudo_inverse);
+        return status;
+    }
+
+    Matrix* W = NULL;
+    status = allocate_2d_matrix_float32_without_data(weights->length, 1, &W);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&pseudo_inverse);
+        free_linear_model(&weights);
+        return status;
+    }
+    W->data = weights->weights;
+
+    // X+ * Y = W
+    // (n, m) * (m, 1) = (n, 1)
+    status = multiply_2d_matrix(pseudo_inverse, dataset_expected_outputs, &W);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&pseudo_inverse);
+        free_linear_model(&weights);
+        return status;
+    }
+
+    *res_model = weights;
+    
+    free_matrix(&pseudo_inverse);
+    free_matrix(&W);
+
+    return status;
+}
+
+
+/*
+    Prend en entrée list de float32 et appel `get_linear_regression_weights`
+*/
+unsigned char get_linear_regression_weights_from_list(float* dataset_inputs_without_bias, float* dataset_expected_outputs, uint32_t row, uint32_t col, LinearModel** res_model) {
+    if (!res_model || *res_model != NULL) return ERR_INVALID_PTR;
+    if (!dataset_inputs_without_bias || !dataset_expected_outputs) return ERR_INVALID_PTR;
+    if (row == 0 || col == 0) return ERR_INVALID_MATRIX_DIMENSIONS;
+
+    unsigned char status = RES_EXIT_SUCCESS;
+
+    Matrix* X = NULL;
+    status = allocate_2d_matrix_float32(row, col + 1, &X); // +1 pour la colonne du biais
+    if (status != RES_EXIT_SUCCESS) return status;
+    
+    status = fill_from_list_2d_matrix(dataset_inputs_without_bias, true, &X); // bias = true
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&X);
+        return status;
+    }
+
+    Matrix* Y = NULL;
+    status = allocate_2d_matrix_float32_without_data(row, 1, &Y);
+    if (status != RES_EXIT_SUCCESS) {
+        free_matrix(&X);
+        return status;
+    }
+    Y->data = dataset_expected_outputs;
+
+    status = get_linear_regression_weights(X, Y, res_model);
+
+    free_matrix(&X);
+    free_matrix(&Y);
+
+    return status;
 }

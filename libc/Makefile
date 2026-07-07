@@ -8,6 +8,11 @@ OBJ_DIR  := $(OUT_DIR)/objects
 SPEC_DIR := specs
 
 
+# ===== Flags =====
+CFLAGS := -I$(INC_DIR) -Wall -Wextra -O3 -std=c17 -pedantic
+LDLIBS := -lopenblas
+
+
 # ===== Détection Python =====
 PYTHON := $(shell which python3 2>/dev/null || which python 2>/dev/null || which py 2>/dev/null || echo "")
 ifeq ($(PYTHON),)
@@ -32,6 +37,7 @@ else
     else
         EXT  := so
         FLAG := -shared -fPIC
+		LDLIBS += -llapacke
     endif
 endif
 
@@ -41,9 +47,6 @@ C_FILES   := $(wildcard $(SRC_DIR)/*.c)
 H_FILES   := $(wildcard $(INC_DIR)/*.h)
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 TARGET    := $(OUT_DIR)/$(LIB_NAME).$(EXT)
-
-# ===== Flags =====
-CFLAGS := -I$(INC_DIR) -Wall -Wextra -O2 -std=c17 -pedantic
 
 
 # ===== Règle par défaut =====
@@ -58,7 +61,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(H_FILES)
 # Linkage final : on rassemble tous les .o pour créer la DLL
 $(TARGET): $(OBJ_FILES)
 	@echo "  LINK    $@"
-	@$(CC) $(FLAG) -o $@ $^
+	@$(CC) $(FLAG) -o $@ $^ $(LDLIBS)
 
 
 # ===== Génération des JSON specs =====
@@ -76,6 +79,8 @@ endif
 # ===== Utils =====
 clean:
 	@rm -rf $(OUT_DIR) && rm -rf $(SPEC_DIR)/*.json
+	@mkdir -p $(OUT_DIR)
+	@touch $(OUT_DIR)/.gitkeep
 
 info:
 	@echo "================================"

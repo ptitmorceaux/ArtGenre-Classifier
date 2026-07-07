@@ -1,6 +1,11 @@
 numpy
 matplotlib
-selenium
-webdriver-manager
-requests
-undetected-chromedriver
+django
+django-cors-headers
+djangorestframework
+datafilter
+pillow
+pandas
+ipykernel
+scikit-learn
+
