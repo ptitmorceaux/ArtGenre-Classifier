@@ -256,7 +256,7 @@ def train_models(df_X, df_Y):
     models_per_category = dict()
     
     # Préparation de TensorBoard
-    current_time = datetime.datetime.now().strftime("Train_%d/%m-%H:%M")
+    current_time = datetime.datetime.now().strftime("Train_%d/%m-%H_%M")
     log_dir = os.path.join("logs", "Linear_Classification",current_time)
     summary_writer = tf.summary.create_file_writer(log_dir)
     print(f"\n[*] TensorBoard Logs directory: {log_dir}")
