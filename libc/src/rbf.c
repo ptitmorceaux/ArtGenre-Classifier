@@ -317,7 +317,9 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
         dataset_expected_outputs,
         dataset_size,
         alpha,
-        epochs
+        epochs,
+        NULL,
+        NULL
     );
 
     free(transformed_inputs);

@@ -26,7 +26,7 @@
     +-----------------------------------------------------------------------+
 */
 
-const char* get_current_datetime_string();
+// const char* get_current_datetime_string();
 unsigned char init_filename(ModelType model_type, NormalizationMethod normalization_method, char** res_filename);
 unsigned char get_format_filepath(const char* output_folder_path, const char* _filename, ModelType model_type, NormalizationMethod normalization_method, char** filepath);
 
