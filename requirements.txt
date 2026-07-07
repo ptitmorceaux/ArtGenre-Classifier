@@ -10,3 +10,5 @@ ipykernel
 scikit-learn
 tensorflow
 tensorboard
+ruff
+pytest

@@ -1,5 +1,5 @@
 import os
-import json
+# import json
 
 
 CONFIG = {
@@ -60,27 +60,26 @@ CATEGORIES = {
 }
 
 
-def load_config_from_json(filepath: str = "conf/config.json"):
-    """
-    Charge la configuration depuis un fichier JSON.
-    """
-    # TODO: A finir
-    config_path = os.path.join(filepath)
-    if not os.path.exists(config_path):
-        raise FileNotFoundError(f"Le fichier de configuration '{config_path}' est introuvable.")
-    with open(config_path, "r") as f:
-        loaded_config = json.load(f)
-        CONFIG.update(loaded_config)
-    return CONFIG
+# def load_config_from_json(filepath: str = "conf/config.json"):
+#     """
+#     Charge la configuration depuis un fichier JSON.
+#     """
+#     # TODO: A finir
+#     config_path = os.path.join(filepath)
+#     if not os.path.exists(config_path):
+#         raise FileNotFoundError(f"Le fichier de configuration '{config_path}' est introuvable.")
+#     with open(config_path, "r") as f:
+#         loaded_config = json.load(f)
+#         CONFIG.update(loaded_config)
 
-def load_categories_from_json(filepath: str = "conf/categories.json"):
-    """
-    Charge les catégories depuis un fichier JSON.
-    """
-    # TODO: A finir
-    categories_path = os.path.join(filepath)
-    if not os.path.exists(categories_path):
-        raise FileNotFoundError(f"Le fichier de catégories '{categories_path}' est introuvable.")
-    with open(categories_path, "r") as f:
-        CATEGORIES = json.load(f)
-    return CATEGORIES
+# def load_categories_from_json(filepath: str = "conf/categories.json"):
+#     """
+#     Charge les catégories depuis un fichier JSON.
+#     """
+#     # TODO: A finir
+#     categories_path = os.path.join(filepath)
+#     if not os.path.exists(categories_path):
+#         raise FileNotFoundError(f"Le fichier de catégories '{categories_path}' est introuvable.")
+#     with open(categories_path, "r") as f:
+#         CATEGORIES = json.load(f)
+    
