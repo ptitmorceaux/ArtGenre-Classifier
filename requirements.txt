@@ -1,6 +1,6 @@
 numpy
 matplotlib
-django
+requests
 django-cors-headers
 djangorestframework
 datafilter
