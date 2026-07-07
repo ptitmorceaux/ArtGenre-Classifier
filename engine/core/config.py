@@ -71,6 +71,7 @@ def load_config_from_json(filepath: str = "conf/config.json"):
     with open(config_path, "r") as f:
         loaded_config = json.load(f)
         CONFIG.update(loaded_config)
+    return CONFIG
 
 def load_categories_from_json(filepath: str = "conf/categories.json"):
     """
@@ -82,3 +83,4 @@ def load_categories_from_json(filepath: str = "conf/categories.json"):
         raise FileNotFoundError(f"Le fichier de catégories '{categories_path}' est introuvable.")
     with open(categories_path, "r") as f:
         CATEGORIES = json.load(f)
+    return CATEGORIES
