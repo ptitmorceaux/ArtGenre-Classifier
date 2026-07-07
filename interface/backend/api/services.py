@@ -1,7 +1,7 @@
 from PIL import Image
 
 from engine.interop.mlp import MLP
-from engine.interop.linearModel import LinearModel
+# from engine.interop.linearModel import LinearModel
 
 class ArtClassifierService:
     @staticmethod

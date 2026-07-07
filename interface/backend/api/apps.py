@@ -21,7 +21,7 @@ class ApiConfig(AppConfig):
             build_folder = os.path.join(settings.PROJECT_ROOT, "libc", "build")
             specs_folder = os.path.join(settings.PROJECT_ROOT, "libc", "specs")
             
-            print(f"[*] Initialisation de l'interopérabilité C via _LibLoader...")
+            print("[*] Initialisation de l'interopérabilité C via _LibLoader...")
             print(f"    - Nom de la lib : {lib_name}")
             print(f"    - Dossier Build : {build_folder}")
             print(f"    - Dossier Specs : {specs_folder}")
