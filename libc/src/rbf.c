@@ -54,7 +54,7 @@ unsigned char rbf_kmeans(float* points, uint32_t num_points, uint32_t input_dim,
     if (!assignments || !cluster_sizes) {
         free(assignments);
         free(cluster_sizes);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
 
     // Initialisation naïve : on place les centres sur les k premiers points
@@ -152,7 +152,7 @@ unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, 
     if (!res_model) return ERR_INVALID_PTR;
 
     RBF* model = (RBF*) malloc(sizeof(RBF));
-    if (!model) return ERR_ALLOCATION_FAILED;
+    if (!model) return ERR_MEMORY_ALLOCATION;
 
     model->input_dim = input_dim;
     model->num_centers = num_centers;
@@ -162,7 +162,7 @@ unsigned char create_rbf(uint32_t input_dim, uint32_t num_centers, float gamma, 
     model->centers = (float*) calloc(num_centers * input_dim, sizeof(float));
     if (!model->centers) {
         free(model);
-        return ERR_ALLOCATION_FAILED;
+        return ERR_MEMORY_ALLOCATION;
     }
 
     // Création de la couche de sortie : un modèle linéaire dont l'entrée est de taille `num_centers`
@@ -223,7 +223,7 @@ unsigned char predict_rbf(RBF* model, float* input, int32_t* outputs) {
 
     // Tableau pour stocker l'activation de chaque centre (de taille `num_centers`)
     float* hidden_activations = (float*) malloc(model->num_centers * sizeof(float));
-    if (!hidden_activations) return ERR_ALLOCATION_FAILED;
+    if (!hidden_activations) return ERR_MEMORY_ALLOCATION;
 
     // Étape 1 : Calcul des activations gaussiennes
     for (uint32_t i = 0; i < model->num_centers; i++) {
@@ -293,7 +293,7 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
     // b. Transformation de l'espace (Matrice Phi)
     //    On transforme la matrice [dataset_size * input_dim] en [dataset_size * num_centers]
     float* transformed_inputs = (float*) malloc(dataset_size * model->num_centers * sizeof(float));
-    if (!transformed_inputs) return ERR_ALLOCATION_FAILED;
+    if (!transformed_inputs) return ERR_MEMORY_ALLOCATION;
 
     for (uint32_t i = 0; i < dataset_size; i++) {
         for (uint32_t j = 0; j < model->num_centers; j++) {
