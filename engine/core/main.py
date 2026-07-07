@@ -46,7 +46,7 @@ def main():
     # 4. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
     print("\n# Etape 4 : Sauvegarde des modèles entraînés...")
-    save_trained_models(models_per_category, scaler, CONFIG["output"]["models_folder"])
+    save_trained_models(models_per_category, scaler, CONFIG["output"]["models"])
 
     # 5. Évaluation et Visualisation
     print("\n# Etape 5 : Évaluation et Visualisation...")
