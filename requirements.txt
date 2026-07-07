@@ -8,3 +8,5 @@ pillow
 pandas
 ipykernel
 scikit-learn
+tensorflow
+tensorboard
