@@ -24,32 +24,37 @@ def select_seed():
 
 
 def main():
+
+    # INFO
+    print(f"\n# INFO :")
+    print(f"[*] Start TensorBoard with: tensorboard --logdir={CONFIG['output']} --port=6007")
+
     # 0. Gestion de l'aléa
     select_seed()
-    print(f"\n# Etape 0 : Seed sélectionnée : {CONFIG['lib']['seed']}")
+    print(f"\n# Etape 1 : Seed sélectionnée : {CONFIG['lib']['seed']}")
 
     # 1. Compilation et chargement de l'interopérabilité
-    print("\n# Etape 1 : Compilation et chargement de l'interopérabilité...")
+    print("\n# Etape 2 : Compilation et chargement de l'interopérabilité...")
     compile_c_library()
     load_c_library()
 
     # 2. Préparation des données
-    print("\n# Etape 2 : Préparation des données...")
+    print("\n# Etape 3 : Préparation des données...")
     df_X_filepaths, df_Y = load_and_prepare_csv()
     df_X = load_images_from_filepaths(df_X_filepaths)
     df_X, scaler = standardize_data(df_X)
 
     # 3. Entraînement
-    print("\n# Etape 3 : Entraînement des modèles...")
+    print("\n# Etape 4 : Entraînement des modèles...")
     models_per_category = train_models(df_X, df_Y)
 
     # 4. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
-    print("\n# Etape 4 : Sauvegarde des modèles entraînés...")
+    print("\n# Etape 5 : Sauvegarde des modèles entraînés...")
     save_trained_models(models_per_category, scaler, CONFIG["output"]["models"])
 
     # 5. Évaluation et Visualisation
-    print("\n# Etape 5 : Évaluation et Visualisation...")
+    print("\n# Etape 6 : Évaluation et Visualisation...")
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X)
 
