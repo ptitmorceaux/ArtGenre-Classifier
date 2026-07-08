@@ -26,7 +26,7 @@ def select_seed():
 def main():
     # 0. Gestion de l'aléa
     select_seed()
-    print(f"Seed sélectionnée : {CONFIG['lib']['seed']}")
+    print(f"\n# Etape 0 : Seed sélectionnée : {CONFIG['lib']['seed']}")
 
     # 1. Compilation et chargement de l'interopérabilité
     print("\n# Etape 1 : Compilation et chargement de l'interopérabilité...")

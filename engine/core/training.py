@@ -1,5 +1,3 @@
-import os
-import datetime
 import tensorflow as tf
 
 from engine.core.config import CONFIG, CATEGORIES
@@ -18,10 +16,9 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
     """Entraîne un LinearModel par catégorie (One-vs-All)."""
     models_per_category = dict()
 
-    current_time = datetime.datetime.now().strftime("Train_%d/%m-%H_%M")
-    log_dir = os.path.join(CONFIG["output"]["logs"], "Linear_Classification", current_time)
-    summary_writer = tf.summary.create_file_writer(log_dir)
-    print(f"\n[*] TensorBoard Logs directory: {log_dir}")
+    summary_writer = tf.summary.create_file_writer(CONFIG["output"]["logs"])
+    print(f"\n[*] TensorBoard Logs directory: {CONFIG['output']['logs']}\n")
+    print(f"[*] Start TensorBoard with: tensorboard --logdir={CONFIG['output']['logs']} --port=6007")
 
     for category in CATEGORIES:
         print(f"> Training LinearModel for category: {category}")
