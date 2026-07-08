@@ -8,7 +8,7 @@ import random
 def select_seed(seeds_choice: list[int], seed: int | None) -> int:
     if seed is None:
         if seeds_choice is None:
-            raise ValueError("select_seed(): 'seeds_choice' doit être défini si 'seed' est None.")
+            return random.randint(-(2**1024), 2**1024)
         seed = random.choice(seeds_choice)
     if not isinstance(seed, int):
         raise ValueError("select_seed(): 'seed' doit être un entier ou None.")
@@ -66,9 +66,9 @@ def get_config_documentation() -> dict:
                 "default": r"C:\msys64\mingw64\bin",
             },
             "seeds_choice": {
-                "docs": "Liste des graines pour le choix aléatoire.",
-                "type": (list,),
-                "default": [42, 1337, 2024, 1234, 5678],
+                "docs": "Liste des graines pour le choix aléatoire. Si 'seed' et 'seeds_choice' sont None, une graine est choisie aléatoirement dans l'intervalle [-2**1024, 2**1024].",
+                "type": (list,type(None)),
+                "default": None,
             },
             "seed": {
                 "docs": "Graine pour l'initialisation aléatoire. Si None, une graine est choisie aléatoirement parmi seeds_choice.",
@@ -159,6 +159,7 @@ def get_config_documentation() -> dict:
             "unknown_category": {
                 "docs": "Définit la catégorie par défaut pour les données inconnues. Si None, on predit la catégorie la plus probable.",
                 "type": (str, type(None)),
+                "default": None,
             },
         },
     }
