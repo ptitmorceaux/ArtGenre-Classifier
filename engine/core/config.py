@@ -4,7 +4,7 @@ import os
 
 CONFIG = {
     "lib": {
-        "compile": False,
+        "compile": True,
         "lib_name": "libc",
         "lib_folder": os.path.join("libc"),
         "build_folder": os.path.join("libc", "build"),
@@ -16,7 +16,7 @@ CONFIG = {
     "dataset": {
         "csv_path": os.path.join("dataset"),
         "data_folder_path": os.path.join("dataset", "64x64"),
-        "limit_per_category": 1000,
+        "limit_per_category": 5000,
         "train_test_split_ratio": 0.7,
         # "standard"     -> une seule moyenne/écart-type sur tous les pixels
         # "per_column" -> une moyenne/écart-type par canal (r, g, b)
@@ -31,8 +31,8 @@ CONFIG = {
         # "linear" -> LinearModel (One-vs-All)
         # "mlp"    -> MLP (One-vs-All)
         "type": "linear",
-        "alpha": 0.00001,
-        "epochs": 300,
+        "alpha": 0.001,
+        "epochs": 50,
         # Utilisé seulement si type == "mlp" : couches cachées, sans compter
         # l'entrée (W_length, déduite du dataset) ni la sortie (toujours 1, one-vs-all)
         # couche d'entrée et couche de sortie deja définies par le dataset et le type de modèle
