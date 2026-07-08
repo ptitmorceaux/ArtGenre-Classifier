@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from engine.core.config import CONFIG, CATEGORIES
+from engine.core.config import CONFIG
 
 def _predict_scalar(model, x) -> float:
     """
@@ -22,7 +22,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
 
-    for category in CATEGORIES:
+    for category in CONFIG["dataset"]["categories"].keys():
         print(f"Evaluating model for category: {category}")
 
         predictions[category] = dict()
@@ -33,10 +33,10 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
-    first_cat = list(CATEGORIES.keys())[0]
+    first_cat = list(CONFIG["dataset"]["categories"].keys())[0]
 
     for i in range(len(predictions[first_cat]["prediction"])):
-        category_predicted = max(CATEGORIES.keys(), key=lambda c: predictions[c]["values"][i])
+        category_predicted = max(CONFIG["dataset"]["categories"].keys(), key=lambda c: predictions[c]["values"][i])
 
         unknown_is_valid = CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != ""
 
@@ -48,7 +48,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     # Détermination de la catégorie attendue
     df_predictions_expected = []
     for i in range(len(df_Y["test"][first_cat])):
-        category_expected = next((c for c in CATEGORIES if df_Y["test"][c][i] == 1), None)
+        category_expected = next((c for c in CONFIG["dataset"]["categories"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
 
     return df_predictions_expected, df_predictions_test
@@ -59,7 +59,7 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     
     fig, ax = plt.subplots(figsize=(10, 5.5))
 
-    labels = list(CATEGORIES.keys())
+    labels = list(CONFIG["dataset"]["categories"].keys())
     if CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != "":
         labels.append(CONFIG["global"]["unknown_category"])
 

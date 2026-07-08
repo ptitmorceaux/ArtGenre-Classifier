@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-from engine.core.config import CONFIG, CATEGORIES
+from engine.core.config import CONFIG
 
 
 def load_and_prepare_csv() -> tuple[dict, dict]:
@@ -18,7 +18,7 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
     CONFIG["dataset"]["count_total_dataset"] = dict()
     CONFIG["dataset"]["count_total_dataset"]["total"] = 0
 
-    for category, paths in CATEGORIES.items():
+    for category, paths in CONFIG["dataset"]["categories"].items():
         df = pd.read_csv(paths["csv_path"])
 
         if df.empty:
@@ -37,7 +37,7 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
         df["filepath"] = df["Nom_Fichier"].apply(lambda x: os.path.join(paths["data_folder_path"], x))
 
         # Ajouter une colonne category (Y) avec Encodage One-vs-All (1 ou -1)
-        for c in CATEGORIES:
+        for c in CONFIG["dataset"]["categories"].keys():
             if c in df.columns:
                 raise ValueError(f"La colonne '{c}' existe déjà dans le DataFrame. Veuillez renommer ou supprimer cette colonne.")
             df[c] = 1 if c == category else -1
@@ -68,7 +68,7 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
     }
 
     df_Y = {"train": {}, "test": {}}
-    for category in CATEGORIES:
+    for category in CONFIG["dataset"]["categories"].keys():
         df_Y["train"][category] = list(df_csv_all_shuffled["train"][category])
         df_Y["test"][category] = list(df_csv_all_shuffled["test"][category])
         df_csv_all_shuffled["train"].drop(columns=[category], inplace=True)

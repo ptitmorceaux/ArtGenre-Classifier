@@ -20,8 +20,8 @@ CONFIG = {
         "data_folder_path": os.path.join("dataset", "64x64"),
         "limit_per_category": 2000,
         "train_test_split_ratio": 0.7,
-        # "standard"     -> une seule moyenne/écart-type sur tous les pixels
-        # "per_column" -> une moyenne/écart-type par canal (r, g, b)
+        # "standard"    -> une seule moyenne/écart-type sur tous les pixels
+        # "per_column"  -> une moyenne/écart-type par canal (r, g, b)
         "normalization_method": "per_column",
     },
     "output": {
@@ -55,7 +55,7 @@ CONFIG["output"]["logs"] = os.path.join(CONFIG["output"]["folder"], CONFIG["mode
 CONFIG["output"]["models"] = os.path.join(CONFIG["output"]["logs"], "models")
 
 # Définition des catégories globales
-CATEGORIES = {
+CONFIG["dataset"]["categories"] = {
     "impressionism": {
         "data_folder_path": os.path.join(CONFIG["dataset"]["data_folder_path"], "impressionism"),
         "csv_path": os.path.join(CONFIG["dataset"]["csv_path"], "impressionism_clean.csv")
@@ -92,5 +92,5 @@ CATEGORIES = {
 #     if not os.path.exists(categories_path):
 #         raise FileNotFoundError(f"Le fichier de catégories '{categories_path}' est introuvable.")
 #     with open(categories_path, "r") as f:
-#         CATEGORIES = json.load(f)
+#         CONFIG["dataset"]["categories"] = json.load(f)
     

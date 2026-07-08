@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from engine.core.config import CONFIG, CATEGORIES
+from engine.core.config import CONFIG
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
 
@@ -20,7 +20,7 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
     print(f"\n[*] TensorBoard Logs directory: {CONFIG['output']['logs']}")
     print(f"[*] Models (bin) directory: {CONFIG['output']['models']}\n")
 
-    for category in CATEGORIES:
+    for category in CONFIG["dataset"]["categories"].keys():
         print(f"> Training LinearModel for category: {category}")
         models_per_category[category] = LinearModel.init_random(input_dim=CONFIG["dataset"]["W_length"])
         loss_history, acc_history = models_per_category[category].train(
@@ -48,7 +48,7 @@ def train_mlp_models(df_X: dict, df_Y: dict) -> dict[str, MLP]:
     models_per_category = dict()
     npl = _build_mlp_npl()
 
-    for category in CATEGORIES:
+    for category in CONFIG["dataset"]["categories"].keys():
         print(f"> Training MLP {npl} for category: {category}")
         models_per_category[category] = MLP(npl)
         models_per_category[category].train(

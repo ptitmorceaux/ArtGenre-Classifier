@@ -45,7 +45,7 @@ def main():
     df_X, scaler = standardize_data(df_X)
 
     # 4. Entraînement
-    print("\n# Etape 4 : Entraînement des modèles...")
+    print("\n# Etape 4 : Entraînement des modèles et enregistrement des logs pour tensorboard...")
     models_per_category = train_models(df_X, df_Y)
 
     # 5. Sauvegarde de la configuration en json
@@ -55,7 +55,7 @@ def main():
     # 6. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
     print("\n# Etape 6 : Sauvegarde des modèles entraînés...")
-    save_trained_models(models_per_category, scaler, CONFIG["output"]["models"], CONFIG["model"]["type"])
+    save_trained_models(models_per_category, scaler, CONFIG["output"]["logs"], CONFIG["model"]["type"])
 
     # 7. Évaluation et Visualisation
     print("\n# Etape 7 : Évaluation et Visualisation...")
