@@ -8,7 +8,7 @@ import random
 def select_seed(seeds_choice: list[int], seed: int | None) -> int:
     if seed is None:
         if seeds_choice is None:
-            return random.randint(-(2**1024), 2**1024)
+            return random.randint(0, 2**32 - 1)
         seed = random.choice(seeds_choice)
     if not isinstance(seed, int):
         raise ValueError("select_seed(): 'seed' doit être un entier ou None.")
@@ -62,7 +62,7 @@ def get_config_documentation() -> dict:
                 "default": r"C:\msys64\mingw64\bin",
             },
             "seeds_choice": {
-                "docs": "Liste des graines pour le choix aléatoire. Si 'seed' et 'seeds_choice' sont None, une graine est choisie aléatoirement dans l'intervalle [-2**1024, 2**1024].",
+                "docs": "Liste des graines pour le choix aléatoire. Si 'seed' et 'seeds_choice' sont None, une graine est choisie aléatoirement dans l'intervalle [0, 2**32 - 1] (uint32).",
                 "type": (list,type(None)),
                 "default": None,
             },
