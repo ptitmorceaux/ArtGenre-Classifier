@@ -29,7 +29,7 @@ def save_trained_models(
             os.remove(filepath)
 
         Storage["save"](model, scaler, output_folder, filename)
-        print(f"> Modèle '{category}' sauvegardé : {filepath}")
+        print(f"[*] Modèle '{category}' sauvegardé : {filepath}")
 
 
 def save_config_json(output_folder: str, config: dict) -> None:
@@ -38,4 +38,5 @@ def save_config_json(output_folder: str, config: dict) -> None:
     filepath = os.path.join(output_folder, "config.json")
     with open(filepath, "w") as f:
         json.dump(config, f, indent=4)
-    print(f"> Configuration sauvegardée : {filepath}")
+    print(f"[*] Configuration sauvegardée : {filepath}")
+    

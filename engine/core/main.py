@@ -50,12 +50,12 @@ def main():
 
     # 5. Sauvegarde de la configuration en json
     print("\n# Etape 5 : Sauvegarde de la configuration...")
-    save_config_json(CONFIG["output"]["models"], CONFIG)
+    save_config_json(CONFIG["output"]["logs"], CONFIG)
 
     # 6. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
     print("\n# Etape 6 : Sauvegarde des modèles entraînés...")
-    save_trained_models(models_per_category, scaler, CONFIG["output"]["logs"], CONFIG["model"]["type"])
+    save_trained_models(models_per_category, scaler, CONFIG["output"]["models"], CONFIG["model"]["type"])
 
     # 7. Évaluation et Visualisation
     print("\n# Etape 7 : Évaluation et Visualisation...")
