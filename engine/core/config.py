@@ -29,10 +29,6 @@ def get_config_documentation() -> dict:
     """
     default_dataset_data_folder_path = os.path.join("dataset", "64x64")
     default_dataset_data_csv_path = os.path.join("dataset")
-
-    date = get_date_time_now()
-    default_output_folder = os.path.join("engine", "core", "output")
-    default_output_logs = os.path.join(default_output_folder, date[0], date[1])
     return {
         "lib": {
             "compile": {
@@ -123,17 +119,7 @@ def get_config_documentation() -> dict:
             "folder": {
                 "docs": "Chemin vers le dossier de sortie.",
                 "type": (str,),
-                "default": default_output_folder,
-            },
-            "logs": {
-                "docs": "Chemin vers le dossier de logs.",
-                "type": (str,),
-                "default": default_output_logs,
-            },
-            "models": {
-                "docs": "Chemin vers le dossier des modèles entraînés.",
-                "type": (str,),
-                "default": os.path.join(default_output_logs, "models"),
+                "default": os.path.join("engine", "core", "output"),
             },
         },
         "model": {
@@ -199,6 +185,11 @@ def init_config(config: dict) -> dict:
 
             if section == "lib" and key == "seed":
                 config[section][key] = select_seed(config[section]["seeds_choice"], value)
+    
+    date, time = get_date_time_now()
+    config["output"]["logs"] = os.path.join(config["output"]["folder"], config["model"]["type"], date, time)
+    config["output"]["models"] = os.path.join(config["output"]["logs"], "models", date, time)
+    
     return config
 
 
