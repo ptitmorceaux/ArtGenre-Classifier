@@ -1,5 +1,6 @@
 import os
 import datetime
+from zoneinfo import ZoneInfo
 # import json
 
 
@@ -46,7 +47,11 @@ CONFIG = {
     }
 }
 
-CONFIG["output"]["logs"] = os.path.join(CONFIG["output"]["folder"], CONFIG["model"]["type"], datetime.datetime.now().strftime("Train_%d/%m-%H_%M"))
+# yyyy-mm-dd / hh-mm-ss-ms(5lastdigits) : pour différencier les runs d'entraînement dans le dossier de sortie
+datetime_now = datetime.datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d/%H-%M-%S_%f")
+datetime_now = datetime_now.split("/")
+
+CONFIG["output"]["logs"] = os.path.join(CONFIG["output"]["folder"], CONFIG["model"]["type"], datetime_now[0], datetime_now[1])
 CONFIG["output"]["models"] = os.path.join(CONFIG["output"]["logs"], "models")
 
 # Définition des catégories globales
