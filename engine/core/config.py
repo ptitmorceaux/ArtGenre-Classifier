@@ -16,7 +16,7 @@ CONFIG = {
     "dataset": {
         "csv_path": os.path.join("dataset"),
         "data_folder_path": os.path.join("dataset", "64x64"),
-        "limit_per_category": 5000,
+        "limit_per_category": 1000,
         "train_test_split_ratio": 0.7,
         # "standard"     -> une seule moyenne/écart-type sur tous les pixels
         # "per_column" -> une moyenne/écart-type par canal (r, g, b)
@@ -26,6 +26,7 @@ CONFIG = {
         "outdir": os.path.join("engine", "core", "output"),
         "logs": os.path.join("engine", "core", "output", "logs"),
         "models": os.path.join("engine", "core", "output", "trained_models"),
+        "metrics": os.path.join("engine", "core", "output", "metrics"),
     },
     "model": {
         # "linear" -> LinearModel (One-vs-All)

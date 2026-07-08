@@ -1,19 +1,22 @@
 from PIL import Image
 
 import os
-import glob
 import io
+import glob
 import base64
 
+import json
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import numpy as np
-matplotlib.use('Agg')
 
+from .models import TrainingSession
 from engine.interop.storage import Storage
 from engine.core.config import CONFIG, CATEGORIES
 
+matplotlib.use('Agg')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 
 class ArtClassifierService:
     @staticmethod
@@ -95,3 +98,36 @@ class ArtClassifierService:
             'chart_base64': chart_base64,
             'input_size': input_size
         }
+    
+
+class ModelSyncService:
+    @staticmethod
+    def sync_models_to_db():
+        """Scanne le dossier metrics et peuple la base de données Django."""
+        metrics_dir = os.path.join(BASE_DIR, CONFIG["output"]["metrics"])
+        
+        # On cherche tous les fichiers metadata générés par le moteur C/Python
+        metadata_files = glob.glob(os.path.join(metrics_dir, "metadata__*.json"))
+        
+        synced_count = 0
+        for filepath in metadata_files:
+            with open(filepath, 'r') as f:
+                data = json.load(f)
+                
+            # get_or_create permet d'éviter les doublons si on relance la fonction
+            session, created = TrainingSession.objects.get_or_create(
+                session_id=data['session_id'],
+                defaults={
+                    'model_type': data['model_type'],
+                    'epochs': data['hyperparameters'].get('epochs', 0),
+                    'learning_rate': data['hyperparameters'].get('alpha', 0.0),
+                    'accuracy': data['metrics'].get('accuracy'),
+                    'final_loss': data['metrics'].get('loss'),
+                    'loss_curve_filename': data['artifacts'].get('loss_curve'),
+                    'confusion_matrix_filename': data['artifacts'].get('confusion_matrix'),
+                }
+            )
+            if created:
+                synced_count += 1
+                
+        return synced_count

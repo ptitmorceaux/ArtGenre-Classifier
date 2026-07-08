@@ -1,59 +1,66 @@
-from rest_framework.decorators import api_view, parser_classes
-from rest_framework.parsers import MultiPartParser, FormParser
+import os
+import json
+import glob
+import base64
+
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from PIL import Image
+from .models import TrainingSession
+from engine.core.config import CONFIG
 
-from .services import ArtClassifierService 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-MAX_IMAGE_SIZE = 5 * 1024 * 1024 
-
-@api_view(['GET', 'POST'])
-@parser_classes([MultiPartParser, FormParser])
-def predict_view(request):
-    """Predict the output based on the input image data."""
-
-
-    if request.method == 'GET':
-        return Response({
-            "status": "Ready",
-            "message": "Interface de l'API de Classification. L'API est prête à recevoir une requête POST avec une 'image' et le paramètre 'model'."
-        })
-    try:
-        image_file = request.FILES.get('image')
-        model_type = request.data.get('model')
-
-        if not image_file:
-            return Response({"status": "error", "message": "Aucune image fournie."}, status=400)
-            
-        if not model_type:
-            return Response({"status": "error", "message": "Aucun modèle sélectionné."}, status=400)
-
-        if image_file.size > MAX_IMAGE_SIZE:
-            return Response({"status": "error", "message": f"Taille maximum : {MAX_IMAGE_SIZE / (1024*1024)} Mo."}, status=400)
-
-        try:
-            with Image.open(image_file) as img:
-                img.verify()
-        except Exception:
-            return Response({"status": "error", "message": "Fichier corrompu ou fausse image."}, status=400)
-
-        model_type = str(model_type).strip().lower()
-        if model_type not in ["mlp", "linear"]:
-            return Response({"status": "error", "message": "Modèle non supporté ('mlp' ou 'linear')."}, status=400)
-
-        prediction_result = ArtClassifierService.predict(model_type, image_file)
-
-        if 'error' in prediction_result:
-            return Response({"status": "error", "message": prediction_result['error']}, status=400)
-
-        return Response({
-            "status": "success",
-            "data": prediction_result
-        })
-
-    except Exception as e:
-        return Response({
-            "status": "error",
-            "message": f"Erreur interne du serveur: {str(e)}"
-        }, status=500)
+@api_view(['GET'])
+def get_trained_models(request):
+    """Synchronise la BDD avec les JSON, puis renvoie la liste triée."""
+    metrics_base_dir = os.path.join(BASE_DIR, CONFIG["output"]["outdir"], "metrics")
     
+    # SYNCHRONISATION
+    if os.path.exists(metrics_base_dir):
+        for session_folder in os.listdir(metrics_base_dir):
+            json_path = os.path.join(metrics_base_dir, session_folder, "metadata.json")
+            if os.path.isfile(json_path):
+                with open(json_path, 'r') as f:
+                    data = json.load(f)
+                    TrainingSession.objects.get_or_create(
+                        session_id=data['session_id'],
+                        defaults={
+                            'model_type': data['model_type'],
+                            'epochs': data['hyperparameters'].get('epochs', 0),
+                            'learning_rate': data['hyperparameters'].get('alpha', 0.0),
+                            'accuracy': data['metrics'].get('accuracy', 0)
+                        }
+                    )
+
+    # RENVOIE LA LISTE TRIÉE PAR ACCURACY
+    models = TrainingSession.objects.all().order_by('-accuracy')
+    results = []
+    for m in models:
+        acc_pct = f"{m.accuracy * 100:.1f}%" if m.accuracy else "N/A"
+        results.append({
+            "id": m.session_id,
+            "type": m.model_type,
+            "label": f"{m.model_type.upper()} | Acc: {acc_pct} | {m.session_id}"
+        })
+        
+    return Response({"status": "success", "models": results})
+
+@api_view(['GET'])
+def get_model_metrics(request, session_id):
+    """Renvoie les 3 images (Loss, Accuracy, Matrice) en Base64 pour le frontend."""
+    metrics_dir = os.path.join(BASE_DIR, CONFIG["output"]["outdir"], "metrics", session_id)
+    
+    def image_to_base64(filename):
+        path = os.path.join(metrics_dir, filename)
+        if os.path.exists(path):
+            with open(path, "rb") as image_file:
+                return base64.b64encode(image_file.read()).decode('utf-8')
+        return None
+
+    return Response({
+        "status": "success",
+        "session_id": session_id,
+        "loss_curve": image_to_base64("loss_curve.png"),
+        "accuracy_curve": image_to_base64("accuracy_curve.png"),
+        "confusion_matrix": image_to_base64("confusion_matrix.png")
+    })
