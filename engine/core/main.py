@@ -53,7 +53,7 @@ def main():
     # 7. Évaluation et Visualisation
     print("\n# Etape 7 : Évaluation et Visualisation...")
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
-    plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X)
+    plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
 
 
 if __name__ == "__main__":

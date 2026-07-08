@@ -54,7 +54,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     return df_predictions_expected, df_predictions_test
 
 
-def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict) -> None:
+def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict, show: bool = True) -> None:
     """Génère et affiche la matrice de confusion."""
     
     fig, ax = plt.subplots(figsize=(10, 5.5))
@@ -86,7 +86,12 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     )
 
     plt.subplots_adjust(top=0.82, bottom=0.12)
-    plt.show()
+
+    plt.savefig(cf.CONFIG["output"]["logs"] + "/confusion_matrix_test.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['logs']}/confusion_matrix_test.png")
+    if show:
+        plt.show()
 
 if __name__ == "__main__":
 
