@@ -96,7 +96,15 @@ const submitPrediction = async () => {
         <p><strong>Catégorie prédite :</strong> <span class="winner-text">{{ result.best_category }}</span></p>
       </div>
 
-      <p><strong>Scores par catégorie (One-vs-All) :</strong></p>
+      <div v-if="result.chart_base64" class="chart-container">
+        <h4>Cheminement des scores (Logique interne) :</h4>
+        <img :src="'data:image/png;base64,' + result.chart_base64" alt="Graphique d'analyse Matplotlib" />
+        <p class="help-text">
+          <em>Ce graphique montre la valeur de sortie de chaque sous-modèle avant l'application du seuil de classification. Plus la barre est haute, plus le modèle "reconnaît" cette catégorie.</em>
+        </p>
+      </div>
+
+      <p><strong>Scores précis par catégorie :</strong></p>
       <ul class="score-list">
         <li v-for="(score, category) in result.raw_prediction" :key="category">
           <span class="cat-name">{{ category }}</span> : 
@@ -244,5 +252,25 @@ select {
 
 .cat-score {
   font-family: monospace;
+}
+
+.chart-container {
+  margin: 1.5rem 0;
+  text-align: center;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.chart-container img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.help-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 10px;
 }
 </style>
