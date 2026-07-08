@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from engine.core.config import CONFIG, CATEGORIES
+import engine.core.config as cf
 
 def _predict_scalar(model, x) -> float:
     """
@@ -22,7 +22,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
 
-    for category in CATEGORIES:
+    for category in cf.CONFIG["dataset"]["categories"].keys():
         print(f"Evaluating model for category: {category}")
 
         predictions[category] = dict()
@@ -33,35 +33,35 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
-    first_cat = list(CATEGORIES.keys())[0]
+    first_cat = list(cf.CONFIG["dataset"]["categories"].keys())[0]
 
     for i in range(len(predictions[first_cat]["prediction"])):
-        category_predicted = max(CATEGORIES.keys(), key=lambda c: predictions[c]["values"][i])
+        category_predicted = max(cf.CONFIG["dataset"]["categories"].keys(), key=lambda c: predictions[c]["values"][i])
 
-        unknown_is_valid = CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != ""
+        unknown_is_valid = cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != ""
 
         if unknown_is_valid and not predictions[category_predicted]["prediction"][i]:
-            df_predictions_test.append(CONFIG["global"]["unknown_category"])
+            df_predictions_test.append(cf.CONFIG["global"]["unknown_category"])
         else:
             df_predictions_test.append(category_predicted)
 
     # Détermination de la catégorie attendue
     df_predictions_expected = []
     for i in range(len(df_Y["test"][first_cat])):
-        category_expected = next((c for c in CATEGORIES if df_Y["test"][c][i] == 1), None)
+        category_expected = next((c for c in cf.CONFIG["dataset"]["categories"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
 
     return df_predictions_expected, df_predictions_test
 
 
-def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict) -> None:
+def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict, show: bool = True) -> None:
     """Génère et affiche la matrice de confusion."""
     
     fig, ax = plt.subplots(figsize=(10, 5.5))
 
-    labels = list(CATEGORIES.keys())
-    if CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != "":
-        labels.append(CONFIG["global"]["unknown_category"])
+    labels = list(cf.CONFIG["dataset"]["categories"].keys())
+    if cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != "":
+        labels.append(cf.CONFIG["global"]["unknown_category"])
 
     ConfusionMatrixDisplay.from_predictions(
         df_predictions_expected,
@@ -73,20 +73,25 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     )
 
     length_X_test = len(df_X["test"])
-    length_X_train = CONFIG["dataset"]["count_total_dataset"]["total"] - length_X_test
+    length_X_train = cf.CONFIG["dataset"]["count_total_dataset"]["total"] - length_X_test
 
     plt.title("Confusion Matrix")
 
     plt.suptitle(
-        f"Model: {CONFIG['model']['type']} | Norm: {CONFIG['dataset']['normalization_method']} | Seed: {CONFIG['lib']['seed']}\n"
-        f"Alpha: {CONFIG['model']['alpha']} | Epochs: {CONFIG['model']['epochs']}\n"
+        f"Model: {cf.CONFIG['model']['type']} | Norm: {cf.CONFIG['dataset']['normalization_method']} | Seed: {cf.CONFIG['lib']['seed']}\n"
+        f"Alpha: {cf.CONFIG['model']['alpha']} | Epochs: {cf.CONFIG['model']['epochs']}\n"
         f"Train: {length_X_train}, Test: {length_X_test}",
         fontsize=9,
         y=0.95
     )
 
     plt.subplots_adjust(top=0.82, bottom=0.12)
-    plt.show()
+
+    plt.savefig(cf.CONFIG["output"]["logs"] + "/confusion_matrix_test.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['logs']}/confusion_matrix_test.png")
+    if show:
+        plt.show()
 
 if __name__ == "__main__":
 
@@ -109,5 +114,5 @@ if __name__ == "__main__":
     }
     sample_df_predictions_expected = ["impressionism", "realism"]
     sample_df_predictions_test = ["impressionism", "realism"]
-    CONFIG["dataset"]["count_total_dataset"] = {"total": 3}
+    cf.CONFIG["dataset"]["count_total_dataset"] = {"total": 3}
     plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)
