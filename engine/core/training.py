@@ -17,7 +17,7 @@ def train_linear_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel]:
     models_per_category = dict()
 
     summary_writer = tf.summary.create_file_writer(CONFIG["output"]["logs"])
-    print(f"\n[*] TensorBoard Logs directory: {CONFIG['output']['logs']}\n")
+    print(f"\n[*] TensorBoard Logs directory: {CONFIG['output']['logs']}")
     print(f"[*] Models (bin) directory: {CONFIG['output']['models']}\n")
 
     for category in CATEGORIES:
