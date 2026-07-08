@@ -1,4 +1,4 @@
-from engine.core.config import CONFIG
+import engine.core.config as cf
 from engine.interop.normalization import (
     StandardScaler,
     StandardPerColumnScaler,
@@ -44,8 +44,8 @@ def standard_column_scaler(df_X: dict) -> tuple[dict, StandardPerColumnScaler]:
 
 
 def standardize_data(df_X: dict) -> tuple[dict, StandardScaler | StandardPerColumnScaler]:
-    """Dispatch vers la méthode de normalisation choisie dans CONFIG."""
-    method = CONFIG["dataset"]["normalization_method"]
+    """Dispatch vers la méthode de normalisation choisie dans cf.CONFIG."""
+    method = cf.CONFIG["dataset"]["normalization_method"]
 
     if method == "standard":
         return standard_scaler(df_X)

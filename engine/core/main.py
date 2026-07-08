@@ -1,11 +1,10 @@
 # ruff: noqa
 import os
 import sys
-import random
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from engine.core.config import CONFIG
+import engine.core.config as cf
 from engine.core.build import compile_c_library, load_c_library
 from engine.core.dataset import load_and_prepare_csv, load_images_from_filepaths
 from engine.core.preprocessing import standardize_data
@@ -14,24 +13,18 @@ from engine.core.persistence import save_trained_models, save_config_json
 from engine.core.evaluation import evaluate_models, plot_confusion_matrix
 
 
-def select_seed():
-    if CONFIG["lib"]["seed"] is None:
-        if CONFIG["lib"]["seeds_choice"] is None:
-            raise ValueError("CONFIG['lib']['seeds_choice'] doit être défini si CONFIG['lib']['seed'] est None.")
-        CONFIG["lib"]["seed"] = random.choice(CONFIG["lib"]["seeds_choice"])
-    if not isinstance(CONFIG["lib"]["seed"], int):
-        raise ValueError("CONFIG['lib']['seed'] doit être un entier ou None.")
-
-
 def main():
+
+    # Chargement de la configuration depuis un fichier JSON si disponible
+    config_json_path = os.path.join("engine", "core", "conf", "config.json")
+    cf.CONFIG = cf.load_config_from_json(config_json_path)
 
     # INFO
     print(f"\n# INFO :")
-    print(f"[*] Start TensorBoard with: tensorboard --logdir={CONFIG['output']['folder']} --port=6007")
+    print(f"[*] Start TensorBoard with: tensorboard --logdir={cf.CONFIG['output']['folder']} --port=6007")
 
     # 1. Gestion de l'aléa
-    select_seed()
-    print(f"\n# Etape 1 : Seed sélectionnée : {CONFIG['lib']['seed']}")
+    print(f"\n# Etape 1 : Seed sélectionnée : {cf.CONFIG['lib']['seed']}")
 
     # 2. Compilation et chargement de l'interopérabilité
     print("\n# Etape 2 : Compilation et chargement de l'interopérabilité...")
@@ -50,12 +43,12 @@ def main():
 
     # 5. Sauvegarde de la configuration en json
     print("\n# Etape 5 : Sauvegarde de la configuration...")
-    save_config_json(CONFIG["output"]["logs"], CONFIG)
+    save_config_json(cf.CONFIG["output"]["logs"], cf.CONFIG)
 
     # 6. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
     print("\n# Etape 6 : Sauvegarde des modèles entraînés...")
-    save_trained_models(models_per_category, scaler, CONFIG["output"]["models"], CONFIG["model"]["type"])
+    save_trained_models(models_per_category, scaler, cf.CONFIG["output"]["models"], cf.CONFIG["model"]["type"])
 
     # 7. Évaluation et Visualisation
     print("\n# Etape 7 : Évaluation et Visualisation...")

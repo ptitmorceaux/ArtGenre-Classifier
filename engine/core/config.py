@@ -2,6 +2,17 @@ import os
 import datetime
 from zoneinfo import ZoneInfo
 import json
+import random
+
+
+def select_seed(seeds_choice: list[int], seed: int | None) -> int:
+    if seed is None:
+        if seeds_choice is None:
+            raise ValueError("select_seed(): 'seeds_choice' doit être défini si 'seed' est None.")
+        seed = random.choice(seeds_choice)
+    if not isinstance(seed, int):
+        raise ValueError("select_seed(): 'seed' doit être un entier ou None.")
+    return seed
 
 
 def get_date_time_now() -> list[str, str]:
@@ -159,9 +170,13 @@ def init_config(config: dict) -> dict:
     """
     docs = get_config_documentation()
     for section, section_docs in docs.items():
+
+        required_section = any("default" not in key_docs for key_docs in section_docs.values())
         
-        if section not in config:
+        if required_section and section not in config:
             raise KeyError(f"init_config(): Section manquante dans la configuration : {section}")
+        elif section not in config:
+            config[section] = {}
         
         for key, key_docs in section_docs.items():
             if key not in config[section]:
@@ -180,6 +195,9 @@ def init_config(config: dict) -> dict:
             if "options" in key_docs and value not in key_docs["options"]:
                 raise ValueError(f"init_config(): Valeur incorrecte pour {section}.{key}. "
                                  f"Attendu: {key_docs['options']}, Obtenu: {value}")
+
+            if section == "lib" and key == "seed":
+                config[section][key] = select_seed(config[section]["seeds_choice"], value)
     return config
 
 
