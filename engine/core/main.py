@@ -27,7 +27,7 @@ def main():
 
     # INFO
     print(f"\n# INFO :")
-    print(f"[*] Start TensorBoard with: tensorboard --logdir={CONFIG['output']} --port=6007")
+    print(f"[*] Start TensorBoard with: tensorboard --logdir={CONFIG['output']['folder']} --port=6007")
 
     # 1. Gestion de l'aléa
     select_seed()
