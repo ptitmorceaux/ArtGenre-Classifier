@@ -1,50 +1,3 @@
-<template>
-  <div class="classifier-container">
-    <h2>Analyse d'Image d'Art</h2>
-    
-    <div class="form-group">
-      <label for="model-select">Modèle à utiliser :</label>
-      <select id="model-select" v-model="selectedModel">
-        <option value="mlp">Perceptron Multi-Couches (PMC)</option>
-        <option value="linear">Modèle Linéaire</option>
-      </select>
-    </div>
-
-    <div class="form-group upload-zone" :class="{ 'has-image': imagePreview }">
-      <label for="image-input" class="file-label">
-        <span v-if="!imagePreview">📁 Cliquez pour choisir une œuvre d'art</span>
-        <img v-else :src="imagePreview" class="preview-img" alt="Aperçu" />
-      </label>
-      <input 
-        type="file" 
-        id="image-input" 
-        accept="image/*" 
-        @change="handleFileChange" 
-        style="display: none;" 
-      />
-    </div>
-
-    <button 
-      @click="submitPrediction" 
-      :disabled="!selectedFile || isLoading"
-      class="btn-predict"
-    >
-      {{ isLoading ? 'Classification en cours...' : 'Lancer la classification' }}
-    </button>
-
-    <div v-if="result" class="result-box success">
-      <h3>Résultat du modèle C :</h3>
-      <p><strong>Modèle :</strong> {{ result.model_used }}</p>
-      <p><strong>Sorties brutes du réseau :</strong></p>
-      <pre>{{ result.raw_prediction }}</pre>
-    </div>
-
-    <div v-if="error" class="result-box error">
-      <strong>Erreur :</strong> {{ error }}
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 
@@ -101,7 +54,65 @@ const submitPrediction = async () => {
 }
 </script>
 
+<template>
+  <div class="classifier-container">
+    <h2>Analyse d'Image d'Art</h2>
+    
+    <div class="form-group">
+      <label for="model-select">Modèle à utiliser :</label>
+      <select id="model-select" v-model="selectedModel">
+        <option value="mlp">Perceptron Multi-Couches (PMC)</option>
+        <option value="linear">Modèle Linéaire</option>
+      </select>
+    </div>
+
+    <div class="form-group upload-zone" :class="{ 'has-image': imagePreview }">
+      <label for="image-input" class="file-label">
+        <span v-if="!imagePreview">📁 Cliquez pour choisir une œuvre d'art</span>
+        <img v-else :src="imagePreview" class="preview-img" alt="Aperçu" />
+      </label>
+      <input 
+        type="file" 
+        id="image-input" 
+        accept="image/*" 
+        @change="handleFileChange" 
+        style="display: none;" 
+      />
+    </div>
+
+    <button 
+      @click="submitPrediction" 
+      :disabled="!selectedFile || isLoading"
+      class="btn-predict"
+    >
+      {{ isLoading ? 'Classification en cours...' : 'Lancer la classification' }}
+    </button>
+
+    <div v-if="result" class="result-box success">
+      <h3>Résultat de l'analyse :</h3>
+      <p><strong>Modèle utilisé :</strong> {{ result.model_used }}</p>
+      
+      <div class="winner-box">
+        <p><strong>Catégorie prédite :</strong> <span class="winner-text">{{ result.best_category }}</span></p>
+      </div>
+
+      <p><strong>Scores par catégorie (One-vs-All) :</strong></p>
+      <ul class="score-list">
+        <li v-for="(score, category) in result.raw_prediction" :key="category">
+          <span class="cat-name">{{ category }}</span> : 
+          <span class="cat-score">{{ typeof score === 'number' ? score.toFixed(4) : score }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div v-if="error" class="result-box error">
+      <strong>Erreur :</strong> {{ error }}
+    </div>
+  </div>
+</template>
+
 <style scoped>
+
 .classifier-container {
   max-width: 500px;
   margin: 0 auto;
@@ -162,10 +173,10 @@ select {
   font-size: 16px;
   font-weight: bold;
   color: white;
-  background-color: #3498db;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  background-color:
+  #3498db; border:
+  none; border-radius:
+  6px; cursor: pointer;
   transition: background 0.2s;
 }
 
@@ -185,7 +196,53 @@ select {
   text-align: left;
 }
 
-.success { background-color: #e8f5e9; border: 1px solid #4caf50; color: #2e7d32; }
-.error { background-color: #ffebee; border: 1px solid #f44336; color: #c62828; }
-pre { background: rgba(0,0,0,0.04); padding: 8px; border-radius: 4px; overflow-x: auto; }
+.success {
+  background-color: #e8f5e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+.error {
+  background-color: #ffebee;
+  border: 1px solid #f44336;
+  color: #c62828;
+}
+
+/* Styles spécifiques au panneau de vainqueur et la liste de scores */
+.winner-box {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-left: 4px solid #4caf50;
+  border-radius: 4px;
+}
+
+.winner-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  color: #2e7d32;
+}
+
+.score-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.score-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #c8e6c9;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cat-name {
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.cat-score {
+  font-family: monospace;
+}
 </style>
