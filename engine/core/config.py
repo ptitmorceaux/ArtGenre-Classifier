@@ -188,7 +188,7 @@ def init_config(config: dict) -> dict:
     
     date, time = get_date_time_now()
     config["output"]["logs"] = os.path.join(config["output"]["folder"], config["model"]["type"], date, time)
-    config["output"]["models"] = os.path.join(config["output"]["logs"], "models", date, time)
+    config["output"]["models"] = os.path.join(config["output"]["logs"], "models")
     
     return config
 
