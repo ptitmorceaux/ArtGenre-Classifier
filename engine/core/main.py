@@ -1,6 +1,7 @@
 # ruff: noqa
 import os
 import sys
+import argparse
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -13,11 +14,25 @@ from engine.core.persistence import save_trained_models, save_config_json
 from engine.core.evaluation import evaluate_models, plot_confusion_matrix
 
 
+def parse_args() -> argparse.Namespace:
+    default_json_path = os.path.join("engine", "core", "conf", "config.json")
+    parser = argparse.ArgumentParser(description="Entraînement d'un classifieur de genre artistique.")
+    parser.add_argument(
+        "-j", "--json",
+        dest="json_path",
+        type=str,
+        default=default_json_path,
+        help=f"Chemin vers le fichier de configuration JSON (défaut: '{default_json_path}')",
+    )
+    return parser.parse_args()
+
+
+
 def main():
+    args = parse_args()
 
     # Chargement de la configuration depuis un fichier JSON si disponible
-    config_json_path = os.path.join("engine", "core", "conf", "config.json")
-    cf.CONFIG = cf.load_config_from_json(config_json_path)
+    cf.CONFIG = cf.load_config_from_json(args.json_path)
 
     # INFO
     print(f"\n# INFO :")
