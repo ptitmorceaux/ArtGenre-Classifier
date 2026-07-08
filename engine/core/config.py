@@ -1,96 +1,201 @@
 import os
 import datetime
 from zoneinfo import ZoneInfo
-# import json
+import json
 
 
-CONFIG = {
-    "lib": {
-        "compile": False,
-        "lib_name": "libc",
-        "lib_folder": os.path.join("libc"),
-        "build_folder": os.path.join("libc", "build"),
-        "specs_folder": os.path.join("libc", "specs"),
-        "dependencies_folder": r"C:\msys64\mingw64\bin",
-        "seeds_choice": [42, 1337, 2024, 1234, 5678],
-        "seed": None, # Si None, une seed aléatoire sera choisie parmi seeds_choice
-    },
-    "dataset": {
-        "csv_path": os.path.join("dataset"),
-        "data_folder_path": os.path.join("dataset", "64x64"),
-        "limit_per_category": 2000,
-        "train_test_split_ratio": 0.7,
-        # "standard"    -> une seule moyenne/écart-type sur tous les pixels
-        # "per_column"  -> une moyenne/écart-type par canal (r, g, b)
-        "normalization_method": "per_column",
-    },
-    "output": {
-        "folder": os.path.join("engine", "core", "output"),
-        "logs": None,
-        "models": None,
-    },
-    "model": {
-        # "linear" -> LinearModel (One-vs-All)
-        # "mlp"    -> MLP (One-vs-All)
-        "type": "linear",
-        "alpha": 0.001,
-        "epochs": 100,
-        # Utilisé seulement si type == "mlp" : couches cachées, sans compter
-        # l'entrée (W_length, déduite du dataset) ni la sortie (toujours 1, one-vs-all)
-        # couche d'entrée et couche de sortie deja définies par le dataset et le type de modèle
-        "mlp_hidden_layers": [64, 32],
-    },
-    "global": {
-        # Si vide ou None, on force la meilleure catégorie parmi celles connues. Sinon, on renvoie "unknown" si aucune catégorie n'est prédite.
-        # Exemple : "unknown" / "autre" ou encore None / "" (vide) pour forcer la meilleure catégorie connue.
-        "unknown_category": None,
+def get_date_time_now() -> list[str, str]:
+    """
+    Renvoie "yyyy-mm-dd" et "hh-mm-ss_ms" : pour différencier les runs dans le dossier de sortie
+    """
+    return datetime.datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d/%H-%M-%S_%f").split("/")
+
+
+def get_config_documentation() -> dict:
+    """
+    Renvoie la documentation de la configuration sous forme de dictionnaire.
+    Chaque section contient des clés avec leurs types, valeurs par défaut et options possibles.
+    """
+    default_dataset_data_folder_path = os.path.join("dataset", "64x64")
+    default_dataset_data_csv_path = os.path.join("dataset")
+
+    date = get_date_time_now()
+    default_output_folder = os.path.join("engine", "core", "output")
+    default_output_logs = os.path.join(default_output_folder, date[0], date[1])
+    return {
+        "lib": {
+            "compile": {
+                "docs": "Si True, compile la bibliothèque C. Si False, charge la bibliothèque C précompilée.",
+                "type": (bool,),
+                "default": True,
+            },
+            "lib_name": {
+                "docs": "Nom de la bibliothèque C (sans l'extension).",
+                "type": (str,),
+                "default": "libc",
+            },
+            "lib_folder": {
+                "docs": "Chemin vers le dossier contenant la bibliothèque C.",
+                "type": (str,),
+                "default": os.path.join("libc"),
+            },
+            "build_folder": {
+                "docs": "Chemin vers le dossier de construction.",
+                "type": (str,),
+                "default": os.path.join("libc", "build"),
+            },
+            "specs_folder": {
+                "docs": "Chemin vers le dossier contenant les spécifications.",
+                "type": (str,),
+                "default": os.path.join("libc", "specs"),
+            },
+            "dependencies_folder": {
+                "docs": "Chemin vers le dossier contenant les dépendances.",
+                "type": (str,),
+                "default": r"C:\msys64\mingw64\bin",
+            },
+            "seeds_choice": {
+                "docs": "Liste des graines pour le choix aléatoire.",
+                "type": (list,),
+                "default": [42, 1337, 2024, 1234, 5678],
+            },
+            "seed": {
+                "docs": "Graine pour l'initialisation aléatoire. Si None, une graine est choisie aléatoirement parmi seeds_choice.",
+                "type": (int, type(None)),
+                "default": None,
+            },
+        },
+        "dataset": {
+            "csv_path": {
+                "docs": "Chemin vers le fichier CSV du dataset.",
+                "type": (str,),
+                "default": default_dataset_data_csv_path,
+            },
+            "data_folder_path": {
+                "docs": "Chemin vers le dossier contenant les images du dataset.",
+                "type": (str,),
+                "default": default_dataset_data_folder_path,
+            },
+            "limit_per_category": {
+                "docs": "Limite de données par catégorie.",
+                "type": (int,),
+            },
+            "train_test_split_ratio": {
+                "docs": "Ratio de séparation entre les ensembles d'entraînement et de test.",
+                "type": (float,),
+            },
+            "normalization_method": {
+                "docs": "Méthode de normalisation des données.",
+                "type": (str,),
+                "options": ["standard", "per_column"],
+            },
+            "categories": {
+                "docs": "Dictionnaire des catégories avec leurs chemins de données et CSV. Ex: {'impressionism': {'data_folder_path': 'path/to/impressionism', 'csv_path': 'path/to/impressionism.csv'}, ...}",
+                "type": (dict,),
+                "default": {
+                    "impressionism": {
+                        "data_folder_path": os.path.join(default_dataset_data_folder_path, "impressionism"),
+                        "csv_path": os.path.join(default_dataset_data_csv_path, "impressionism_clean.csv")
+                    },
+                    "realism": {
+                        "data_folder_path": os.path.join(default_dataset_data_folder_path, "realism"),
+                        "csv_path": os.path.join(default_dataset_data_csv_path, "realism_clean.csv")
+                    },
+                    "romanticism": {
+                        "data_folder_path": os.path.join(default_dataset_data_folder_path, "romanticism"),
+                        "csv_path": os.path.join(default_dataset_data_csv_path, "romanticism_clean.csv")
+                    },
+                },
+            },
+        },
+        "output": {
+            "folder": {
+                "docs": "Chemin vers le dossier de sortie.",
+                "type": (str,),
+                "default": default_output_folder,
+            },
+            "logs": {
+                "docs": "Chemin vers le dossier de logs.",
+                "type": (str,),
+                "default": default_output_logs,
+            },
+            "models": {
+                "docs": "Chemin vers le dossier des modèles entraînés.",
+                "type": (str,),
+                "default": os.path.join(default_output_logs, "models"),
+            },
+        },
+        "model": {
+            "type": {
+                "docs": "Type de modèle à utiliser.",
+                "type": (str,),
+                "options": ["linear", "mlp"],
+            },
+            "alpha": {
+                "docs": "Paramètre de régularisation pour le modèle linéaire.",
+                "type": (float,),
+            },
+            "epochs": {
+                "docs": "Nombre d'itérations pour l'entraînement.",
+                "type": (int,),
+            },
+            "mlp_hidden_layers": {
+                "docs": "Nombre de neurones dans les couches **cachées** du MLP. Utiliser seulement si le type de modèle est 'mlp'.",
+                "type": (list,),
+            },
+        },
+        "global": {
+            "unknown_category": {
+                "docs": "Définit la catégorie par défaut pour les données inconnues. Si None, on predit la catégorie la plus probable.",
+                "type": (str, type(None)),
+            },
+        },
     }
-}
-
-# yyyy-mm-dd / hh-mm-ss-ms(5lastdigits) : pour différencier les runs d'entraînement dans le dossier de sortie
-datetime_now = datetime.datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d/%H-%M-%S_%f")
-datetime_now = datetime_now.split("/")
-
-CONFIG["output"]["logs"] = os.path.join(CONFIG["output"]["folder"], CONFIG["model"]["type"], datetime_now[0], datetime_now[1])
-CONFIG["output"]["models"] = os.path.join(CONFIG["output"]["logs"], "models")
-
-# Définition des catégories globales
-CONFIG["dataset"]["categories"] = {
-    "impressionism": {
-        "data_folder_path": os.path.join(CONFIG["dataset"]["data_folder_path"], "impressionism"),
-        "csv_path": os.path.join(CONFIG["dataset"]["csv_path"], "impressionism_clean.csv")
-    },
-    "realism": {
-        "data_folder_path": os.path.join(CONFIG["dataset"]["data_folder_path"], "realism"),
-        "csv_path": os.path.join(CONFIG["dataset"]["csv_path"], "realism_clean.csv")
-    },
-    "romanticism": {
-        "data_folder_path": os.path.join(CONFIG["dataset"]["data_folder_path"], "romanticism"),
-        "csv_path": os.path.join(CONFIG["dataset"]["csv_path"], "romanticism_clean.csv")
-    }
-}
 
 
-# def load_config_from_json(filepath: str = "conf/config.json"):
-#     """
-#     Charge la configuration depuis un fichier JSON.
-#     """
-#     # TODO: A finir
-#     config_path = os.path.join(filepath)
-#     if not os.path.exists(config_path):
-#         raise FileNotFoundError(f"Le fichier de configuration '{config_path}' est introuvable.")
-#     with open(config_path, "r") as f:
-#         loaded_config = json.load(f)
-#         CONFIG.update(loaded_config)
+def init_config(config: dict) -> dict:
+    """
+    Initialise la configuration en vérifiant les types et les valeurs par défaut.
+    """
+    docs = get_config_documentation()
+    for section, section_docs in docs.items():
+        
+        if section not in config:
+            raise KeyError(f"init_config(): Section manquante dans la configuration : {section}")
+        
+        for key, key_docs in section_docs.items():
+            if key not in config[section]:
+                if "default" in key_docs:
+                    config[section][key] = key_docs["default"]
+                else:
+                    raise KeyError(f"init_config(): Clé manquante dans la configuration : {section}.{key}")
+        
+            value = config[section][key]
+            expected_types = key_docs["type"]
+        
+            if not isinstance(value, expected_types):
+                raise TypeError(f"init_config(): Type incorrect pour {section}.{key}. "
+                                f"Attendu: {expected_types}, Obtenu: {type(value)}")
+        
+            if "options" in key_docs and value not in key_docs["options"]:
+                raise ValueError(f"init_config(): Valeur incorrecte pour {section}.{key}. "
+                                 f"Attendu: {key_docs['options']}, Obtenu: {value}")
+    return config
 
-# def load_categories_from_json(filepath: str = "conf/categories.json"):
-#     """
-#     Charge les catégories depuis un fichier JSON.
-#     """
-#     # TODO: A finir
-#     categories_path = os.path.join(filepath)
-#     if not os.path.exists(categories_path):
-#         raise FileNotFoundError(f"Le fichier de catégories '{categories_path}' est introuvable.")
-#     with open(categories_path, "r") as f:
-#         CONFIG["dataset"]["categories"] = json.load(f)
+
+def load_config_from_json(filepath: str) -> dict:
+    """
+    Charge la configuration depuis un fichier JSON.
+    """
+    config_path = os.path.join(filepath)
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Le fichier de configuration '{config_path}' est introuvable.")
+
+    with open(config_path, "r") as f:
+        loaded_config = json.load(f)
     
+    return init_config(loaded_config)
+
+
+# On appel CONFIG dans tous les fichiers / On initialise CONFIG dans main.py avec load_config_from_json() avant de l'utiliser.
+CONFIG = None
