@@ -1,4 +1,3 @@
-import os
 import tensorflow as tf
 
 from engine.core.config import CONFIG, CATEGORIES
