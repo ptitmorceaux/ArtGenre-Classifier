@@ -335,8 +335,8 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
             loss_history[e] = epoch_loss / dataset_size; // moyenne des MSE pour cette époque
         }
 
-        // Calcul de l'accuracy pour cette époque
-        if (accuracy_history != NULL) {
+        // Calcul de l'accuracy pour cette époque (uniquement si classification)
+        if (is_classification && accuracy_history != NULL) {
             accuracy_history[e] = (float)correct_predictions / (float)dataset_size;
         }
     }
