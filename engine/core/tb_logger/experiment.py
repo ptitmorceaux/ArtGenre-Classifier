@@ -36,19 +36,22 @@ def get_dataset_md() -> str:
 
 | Parameter | Value |
 |---|---|
-| Total samples | `{dataset["count_total_dataset"]["total"]}` |
+| Total samples Train | `{dataset["count_total_dataset"]["train"]["total"]}` |
+| Total samples Test | `{dataset["count_total_dataset"]["test"]["total"]}` |
 | Limit per category | `{dataset["limit_per_category"]}` |
 | Normalization | `{dataset["normalization_method"]}` |
 
 ## Categories
 
-| Category | Images |
-|---|---:|
+| Category | Images Train | Images Test |
+|---|---:|---:|
 """
 
-    for category, count in dataset["count_total_dataset"].items():
+    for category in dataset["categories"]["train"].keys():
+        count_train = dataset["count_total_dataset"]["train"][category]
+        count_test = dataset["count_total_dataset"]["test"][category]
         if category != "total":
-            summary += f"| {category} | {count} |\n"
+            summary += f"| {category} | {count_train} | {count_test} |\n"
 
     return summary
 

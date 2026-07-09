@@ -10,7 +10,7 @@ def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.Summa
     """Entraîne un LinearModel par catégorie (One-vs-All)."""
     models_per_category = dict()
 
-    for category in cf.CONFIG["dataset"]["categories"].keys():
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         print(f"> Training LinearModel for category: {category}")
         models_per_category[category] = LinearModel.init_random(input_dim=cf.CONFIG["dataset"]["W_length"])
         loss_history, acc_history = models_per_category[category].train(
@@ -34,7 +34,7 @@ def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryW
     """Entraîne un MLP par catégorie (One-vs-All)."""
     models_per_category = dict()
 
-    for category in cf.CONFIG["dataset"]["categories"].keys():
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         print(f"> Training MLP {cf.CONFIG['model']['npl']} for category: {category}")
         models_per_category[category] = MLP(cf.CONFIG["model"]["npl"])
         loss_history, acc_history = models_per_category[category].train(

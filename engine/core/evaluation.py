@@ -22,7 +22,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
 
-    for category in cf.CONFIG["dataset"]["categories"].keys():
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         print(f"Evaluating model for category: {category}")
 
         predictions[category] = dict()
@@ -33,10 +33,10 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
-    first_cat = list(cf.CONFIG["dataset"]["categories"].keys())[0]
+    first_cat = list(cf.CONFIG["dataset"]["categories"]["train"].keys())[0]
 
     for i in range(len(predictions[first_cat]["prediction"])):
-        category_predicted = max(cf.CONFIG["dataset"]["categories"].keys(), key=lambda c: predictions[c]["values"][i])
+        category_predicted = max(cf.CONFIG["dataset"]["categories"]["train"].keys(), key=lambda c: predictions[c]["values"][i])
 
         unknown_is_valid = cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != ""
 
@@ -48,7 +48,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     # Détermination de la catégorie attendue
     df_predictions_expected = []
     for i in range(len(df_Y["test"][first_cat])):
-        category_expected = next((c for c in cf.CONFIG["dataset"]["categories"].keys() if df_Y["test"][c][i] == 1), None)
+        category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
 
     return df_predictions_expected, df_predictions_test
@@ -59,7 +59,7 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     
     fig, ax = plt.subplots(figsize=(10, 5.5))
 
-    labels = list(cf.CONFIG["dataset"]["categories"].keys())
+    labels = list(cf.CONFIG["dataset"]["categories"]["train"].keys())
     if cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != "":
         labels.append(cf.CONFIG["global"]["unknown_category"])
 
@@ -72,8 +72,8 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
         ax=ax
     )
 
-    length_X_test = len(df_X["test"])
-    length_X_train = cf.CONFIG["dataset"]["count_total_dataset"]["total"] - length_X_test
+    length_X_test = cf.CONFIG["dataset"]["count_total_dataset"]["test"]["total"]
+    length_X_train = cf.CONFIG["dataset"]["count_total_dataset"]["train"]["total"]
 
     plt.title("Confusion Matrix")
 
@@ -114,5 +114,8 @@ if __name__ == "__main__":
     }
     sample_df_predictions_expected = ["impressionism", "realism"]
     sample_df_predictions_test = ["impressionism", "realism"]
-    cf.CONFIG["dataset"]["count_total_dataset"] = {"total": 3}
+    cf.CONFIG["dataset"]["count_total_dataset"] = {
+        "test": {"total": "N/A"},
+        "train": {"total": "N/A"}
+    }
     plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)
