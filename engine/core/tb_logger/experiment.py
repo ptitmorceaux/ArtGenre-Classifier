@@ -38,7 +38,6 @@ def get_dataset_md() -> str:
 |---|---|
 | Total samples | `{dataset["count_total_dataset"]["total"]}` |
 | Limit per category | `{dataset["limit_per_category"]}` |
-| Train/Test split | `{dataset["train_test_split_ratio"]}` |
 | Normalization | `{dataset["normalization_method"]}` |
 
 ## Categories
