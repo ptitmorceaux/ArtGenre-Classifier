@@ -2,10 +2,12 @@
 import os
 import sys
 import argparse
+import tensorflow as tf
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import engine.core.config as cf
+import engine.core.tb_logger as tb
 from engine.core.build import compile_c_library, load_c_library
 from engine.core.dataset import load_and_prepare_csv, load_images_from_filepaths
 from engine.core.preprocessing import standardize_data
@@ -69,6 +71,16 @@ def main():
     print("\n# Etape 7 : Évaluation et Visualisation...")
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
+
+    # 8. Écriture des résultats finaux dans TensorBoard
+    print("\n# Etape 8 : Écriture des résultats finaux dans TensorBoard...")
+    summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
+    tb.write_markdown_from_dict(
+        summary_writer,
+        tb.get_summary_md_dict()
+    )
+    tb.write_images(summary_writer)
+    summary_writer.close()
 
 
 if __name__ == "__main__":
