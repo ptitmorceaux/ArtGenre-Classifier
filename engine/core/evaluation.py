@@ -31,18 +31,58 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         ]
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
 
-        # Caclul de l'accuracy par catégorie
-        correct_predictions = sum(1 for expected, predicted in zip(df_Y["test"][category], predictions[category]["prediction"]) if expected == predicted)
+        # Calcul de l'accuracy par catégorie
+        predicted_values = [pred >= 0 for pred in predictions[category]["values"]]
+        expected_values = [expected >= 0 for expected in df_Y["test"][category]]
+        correct_predictions = sum(1 for expected, predicted in zip(expected_values, predicted_values) if (predicted and expected) or (not predicted and not expected))
         total_predictions = len(df_Y["test"][category])
+
         if total_predictions == 0:
-            print(f"    No test samples for category '{category}'. Skipping accuracy calculation.")
-            accuracy = -1
-        else:
-            accuracy = correct_predictions / total_predictions
+            raise ValueError(f"No test samples for category '{category}'. Cannot compute accuracy.")
+        
+        accuracy = correct_predictions / total_predictions
+
+        total_expected_positives = sum(1 for expected in df_Y["test"][category] if expected == 1)
+        total_expected_negatives = total_predictions - total_expected_positives
+            
+        FP = sum(1 for expected, predicted in zip(df_Y["test"][category], predictions[category]["prediction"]) if expected != 1 and predicted == 1)
+        FN = sum(1 for expected, predicted in zip(df_Y["test"][category], predictions[category]["prediction"]) if expected == 1 and predicted != 1)
+        TP = total_expected_positives - FN
+        TN = total_expected_negatives - FP
+
+        # TPR / Recall / Sensibilité : accuracy de prédire vrai quand c'est vrai
+        if total_expected_positives == 0:
+            print(f"    No positive samples for category '{category}'. TPR is undefined.")
+        TPR = TP / total_expected_positives if total_expected_positives > 0 else -1
+
+        # TNR / Spécificité : accuracy de prédire faux quand c'est faux
+        if total_expected_negatives == 0:
+            print(f"    No negative samples for category '{category}'. TNR is undefined.")
+        TNR = TN / total_expected_negatives if total_expected_negatives > 0 else -1
+
+        # FPR : parmi les vrais négatifs, proportion prédite à tort comme positive (= 1 - TNR)
+        FPR = FP / total_expected_negatives if total_expected_negatives > 0 else -1
+        # FNR : parmi les vrais positifs, proportion prédite à tort comme négative (= 1 - TPR)
+        FNR = FN / total_expected_positives if total_expected_positives > 0 else -1
+
         if "test_accuracy" not in cf.CONFIG["model"].keys():
             cf.CONFIG["model"]["test_accuracy"] = dict()
-        cf.CONFIG["model"]["test_accuracy"][category] = accuracy
+
+        cf.CONFIG["model"]["test_accuracy"][category] = {
+            "accuracy": accuracy,
+            "TP": TP,
+            "TN": TN,
+            "FP": FP,
+            "FN": FN,
+            "TPR": TPR,
+            "TNR": TNR,
+            "FPR": FPR,
+            "FNR": FNR,
+        }
+
         print(f"    Accuracy for '{category}': {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
+        print(f"    TP: {TP} | TN: {TN} | FP: {FP} | FN: {FN}")
+        print(f"    TPR (recall): {TPR * 100:.1f}% | TNR (specificity): {TNR * 100:.1f}% | FPR: {FPR * 100:.1f}% | FNR: {FNR * 100:.1f}%")
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
@@ -64,7 +104,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
     
-    # Caclul de l'accuracy globale
+    # Calcul de l'accuracy globale
     correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
     total_predictions = len(df_predictions_expected)
     accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
