@@ -8,6 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import engine.core.config as cf
 
+
 def _predict_scalar(model, x) -> float:
     """
     Renvoie la sortie scalaire du modèle, quel que soit son type.
@@ -18,10 +19,72 @@ def _predict_scalar(model, x) -> float:
     return output[0] if isinstance(output, list) else output
 
 
+def compute_binary_stats(expected: list, predicted: list, positive_value) -> dict:
+    """
+    Calcule les statistiques de classification binaire (ou One-vs-Rest si les valeurs
+    sont des catégories parmi plusieurs) : TP/TN/FP/FN, les taux dérivés
+    (TPR/TNR/FPR/FNR) et les accuracy (simple + balanced).
+
+    `positive_value` définit ce qui compte comme "positif" dans `expected`/`predicted`
+    (ex: 1 pour un modèle One-vs-All, ou le nom d'une catégorie pour un résultat
+    multiclasse du type argmax).
+
+    Réutilisée à la fois pour évaluer chaque modèle individuel (One-vs-All) et pour
+    évaluer le résultat final multiclasse (One-vs-Rest, une fois par catégorie).
+    """
+    total = len(expected)
+    if total == 0:
+        raise ValueError("compute_binary_stats(): 'expected' est vide, impossible de calculer les statistiques.")
+
+    total_expected_positives = sum(1 for e in expected if e == positive_value)
+    total_expected_negatives = total - total_expected_positives
+
+    FP = sum(1 for e, p in zip(expected, predicted) if e != positive_value and p == positive_value)
+    FN = sum(1 for e, p in zip(expected, predicted) if e == positive_value and p != positive_value)
+    TP = total_expected_positives - FN
+    TN = total_expected_negatives - FP
+
+    accuracy = (TP + TN) / total  # pas forcement représentatif si dataset déséquilibré
+
+    # TPR / Recall / Sensibilité : accuracy de prédire vrai quand c'est vrai
+    TPR = TP / total_expected_positives if total_expected_positives > 0 else -1
+    # TNR / Spécificité : accuracy de prédire faux quand c'est faux
+    TNR = TN / total_expected_negatives if total_expected_negatives > 0 else -1
+    # FPR : parmi les vrais négatifs, proportion prédite à tort comme positive (= 1 - TNR)
+    FPR = FP / total_expected_negatives if total_expected_negatives > 0 else -1
+    # FNR : parmi les vrais positifs, proportion prédite à tort comme négative (= 1 - TPR)
+    FNR = FN / total_expected_positives if total_expected_positives > 0 else -1
+
+    # Balanced Accuracy : moyenne de TPR et TNR — traite les deux classes à poids égal,
+    # contrairement à l'accuracy simple qui est dominée par la classe majoritaire.
+    balanced_accuracy = -1 if TPR == -1 or TNR == -1 else (TPR + TNR) / 2
+
+    return {
+        "accuracy": accuracy,
+        "balanced_accuracy": balanced_accuracy,
+        "TP": TP,
+        "TN": TN,
+        "FP": FP,
+        "FN": FN,
+        "TPR": TPR,
+        "TNR": TNR,
+        "FPR": FPR,
+        "FNR": FNR,
+    }
+
+
+def _print_stats(label: str, stats: dict, correct: int, total: int) -> None:
+    """Affichage uniforme des statistiques, réutilisé pour les modèles individuels et le multiclasse."""
+    print(f"    Accuracy for '{label}': {stats['accuracy'] * 100:.1f}% ({correct}/{total})")
+    print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.1f}%")
+    print(f"    TPR: {stats['TPR'] * 100:.1f}% | TNR: {stats['TNR'] * 100:.1f}% | FPR: {stats['FPR'] * 100:.1f}% | FNR: {stats['FNR'] * 100:.1f}%")
+
+
 def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list]:
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
 
+    # 1. Évaluation de chaque modèle individuel (One-vs-All), stockée dans test_accuracy
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         print(f"\n> Evaluating model for category: {category}")
 
@@ -31,64 +94,17 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         ]
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
 
-        # Calcul de l'accuracy par catégorie
-        predicted_values = [pred >= 0 for pred in predictions[category]["values"]]
-        expected_values = [expected >= 0 for expected in df_Y["test"][category]]
-        correct_predictions = sum(1 for expected, predicted in zip(expected_values, predicted_values) if (predicted and expected) or (not predicted and not expected))
-        total_predictions = len(df_Y["test"][category])
+        expected = df_Y["test"][category]
+        predicted = predictions[category]["prediction"]
 
-        if total_predictions == 0:
-            raise ValueError(f"No test samples for category '{category}'. Cannot compute accuracy.")
-        
-        accuracy = correct_predictions / total_predictions
-
-        total_expected_positives = sum(1 for expected in df_Y["test"][category] if expected == 1)
-        total_expected_negatives = total_predictions - total_expected_positives
-            
-        FP = sum(1 for expected, predicted in zip(df_Y["test"][category], predictions[category]["prediction"]) if expected != 1 and predicted == 1)
-        FN = sum(1 for expected, predicted in zip(df_Y["test"][category], predictions[category]["prediction"]) if expected == 1 and predicted != 1)
-        TP = total_expected_positives - FN
-        TN = total_expected_negatives - FP
-
-        # TPR / Recall / Sensibilité : accuracy de prédire vrai quand c'est vrai
-        if total_expected_positives == 0:
-            print(f"    No positive samples for category '{category}'. TPR is undefined.")
-        TPR = TP / total_expected_positives if total_expected_positives > 0 else -1
-
-        # TNR / Spécificité : accuracy de prédire faux quand c'est faux
-        if total_expected_negatives == 0:
-            print(f"    No negative samples for category '{category}'. TNR is undefined.")
-        TNR = TN / total_expected_negatives if total_expected_negatives > 0 else -1
-
-        # FPR : parmi les vrais négatifs, proportion prédite à tort comme positive (= 1 - TNR)
-        FPR = FP / total_expected_negatives if total_expected_negatives > 0 else -1
-        # FNR : parmi les vrais positifs, proportion prédite à tort comme négative (= 1 - TPR)
-        FNR = FN / total_expected_positives if total_expected_positives > 0 else -1
-
-        # Balanced Accuracy : moyenne de TPR et TNR — traite les deux classes à poids égal,
-        # contrairement à l'accuracy simple qui est dominée par la classe majoritaire (négative).
-        balanced_accuracy = -1 if TPR == -1 or TNR == -1 else (TPR + TNR) / 2
+        stats = compute_binary_stats(expected, predicted, positive_value=1)
 
         if "test_accuracy" not in cf.CONFIG["model"].keys():
             cf.CONFIG["model"]["test_accuracy"] = dict()
+        cf.CONFIG["model"]["test_accuracy"][category] = stats
 
-        cf.CONFIG["model"]["test_accuracy"][category] = {
-            "accuracy": accuracy, # pas forcement représentatif si dataset déséquilibré (ex: 95% de négatifs, 5% de positifs => accuracy = 95% même si le modèle ne prédit jamais de positifs)
-            "balanced_accuracy": balanced_accuracy, # mieux pour dataset déséquilibré
-            "TP": TP,
-            "TN": TN,
-            "FP": FP,
-            "FN": FN,
-            "TPR": TPR,
-            "TNR": TNR,
-            "FPR": FPR,
-            "FNR": FNR,
-        }
-
-        print(f"    Accuracy for '{category}': {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
-        print(f"    Balanced Accuracy: {balanced_accuracy * 100:.1f}%")
-        # print(f"    TP: {TP} | TN: {TN} | FP: {FP} | FN: {FN}")
-        print(f"    TPR: {TPR * 100:.1f}% | TNR: {TNR * 100:.1f}% | FPR: {FPR * 100:.1f}% | FNR: {FNR * 100:.1f}%")
+        correct = sum(1 for e, p in zip(expected, predicted) if (e == 1) == p)
+        _print_stats(category, stats, correct, len(expected))
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
@@ -109,12 +125,27 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     for i in range(len(df_Y["test"][first_cat])):
         category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
-    
-    # Calcul de l'accuracy globale
+
+    # 2. Évaluation du résultat final multiclasse (argmax), en One-vs-Rest par catégorie,
+    #    stockée séparément dans test_accuracy_multiclass (même logique, autre positive_value).
+    print(f"\n> Evaluating final multiclass result (argmax)")
+    cf.CONFIG["model"]["test_accuracy_multiclass"] = dict()
+
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        stats = compute_binary_stats(df_predictions_expected, df_predictions_test, positive_value=category)
+        cf.CONFIG["model"]["test_accuracy_multiclass"][category] = stats
+
+        correct = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if (e == category) == (p == category))
+        print(f"\n  > Category: {category}")
+        _print_stats(category, stats, correct, len(df_predictions_expected))
+
+    # Accuracy globale "brute" (exact match toutes catégories confondues) : une seule
+    # valeur, pas de TP/TN/FP/FN pertinent ici puisque ce n'est pas du binaire.
     correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
     total_predictions = len(df_predictions_expected)
     accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
-    print(f"\n>>> Global Accuracy: {accuracy * 100:.4f}% ({correct_predictions}/{total_predictions})\n")
+    cf.CONFIG["model"]["test_accuracy_multiclass"]["global"] = accuracy
+    print(f"\n  > Global Accuracy (exact match): {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
 
     return df_predictions_expected, df_predictions_test
 
@@ -158,31 +189,3 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['confusion_matrix_test']}")
     if show:
         plt.show()
-
-
-if __name__ == "__main__":
-
-    sample_df_X = {
-        "train": [[0.1, 0.2, 0.3],
-                  [0.4, 0.5, 0.6]],
-        "test": [[0.7, 0.8, 0.9]]
-    }
-    sample_df_Y = {
-        "train": {
-            "impressionism": [1, 0],
-            "realism": [0, 1],
-            "romanticism": [0, 0]
-        },
-        "test": {
-            "impressionism": [0],
-            "realism": [1],
-            "romanticism": [0]
-        }
-    }
-    sample_df_predictions_expected = ["impressionism", "realism"]
-    sample_df_predictions_test = ["impressionism", "realism"]
-    cf.CONFIG["dataset"]["count_total_dataset"] = {
-        "test": {"total": "N/A"},
-        "train": {"total": "N/A"}
-    }
-    plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)
