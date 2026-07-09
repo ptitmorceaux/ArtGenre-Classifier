@@ -55,15 +55,15 @@ def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryW
     return models_per_category
 
 
-def train_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
+def train_models(summary_writer: tf.summary.SummaryWriter, df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
     """Dispatch vers LinearModel ou MLP selon cf.CONFIG['model']['type']."""
     model_type = cf.CONFIG["model"]["type"]
 
-    summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
     print(f"\n[*] TensorBoard Logs directory: {cf.CONFIG['output']['logs']}")
 
     print(f"\n========>>> TRAINING {model_type} MODELS <<<========")
     models = dict()
+    
     try:
         # Choix du type de modèle à entraîner
         if model_type == "linear":
@@ -72,8 +72,10 @@ def train_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
             models = train_mlp_models(df_X, df_Y, summary_writer)
         else:
             raise ValueError(f"train_models(): unknown model type '{model_type}'.")
+        
         print(f"\n========>>> TRAINING {model_type} MODELS COMPLETE <<<========")
         return models
-    finally:
-
+    
+    except Exception as e:
         summary_writer.close()
+        raise e

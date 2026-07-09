@@ -55,9 +55,12 @@ def main():
     cf.CONFIG = cf.finalize_mlp_config(cf.CONFIG)
     df_X, scaler = standardize_data(df_X)
 
+    ### TENSORBOARD SUMMARY WRITER ###
+    summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
+
     # 4. Entraînement
     print("\n# Etape 4 : Entraînement des modèles et enregistrement des logs pour tensorboard...")
-    models_per_category = train_models(df_X, df_Y)
+    models_per_category = train_models(summary_writer, df_X, df_Y)
 
     # 5. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
@@ -84,6 +87,8 @@ def main():
         tb.get_summary_md_dict()
     )
     tb.write_images(summary_writer)
+
+    ### TENSORBOARD SUMMARY WRITER CLOSE ###
     summary_writer.close()
 
 
