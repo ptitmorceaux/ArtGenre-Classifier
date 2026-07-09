@@ -11,7 +11,7 @@ def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.Summa
     models_per_category = dict()
 
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
-        print(f"> Training LinearModel for category: {category}")
+        print(f"\n> Training LinearModel for category: {category}")
         models_per_category[category] = LinearModel.init_random(input_dim=cf.CONFIG["dataset"]["W_length"])
         loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=df_X["train"],
@@ -21,7 +21,7 @@ def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.Summa
             epochs=cf.CONFIG["model"]["epochs"]
         )
         tb.write_training_logs(summary_writer, category, loss_history, acc_history)
-        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%\n")
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%")
         
         if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
             cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
@@ -60,7 +60,7 @@ def train_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
     model_type = cf.CONFIG["model"]["type"]
 
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
-    print(f"\n[*] TensorBoard Logs directory: {cf.CONFIG['output']['logs']}\n")
+    print(f"\n[*] TensorBoard Logs directory: {cf.CONFIG['output']['logs']}")
 
     try:
         # Choix du type de modèle à entraîner
