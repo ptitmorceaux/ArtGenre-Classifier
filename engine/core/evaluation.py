@@ -148,8 +148,8 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     # valeur, différente du macro-average ci-dessous (utile pour vérifier la cohérence).
     correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
     total_predictions = len(df_predictions_expected)
-    exact_match_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
-    cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["exact_match_accuracy"] = exact_match_accuracy
+    top1_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+    cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["top1_accuracy"] = top1_accuracy
 
     # "global" : macro-average des stats par catégorie (moyenne simple des dicts
     # ci-dessus), pour rester un dict homogène avec les autres entrées et pouvoir
@@ -161,7 +161,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     print(f"\n========>>> Evaluation Results <<<========")
 
     print(f"\n> Global Multiclass Stats:")
-    print(f"    Exact Match Accuracy: {exact_match_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})")
+    print(f"    Top-1 Accuracy: {top1_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})")
     print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.2f}%")
 
     print("\n========>>> Evaluation Complete <<<========\n")
