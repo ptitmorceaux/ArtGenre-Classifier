@@ -14,22 +14,22 @@ def _mean(values: list[float]) -> float | None:
 
 def _stats_table_md(stats_per_category: dict) -> str:
     """
-    Génère un tableau markdown Accuracy/Balanced Accuracy/TPR/TNR/FPR/FNR par catégorie
+    Génère un tableau markdown Exact Match Accuracy/Balanced Accuracy/TPR/TNR/FPR/FNR par catégorie
     + une ligne de moyenne par colonne, réutilisé pour test_individual_accuracy et pour
     test_multiclass_accuracy['categories'] (même format de stats dans les deux cas).
     """
-    columns = ["accuracy", "balanced_accuracy", "TPR", "TNR", "FPR", "FNR"]
+    columns = ["exact_match_accuracy", "balanced_accuracy", "TPR", "TNR", "FPR", "FNR"]
     means = {col: _mean([stats[col] for stats in stats_per_category.values()]) for col in columns}
 
     summary = """
-| Category | Accuracy | Balanced Accuracy | TPR | TNR | FPR | FNR |
+| Category | Exact Match Accuracy | Balanced Accuracy | TPR | TNR | FPR | FNR |
 |---|---:|---:|---:|---:|---:|---:|
 """
 
     for category, stats in stats_per_category.items():
         summary += (
             f"| {category} | "
-            f"{_fmt_pct(stats['accuracy'])} | "
+            f"{_fmt_pct(stats['exact_match_accuracy'])} | "
             f"{_fmt_pct(stats['balanced_accuracy'])} | "
             f"{_fmt_pct(stats['TPR'])} | "
             f"{_fmt_pct(stats['TNR'])} | "
@@ -39,7 +39,7 @@ def _stats_table_md(stats_per_category: dict) -> str:
 
     summary += (
         f"| **Mean** | "
-        f"**{_fmt_pct(means['accuracy'])}** | "
+        f"**{_fmt_pct(means['exact_match_accuracy'])}** | "
         f"**{_fmt_pct(means['balanced_accuracy'])}** | "
         f"**{_fmt_pct(means['TPR'])}** | "
         f"**{_fmt_pct(means['TNR'])}** | "
@@ -100,15 +100,14 @@ def get_test_multiclass_accuracy_md() -> str | None:
     summary += _stats_table_md(categories_stats)
     summary += _confusion_counts_md(categories_stats)
 
-    summary += """
-## Global
+    summary += f"""
+## Multiclass Global Metrics
 
 | Metric | Value |
 |---|---:|
+| Top-1 Accuracy | {_fmt_pct(global_stats['top1_accuracy'])} |
+| Average Balanced Accuracy | {_fmt_pct(global_stats['avg_balanced_accuracy'])} |
 """
-    summary += f"| Exact Match Accuracy | {_fmt_pct(global_stats['exact_match_accuracy'])} |\n"
-    summary += f"| Average Balanced Accuracy | {_fmt_pct(global_stats['avg_balanced_accuracy'])} |\n"
-
     return summary
 
 
