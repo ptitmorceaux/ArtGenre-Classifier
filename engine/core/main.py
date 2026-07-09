@@ -58,19 +58,19 @@ def main():
     print("\n# Etape 4 : Entraînement des modèles et enregistrement des logs pour tensorboard...")
     models_per_category = train_models(df_X, df_Y)
 
-    # 5. Sauvegarde de la configuration en json
-    print("\n# Etape 5 : Sauvegarde de la configuration...")
-    save_config_json(cf.CONFIG["output"]["logs"], cf.CONFIG)
-
-    # 6. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
+    # 5. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
-    print("\n# Etape 6 : Sauvegarde des modèles entraînés...")
+    print("\n# Etape 5 : Sauvegarde des modèles entraînés...")
     save_trained_models(models_per_category, scaler, cf.CONFIG["output"]["models"], cf.CONFIG["model"]["type"])
 
-    # 7. Évaluation et Visualisation
-    print("\n# Etape 7 : Évaluation et Visualisation...")
+    # 6. Évaluation et Visualisation
+    print("\n# Etape 6 : Évaluation et Visualisation...")
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
+
+    # 7. Sauvegarde de la configuration en json
+    print("\n# Etape 7 : Sauvegarde de la configuration...")
+    save_config_json(cf.CONFIG["output"]["logs"], cf.CONFIG)
 
     # 8. Écriture des résultats finaux dans TensorBoard
     print("\n# Etape 8 : Écriture des résultats finaux dans TensorBoard...\n")
