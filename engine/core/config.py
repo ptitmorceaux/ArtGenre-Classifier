@@ -193,19 +193,18 @@ def init_config(config: dict) -> dict:
 
     # Ajoute l'architecture du MLP si le type de modèle est 'mlp'
     if config["model"]["type"] == "mlp":
-        if not "npl" in config["model"]:
-            config["model"]["npl"] = list(config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1)
-            return config
-        
-        W_length = config["model"]["npl"][0]
-        if W_length != config["dataset"]["W_length"]:
-            raise ValueError(f"init_config(): La dimension d'entrée du MLP doit correspondre à 'W_length' du dataset. "
-                             f"Obtenu: {W_length}, Attendu: {config['dataset']['W_length']}")
-        
-        npl = config["model"]["npl"][1:-1]
-        if npl != config["model"]["mlp_hidden_layers"]:
-            raise ValueError(f"init_config(): Les couches cachées du MLP doivent correspondre à 'mlp_hidden_layers'. "
-                             f"Obtenu: {npl}, Attendu: {config['model']['mlp_hidden_layers']}")
+        if "npl" not in config["model"]:
+            config["model"]["npl"] = [config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1]
+        else:
+            W_length = config["model"]["npl"][0]
+            if W_length != config["dataset"]["W_length"]:
+                raise ValueError(f"init_config(): La dimension d'entrée du MLP doit correspondre à 'W_length' du dataset. "
+                                f"Obtenu: {W_length}, Attendu: {config['dataset']['W_length']}")
+            
+            npl = config["model"]["npl"][1:-1]
+            if npl != config["model"]["mlp_hidden_layers"]:
+                raise ValueError(f"init_config(): Les couches cachées du MLP doivent correspondre à 'mlp_hidden_layers'. "
+                                f"Obtenu: {npl}, Attendu: {config['model']['mlp_hidden_layers']}")
     
     return config
 

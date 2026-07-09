@@ -2,6 +2,7 @@ import os
 import json
 from datetime import datetime
 
+import engine.core.config as cf
 from engine.interop.storage import Storage
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
@@ -30,6 +31,9 @@ def save_trained_models(
 
         Storage["save"](model, scaler, output_folder, filename)
         print(f"[*] Modèle '{category}' sauvegardé : {filepath}")
+        if "saved_models" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["saved_models"] = dict()
+        cf.CONFIG["model"]["saved_models"][category] = filepath
 
 
 def save_config_json(output_folder: str, config: dict) -> None:
