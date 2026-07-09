@@ -50,8 +50,7 @@ def get_dataset_md() -> str:
     for category in dataset["categories"]["train"].keys():
         count_train = dataset["count_total_dataset"]["train"][category]
         count_test = dataset["count_total_dataset"]["test"][category]
-        if category != "total":
-            summary += f"| {category} | {count_train} | {count_test} |\n"
+        summary += f"| {category} | {count_train} | {count_test} |\n"
 
     return summary
 
