@@ -186,9 +186,26 @@ def init_config(config: dict) -> dict:
             if section == "lib" and key == "seed":
                 config[section][key] = select_seed(config[section]["seeds_choice"], value)
     
+    # Ajoute les chemins de sortie pour les logs et les modèles
     date, time = get_date_time_now()
     config["output"]["logs"] = os.path.join(config["output"]["folder"], config["model"]["type"], date, time)
     config["output"]["models"] = os.path.join(config["output"]["logs"], "models")
+
+    # Ajoute l'architecture du MLP si le type de modèle est 'mlp'
+    if config["model"]["type"] == "mlp":
+        if not "mlp_all_layers" in config["model"]:
+            config["model"]["mlp_all_layers"] = list(config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1)
+            return config
+        
+        W_length = config["model"]["mlp_all_layers"][0]
+        if W_length != config["dataset"]["W_length"]:
+            raise ValueError(f"init_config(): La dimension d'entrée du MLP doit correspondre à 'W_length' du dataset. "
+                             f"Obtenu: {W_length}, Attendu: {config['dataset']['W_length']}")
+        
+        mlp_all_layers = config["model"]["mlp_all_layers"][1:-1]
+        if mlp_all_layers != config["model"]["mlp_hidden_layers"]:
+            raise ValueError(f"init_config(): Les couches cachées du MLP doivent correspondre à 'mlp_hidden_layers'. "
+                             f"Obtenu: {mlp_all_layers}, Attendu: {config['model']['mlp_hidden_layers']}")
     
     return config
 
