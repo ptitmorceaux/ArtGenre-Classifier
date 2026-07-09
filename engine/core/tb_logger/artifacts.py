@@ -28,11 +28,11 @@ def get_models_md() -> str:
         summary += (
             f"| {category} | "
             f"`{file.name}` | "
-            f"{size / 1024**2:.2f} MB |\n"
+            f"{size / 1024**2:.4f} MB |\n"
         )
 
     summary += (
-        f"\nTotal size: `{total / 1024**2:.2f} MB`"
+        f"\nTotal size: `{total / 1024**2:.4f} MB`"
     )
 
     return summary

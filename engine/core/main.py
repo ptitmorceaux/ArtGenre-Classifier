@@ -66,14 +66,17 @@ def main():
     # 6. Évaluation et Visualisation
     print("\n# Etape 6 : Évaluation et Visualisation...")
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
+    
+    # 7. Sauvegarde de la matrice de confusion test
+    print("\n# Etape 7 : Sauvegarde de la matrice de confusion...")
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
 
-    # 7. Sauvegarde de la configuration en json
-    print("\n# Etape 7 : Sauvegarde de la configuration...")
+    # 8. Sauvegarde de la configuration en json
+    print("\n# Etape 8 : Sauvegarde de la configuration...")
     save_config_json(cf.CONFIG["output"]["logs"], cf.CONFIG)
 
-    # 8. Écriture des résultats finaux dans TensorBoard
-    print("\n# Etape 8 : Écriture des résultats finaux dans TensorBoard...\n")
+    # 9. Écriture des résultats finaux dans TensorBoard
+    print("\n# Etape 9 : Écriture des résultats finaux dans TensorBoard...\n")
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
     tb.write_markdown_from_dict(
         summary_writer,

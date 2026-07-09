@@ -73,18 +73,20 @@ def compute_binary_stats(expected: list, predicted: list, positive_value) -> dic
     }
 
 
-def _print_stats(label: str, stats: dict, correct: int, total: int) -> None:
+def _print_stats(stats: dict, count_line: str | None = None) -> None:
     """Affichage uniforme des statistiques, réutilisé pour les modèles individuels et le multiclasse."""
-    print(f"    Accuracy for '{label}': {stats['accuracy'] * 100:.1f}% ({correct}/{total})")
-    print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.1f}%")
-    print(f"    TPR: {stats['TPR'] * 100:.1f}% | TNR: {stats['TNR'] * 100:.1f}% | FPR: {stats['FPR'] * 100:.1f}% | FNR: {stats['FNR'] * 100:.1f}%")
+    suffix = f" ({count_line})" if count_line is not None else ""
+    print(f"    Accuracy: {stats['accuracy'] * 100:.4f}%{suffix}")
+    print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.4f}%")
+    print(f"    TPR: {stats['TPR'] * 100:.4f}% | TNR: {stats['TNR'] * 100:.4f}% | FPR: {stats['FPR'] * 100:.4f}% | FNR: {stats['FNR'] * 100:.4f}%")
 
 
 def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list]:
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
 
-    # 1. Évaluation de chaque modèle individuel (One-vs-All), stockée dans test_accuracy
+    # 1. Évaluation de chaque modèle individuel, stockée dans test_individual_accuracy
+    print(f"\n========>>> Evaluating individual models <<<========")
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         print(f"\n> Evaluating model for category: {category}")
 
@@ -99,12 +101,12 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
         stats = compute_binary_stats(expected, predicted, positive_value=1)
 
-        if "test_accuracy" not in cf.CONFIG["model"].keys():
-            cf.CONFIG["model"]["test_accuracy"] = dict()
-        cf.CONFIG["model"]["test_accuracy"][category] = stats
+        if "test_individual_accuracy" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["test_individual_accuracy"] = dict()
+        cf.CONFIG["model"]["test_individual_accuracy"][category] = stats
 
         correct = sum(1 for e, p in zip(expected, predicted) if (e == 1) == p)
-        _print_stats(category, stats, correct, len(expected))
+        _print_stats(stats, f"{correct}/{len(expected)}")
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
@@ -126,26 +128,38 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
 
-    # 2. Évaluation du résultat final multiclasse (argmax), en One-vs-Rest par catégorie,
-    #    stockée séparément dans test_accuracy_multiclass (même logique, autre positive_value).
-    print(f"\n> Evaluating final multiclass result (argmax)")
-    cf.CONFIG["model"]["test_accuracy_multiclass"] = dict()
+    # 2. Évaluation du résultat final multiclasse (argmax), par catégorie,
+    #    stockée séparément dans test_individual_accuracy_multiclass (même logique, autre positive_value).
+    print(f"\n========>>> Evaluating final multiclass predictions <<<========")
+    cf.CONFIG["model"]["test_individual_accuracy_multiclass"] = { "_global": dict() }
 
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         stats = compute_binary_stats(df_predictions_expected, df_predictions_test, positive_value=category)
-        cf.CONFIG["model"]["test_accuracy_multiclass"][category] = stats
+        cf.CONFIG["model"]["test_individual_accuracy_multiclass"][category] = stats
 
         correct = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if (e == category) == (p == category))
         print(f"\n  > Category: {category}")
-        _print_stats(category, stats, correct, len(df_predictions_expected))
+        _print_stats(stats, f"{correct}/{len(df_predictions_expected)}")
 
-    # Accuracy globale "brute" (exact match toutes catégories confondues) : une seule
-    # valeur, pas de TP/TN/FP/FN pertinent ici puisque ce n'est pas du binaire.
+    # Accuracy globale "exact match" (toutes catégories confondues) : une seule
+    # valeur, différente du macro-average ci-dessous (utile pour vérifier la cohérence).
     correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
     total_predictions = len(df_predictions_expected)
-    accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
-    cf.CONFIG["model"]["test_accuracy_multiclass"]["global"] = accuracy
-    print(f"\n  > Global Accuracy (exact match): {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
+    exact_match_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+    cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["_global"]["exact_match_accuracy"] = exact_match_accuracy
+
+    # "global" : macro-average des stats par catégorie (moyenne simple des dicts
+    # ci-dessus), pour rester un dict homogène avec les autres entrées et pouvoir
+    # itérer sans cas particulier dans tb_logger.
+    sum_balanced_accuracy = sum(stats["balanced_accuracy"] for stats in cf.CONFIG["model"]["test_individual_accuracy_multiclass"].values())
+    len_global_stats = len(cf.CONFIG["model"]["test_individual_accuracy_multiclass"])
+    avg_balanced_accuracy = sum_balanced_accuracy / len_global_stats if len_global_stats > 0 else 0
+    cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["_global"]["avg_balanced_accuracy"] = avg_balanced_accuracy
+    print(f"\n========>>> Global (macro-average across categories) <<<========")
+
+    print(f"\n> Global (macro-average across categories)")
+    print(f"    Exact Match Accuracy: {exact_match_accuracy * 100:.4f}% ({correct_predictions}/{total_predictions})\n")
+    print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.4f}%")
 
     return df_predictions_expected, df_predictions_test
 
@@ -189,3 +203,31 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['confusion_matrix_test']}")
     if show:
         plt.show()
+
+
+if __name__ == "__main__":
+
+    sample_df_X = {
+        "train": [[0.1, 0.2, 0.3],
+                  [0.4, 0.5, 0.6]],
+        "test": [[0.7, 0.8, 0.9]]
+    }
+    sample_df_Y = {
+        "train": {
+            "impressionism": [1, 0],
+            "realism": [0, 1],
+            "romanticism": [0, 0]
+        },
+        "test": {
+            "impressionism": [0],
+            "realism": [1],
+            "romanticism": [0]
+        }
+    }
+    sample_df_predictions_expected = ["impressionism", "realism"]
+    sample_df_predictions_test = ["impressionism", "realism"]
+    cf.CONFIG["dataset"]["count_total_dataset"] = {
+        "test": {"total": "N/A"},
+        "train": {"total": "N/A"}
+    }
+    plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)

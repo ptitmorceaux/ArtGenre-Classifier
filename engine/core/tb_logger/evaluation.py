@@ -12,18 +12,18 @@ def _mean(values: list[float]) -> float | None:
     return sum(valid) / len(valid) if valid else None
 
 
-def get_test_accuracy_md() -> str | None:
+def get_test_individual_accuracy_md() -> str | None:
     """Résumé de l'accuracy de test par catégorie, avec la matrice de confusion binaire
     (TP/TN/FP/FN) et les taux dérivés (TPR/TNR/FPR/FNR/Balanced Accuracy), plus une ligne
     de moyenne par colonne (et non juste une moyenne d'accuracy globale)."""
 
-    test_accuracy = cf.CONFIG["model"].get("test_accuracy")
+    test_individual_accuracy = cf.CONFIG["model"].get("test_individual_accuracy")
 
-    if test_accuracy is None:
+    if test_individual_accuracy is None:
         return None
 
     columns = ["accuracy", "balanced_accuracy", "TPR", "TNR", "FPR", "FNR"]
-    means = {col: _mean([stats[col] for stats in test_accuracy.values()]) for col in columns}
+    means = {col: _mean([stats[col] for stats in test_individual_accuracy.values()]) for col in columns}
 
     summary = """
 # Test Accuracy
@@ -32,7 +32,7 @@ def get_test_accuracy_md() -> str | None:
 |---|---:|---:|---:|---:|---:|---:|
 """
 
-    for category, stats in test_accuracy.items():
+    for category, stats in test_individual_accuracy.items():
         summary += (
             f"| {category} | "
             f"{_fmt_pct(stats['accuracy'])} | "
@@ -60,7 +60,7 @@ def get_test_accuracy_md() -> str | None:
 |---|---:|---:|---:|---:|
 """
 
-    for category, stats in test_accuracy.items():
+    for category, stats in test_individual_accuracy.items():
         summary += (
             f"| {category} | {stats['TP']} | {stats['TN']} | {stats['FP']} | {stats['FN']} |\n"
         )
@@ -73,9 +73,9 @@ def get_evaluation_md() -> dict[str, str]:
 
     summary = {}
 
-    test_accuracy_md = get_test_accuracy_md()
+    test_individual_accuracy_md = get_test_individual_accuracy_md()
 
-    if test_accuracy_md:
-        summary["0. Evaluation/Test Accuracy"] = test_accuracy_md
+    if test_individual_accuracy_md:
+        summary["0. Evaluation/Test Accuracy"] = test_individual_accuracy_md
 
     return summary
