@@ -52,6 +52,7 @@ def main():
     print("\n# Etape 3 : Préparation des données...")
     df_X_filepaths, df_Y = load_and_prepare_csv()
     df_X = load_images_from_filepaths(df_X_filepaths)
+    cf.CONFIG = cf.finalize_mlp_config(cf.CONFIG)
     df_X, scaler = standardize_data(df_X)
 
     # 4. Entraînement

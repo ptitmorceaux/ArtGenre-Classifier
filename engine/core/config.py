@@ -208,22 +208,31 @@ def init_config(config: dict) -> dict:
     date, time = get_date_time_now()
     config["output"]["logs"] = os.path.join(config["output"]["folder"], config["model"]["type"], date, time)
     config["output"]["models"] = os.path.join(config["output"]["logs"], "models")
-
-    # Ajoute l'architecture du MLP si le type de modèle est 'mlp'
-    if config["model"]["type"] == "mlp":
-        if "npl" not in config["model"]:
-            config["model"]["npl"] = [config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1]
-        else:
-            W_length = config["model"]["npl"][0]
-            if W_length != config["dataset"]["W_length"]:
-                raise ValueError(f"init_config(): La dimension d'entrée du MLP doit correspondre à 'W_length' du dataset. "
-                                f"Obtenu: {W_length}, Attendu: {config['dataset']['W_length']}")
-            
-            npl = config["model"]["npl"][1:-1]
-            if npl != config["model"]["mlp_hidden_layers"]:
-                raise ValueError(f"init_config(): Les couches cachées du MLP doivent correspondre à 'mlp_hidden_layers'. "
-                                f"Obtenu: {npl}, Attendu: {config['model']['mlp_hidden_layers']}")
     
+    return config
+
+
+def finalize_mlp_config(config: dict) -> dict:
+    """
+    Construit (ou vérifie) l'architecture 'npl' du MLP. À appeler APRÈS le chargement
+    des images, une fois que 'dataset.W_length' est connu.
+    """
+    if config["model"]["type"] != "mlp":
+        return config
+
+    if "npl" not in config["model"]:
+        config["model"]["npl"] = [config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1]
+    else:
+        W_length = config["model"]["npl"][0]
+        if W_length != config["dataset"]["W_length"]:
+            raise ValueError(f"finalize_mlp_config(): W_length incohérent. "
+                            f"Obtenu: {W_length}, Attendu: {config['dataset']['W_length']}")
+
+        npl = config["model"]["npl"][1:-1]
+        if npl != config["model"]["mlp_hidden_layers"]:
+            raise ValueError(f"finalize_mlp_config(): mlp_hidden_layers incohérent. "
+                            f"Obtenu: {npl}, Attendu: {config['model']['mlp_hidden_layers']}")
+
     return config
 
 
