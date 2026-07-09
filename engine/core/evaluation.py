@@ -86,7 +86,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     predictions = dict()
 
     # 1. Évaluation de chaque modèle individuel, stockée dans test_individual_accuracy
-    print(f"\n========>>> Evaluating individual models <<<========")
+    print(f"\n========>>> TEST: Evaluating individual models <<<========")
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         print(f"\n> Evaluating model for category: {category}")
 
@@ -130,7 +130,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
     # 2. Évaluation du résultat final multiclasse (argmax), par catégorie,
     #    stockée séparément dans test_multiclass_accuracy (même logique, autre positive_value).
-    print(f"\n========>>> Evaluating final multiclass predictions <<<========")
+    print(f"\n========>>> TEST: Evaluating final multiclass predictions <<<========")
     cf.CONFIG["model"]["test_multiclass_accuracy"] = {
         "categories": dict(),
         "global": dict()
@@ -158,13 +158,13 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     len_global_stats = len(cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"])
     avg_balanced_accuracy = sum_balanced_accuracy / len_global_stats if len_global_stats > 0 else 0
     cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["avg_balanced_accuracy"] = avg_balanced_accuracy
-    print(f"\n========>>> Evaluation Results <<<========")
+    print(f"\n========>>> TEST: Evaluation Results <<<========")
 
     print(f"\n> Global Multiclass Stats:")
     print(f"    Top-1 Accuracy: {top1_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})")
     print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.2f}%")
 
-    print("\n========>>> Evaluation Complete <<<========\n")
+    print("\n========>>> TEST: Evaluation Complete <<<========\n")
     return df_predictions_expected, df_predictions_test
 
 
