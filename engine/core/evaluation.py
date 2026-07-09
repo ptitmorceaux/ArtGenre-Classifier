@@ -82,7 +82,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
         print(f"    Accuracy for '{category}': {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
         print(f"    TP: {TP} | TN: {TN} | FP: {FP} | FN: {FN}")
-        print(f"    TPR (recall): {TPR * 100:.1f}% | TNR (specificity): {TNR * 100:.1f}% | FPR: {FPR * 100:.1f}% | FNR: {FNR * 100:.1f}%")
+        print(f"    TPR: {TPR * 100:.1f}% | TNR: {TNR * 100:.1f}% | FPR: {FPR * 100:.1f}% | FNR: {FNR * 100:.1f}%")
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
