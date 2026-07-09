@@ -23,7 +23,7 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     predictions = dict()
 
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
-        print(f"> Evaluating model for category: {category}")
+        print(f"\n> Evaluating model for category: {category}")
 
         predictions[category] = dict()
         predictions[category]["values"] = [
@@ -106,9 +106,10 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
 
     plt.subplots_adjust(top=0.82, bottom=0.12)
 
-    plt.savefig(cf.CONFIG["output"]["logs"] + "/confusion_matrix_test.png", dpi=300, bbox_inches="tight")
+    cf.CONFIG["output"]["confusion_matrix_test"] = os.path.join(cf.CONFIG["output"]["logs"], "confusion_matrix_test.png")
+    plt.savefig(cf.CONFIG["output"]["confusion_matrix_test"], dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['logs']}/confusion_matrix_test.png")
+    print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['confusion_matrix_test']}")
     if show:
         plt.show()
 

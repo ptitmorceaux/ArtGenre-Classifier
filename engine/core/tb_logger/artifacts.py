@@ -46,7 +46,7 @@ def get_artifacts_md() -> str:
 | File | Path |
 |---|---|
 | Config | `./config.json` |
-| Confusion Matrix | `./confusion_matrix_test.png` |
+| Confusion Matrix | `{cf.CONFIG["output"].get("confusion_matrix_test", "Not available")}` |
 
 {get_models_md()}
 """

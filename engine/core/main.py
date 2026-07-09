@@ -73,7 +73,7 @@ def main():
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
 
     # 8. Écriture des résultats finaux dans TensorBoard
-    print("\n# Etape 8 : Écriture des résultats finaux dans TensorBoard...")
+    print("\n# Etape 8 : Écriture des résultats finaux dans TensorBoard...\n")
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
     tb.write_markdown_from_dict(
         summary_writer,
