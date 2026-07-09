@@ -62,13 +62,18 @@ def train_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
     print(f"\n[*] TensorBoard Logs directory: {cf.CONFIG['output']['logs']}")
 
+    print(f"\n========>>> TRAINING {model_type} MODELS <<<========")
+    models = dict()
     try:
         # Choix du type de modèle à entraîner
         if model_type == "linear":
-            return train_linear_models(df_X, df_Y, summary_writer)
+            models = train_linear_models(df_X, df_Y, summary_writer)
         elif model_type == "mlp":
-            return train_mlp_models(df_X, df_Y, summary_writer)
+            models = train_mlp_models(df_X, df_Y, summary_writer)
         else:
             raise ValueError(f"train_models(): unknown model type '{model_type}'.")
+        print(f"\n========>>> TRAINING {model_type} MODELS COMPLETE <<<========")
+        return models
     finally:
+
         summary_writer.close()
