@@ -53,7 +53,7 @@ def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryW
     for category in cf.CONFIG["dataset"]["categories"].keys():
         print(f"> Training MLP {npl} for category: {category}")
         models_per_category[category] = MLP(npl)
-        loss_history, accuracy_history = models_per_category[category].train(
+        loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=df_X["train"],
             dataset_expected_outputs=df_Y["train"][category],
             data_size=len(df_Y["train"][category]),  # requis par MLP.train, pas par LinearModel.train
@@ -61,8 +61,9 @@ def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryW
             epochs=cf.CONFIG["model"]["epochs"],
             is_classification=True,
         )
-        _write_tensorboard_logs(summary_writer, category, loss_history, accuracy_history)
+        _write_tensorboard_logs(summary_writer, category, loss_history, acc_history)
         print(f"    Model for category '{category}' trained successfully.")
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
 
     return models_per_category
 
