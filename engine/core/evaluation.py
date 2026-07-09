@@ -44,7 +44,7 @@ def compute_binary_stats(expected: list, predicted: list, positive_value) -> dic
     TP = total_expected_positives - FN
     TN = total_expected_negatives - FP
 
-    accuracy = (TP + TN) / total  # pas forcement représentatif si dataset déséquilibré
+    exact_match_accuracy = (TP + TN) / total  # pas forcement représentatif si dataset déséquilibré
 
     # TPR / Recall / Sensibilité : accuracy de prédire vrai quand c'est vrai
     TPR = TP / total_expected_positives if total_expected_positives > 0 else -1
@@ -57,10 +57,10 @@ def compute_binary_stats(expected: list, predicted: list, positive_value) -> dic
 
     # Balanced Accuracy : moyenne de TPR et TNR — traite les deux classes à poids égal,
     # contrairement à l'accuracy simple qui est dominée par la classe majoritaire.
-    balanced_accuracy = -1 if TPR == -1 or TNR == -1 else (TPR + TNR) / 2
+    balanced_accuracy = -1 if (TPR == -1 or TNR == -1) else (TPR + TNR) / 2
 
     return {
-        "accuracy": accuracy,
+        "exact_match_accuracy": exact_match_accuracy,
         "balanced_accuracy": balanced_accuracy,
         "TP": TP,
         "TN": TN,
@@ -76,7 +76,7 @@ def compute_binary_stats(expected: list, predicted: list, positive_value) -> dic
 def _print_stats(stats: dict, count_line: str | None = None) -> None:
     """Affichage uniforme des statistiques, réutilisé pour les modèles individuels et le multiclasse."""
     suffix = f" ({count_line})" if count_line is not None else ""
-    print(f"    Accuracy: {stats['accuracy'] * 100:.2f}%{suffix}")
+    print(f"    Exact Match Accuracy: {stats['exact_match_accuracy'] * 100:.2f}%{suffix}")
     print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.2f}%")
     print(f"    TPR: {stats['TPR'] * 100:.2f}% | TNR: {stats['TNR'] * 100:.2f}% | FPR: {stats['FPR'] * 100:.2f}% | FNR: {stats['FNR'] * 100:.2f}%")
 
