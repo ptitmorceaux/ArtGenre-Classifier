@@ -226,7 +226,7 @@ unsigned char predict_mlp(MLP* model, float* input, char is_classification, floa
     // FEUR
 
 unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expected_outputs,
-        uint32_t dataset_size, float alpha, uint32_t epochs, char is_classification) {
+        uint32_t dataset_size, float alpha, uint32_t epochs, char is_classification, float* loss_history, float* accuracy_history) {
     if (!model || !dataset_inputs || !dataset_expected_outputs) return ERR_INVALID_PTR;
     if (dataset_size == 0) return ERR_LENGTH_ZERO;
 
@@ -236,6 +236,9 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
     // Boucle d'entraînement stochastique
     // Une époque effectue dataset_size mises à jour pour mieux couvrir le dataset.
     for (uint32_t e = 0; e < epochs; e++) {
+        float epoch_loss = 0.0f;
+        uint32_t correct_predictions = 0;
+
         for (uint32_t s = 0; s < dataset_size; s++) {
             float tmp;
             random_float(0, dataset_size - 1, &tmp);
@@ -245,6 +248,49 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
 
             unsigned char status = propagate_forward_mlp(model, inputs_k, is_classification);
             if (status != RES_EXIT_SUCCESS) return status;
+
+            // Loss
+            float sample_error = 0.0f;
+            for (uint32_t j = 1; j <= outputs_dim; j++) {
+                float diff = model->X[model->L][j] - y_k[j - 1];
+                sample_error += (diff * diff);
+            }
+            epoch_loss += sample_error / (float)outputs_dim; // MSE pour cet exemple
+
+            // Accuracy (pour classification uniquement)
+            if (is_classification) {
+
+                // INFO: c'est forcement du one-hot encoding, donc on peut utiliser 0.5 comme seuil (pour y_k)
+                
+                // Cas 1 neuronne de sortie (correct = 1)
+                if (outputs_dim == 1) {
+                    float pred = (model->X[model->L][1] >= 0.0f) ? 1 : -1;
+                    if (y_k[0] >= 0.5f && pred == 1) correct_predictions++;
+                    else if (y_k[0] < 0.5f && pred == -1) correct_predictions++;
+                }
+
+                // Cas multi-neurones de sortie (correct = argmax)
+                else {
+                    uint32_t pred_index = 0;
+                    float max_value = model->X[model->L][1];
+                    for (uint32_t j = 2; j <= outputs_dim; j++) {
+                        if (model->X[model->L][j] > max_value) {
+                            max_value = model->X[model->L][j];
+                            pred_index = j - 1;
+                        }
+                    }
+                    uint32_t y_k_index = 0;
+                    for (uint32_t j = 0; j < outputs_dim; j++) {
+                        if (y_k[j] > 0.5f) {
+                            y_k_index = j;
+                            break;
+                        }
+                    }
+                    if (pred_index == y_k_index) {
+                        correct_predictions++;
+                    }
+                }
+            }
 
             // Calcul des deltas pour la couche de sortie
             for (uint32_t j = 1; j <= outputs_dim; j++) {
@@ -282,6 +328,16 @@ unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expect
                     }
                 }
             }
+        }
+
+        // Calcul de la perte et de l'exactitude pour cette époque
+        if (loss_history != NULL) {
+            loss_history[e] = epoch_loss / dataset_size; // moyenne des MSE pour cette époque
+        }
+
+        // Calcul de l'accuracy pour cette époque
+        if (accuracy_history != NULL) {
+            accuracy_history[e] = (float)correct_predictions / (float)dataset_size;
         }
     }
 
