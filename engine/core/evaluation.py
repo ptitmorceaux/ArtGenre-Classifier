@@ -131,11 +131,14 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     # 2. Évaluation du résultat final multiclasse (argmax), par catégorie,
     #    stockée séparément dans test_individual_accuracy_multiclass (même logique, autre positive_value).
     print(f"\n========>>> Evaluating final multiclass predictions <<<========")
-    cf.CONFIG["model"]["test_individual_accuracy_multiclass"] = { "_global": dict() }
+    cf.CONFIG["model"]["test_individual_accuracy_multiclass"] = {
+        "categories": dict(),
+        "global": dict()
+    }
 
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         stats = compute_binary_stats(df_predictions_expected, df_predictions_test, positive_value=category)
-        cf.CONFIG["model"]["test_individual_accuracy_multiclass"][category] = stats
+        cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["categories"][category] = stats
 
         correct = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if (e == category) == (p == category))
         print(f"\n  > Category: {category}")
@@ -146,18 +149,18 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
     total_predictions = len(df_predictions_expected)
     exact_match_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
-    cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["_global"]["exact_match_accuracy"] = exact_match_accuracy
+    cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["global"]["exact_match_accuracy"] = exact_match_accuracy
 
     # "global" : macro-average des stats par catégorie (moyenne simple des dicts
     # ci-dessus), pour rester un dict homogène avec les autres entrées et pouvoir
     # itérer sans cas particulier dans tb_logger.
-    sum_balanced_accuracy = sum(stats["balanced_accuracy"] for stats in cf.CONFIG["model"]["test_individual_accuracy_multiclass"].values())
-    len_global_stats = len(cf.CONFIG["model"]["test_individual_accuracy_multiclass"])
+    sum_balanced_accuracy = sum(stats["balanced_accuracy"] for stats in cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["categories"].values())
+    len_global_stats = len(cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["categories"])
     avg_balanced_accuracy = sum_balanced_accuracy / len_global_stats if len_global_stats > 0 else 0
-    cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["_global"]["avg_balanced_accuracy"] = avg_balanced_accuracy
-    print(f"\n========>>> Global (macro-average across categories) <<<========")
+    cf.CONFIG["model"]["test_individual_accuracy_multiclass"]["global"]["avg_balanced_accuracy"] = avg_balanced_accuracy
+    print(f"\n========>>> Evaluation Results <<<========")
 
-    print(f"\n> Global (macro-average across categories)")
+    print(f"\n> Global Multiclass Stats:")
     print(f"    Exact Match Accuracy: {exact_match_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})\n")
     print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.2f}%")
 
