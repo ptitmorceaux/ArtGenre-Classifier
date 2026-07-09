@@ -82,7 +82,7 @@ def load_images_from_filepaths(df_X_filepaths: dict) -> dict:
 
         for i, filepath in enumerate(filepaths):
             if i % 50 == 0 or i == total - 1:
-                print(f"\rChargement {step}... {i+1}/{total} ({100*(i+1)/total:.4f}%)", end="", flush=True)
+                print(f"\rChargement {step}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
 
             img = Image.open(filepath).convert("RGB")
             img_array = (np.array(img).flatten()).astype(np.float32)

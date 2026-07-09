@@ -76,9 +76,9 @@ def compute_binary_stats(expected: list, predicted: list, positive_value) -> dic
 def _print_stats(stats: dict, count_line: str | None = None) -> None:
     """Affichage uniforme des statistiques, réutilisé pour les modèles individuels et le multiclasse."""
     suffix = f" ({count_line})" if count_line is not None else ""
-    print(f"    Accuracy: {stats['accuracy'] * 100:.4f}%{suffix}")
-    print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.4f}%")
-    print(f"    TPR: {stats['TPR'] * 100:.4f}% | TNR: {stats['TNR'] * 100:.4f}% | FPR: {stats['FPR'] * 100:.4f}% | FNR: {stats['FNR'] * 100:.4f}%")
+    print(f"    Accuracy: {stats['accuracy'] * 100:.2f}%{suffix}")
+    print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.2f}%")
+    print(f"    TPR: {stats['TPR'] * 100:.2f}% | TNR: {stats['TNR'] * 100:.2f}% | FPR: {stats['FPR'] * 100:.2f}% | FNR: {stats['FNR'] * 100:.2f}%")
 
 
 def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list]:
@@ -158,8 +158,8 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     print(f"\n========>>> Global (macro-average across categories) <<<========")
 
     print(f"\n> Global (macro-average across categories)")
-    print(f"    Exact Match Accuracy: {exact_match_accuracy * 100:.4f}% ({correct_predictions}/{total_predictions})\n")
-    print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.4f}%")
+    print(f"    Exact Match Accuracy: {exact_match_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})\n")
+    print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.2f}%")
 
     return df_predictions_expected, df_predictions_test
 
