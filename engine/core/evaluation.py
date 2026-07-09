@@ -23,13 +23,26 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     predictions = dict()
 
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
-        print(f"Evaluating model for category: {category}")
+        print(f"> Evaluating model for category: {category}")
 
         predictions[category] = dict()
         predictions[category]["values"] = [
             _predict_scalar(models_per_category[category], x) for x in df_X["test"]
         ]
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
+
+        # Caclul de l'accuracy par catégorie
+        correct_predictions = sum(1 for expected, predicted in zip(df_Y["test"][category], predictions[category]["prediction"]) if expected == predicted)
+        total_predictions = len(df_Y["test"][category])
+        if total_predictions == 0:
+            print(f"    No test samples for category '{category}'. Skipping accuracy calculation.")
+            accuracy = -1
+        else:
+            accuracy = correct_predictions / total_predictions
+        if "test_accuracy" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["test_accuracy"] = dict()
+        cf.CONFIG["model"]["test_accuracy"][category] = accuracy
+        print(f"    Accuracy for '{category}': {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
@@ -50,6 +63,12 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     for i in range(len(df_Y["test"][first_cat])):
         category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
+    
+    # Caclul de l'accuracy globale
+    correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
+    total_predictions = len(df_predictions_expected)
+    accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+    print(f"\n>>> Global Accuracy: {accuracy * 100:.4f}% ({correct_predictions}/{total_predictions})\n")
 
     return df_predictions_expected, df_predictions_test
 
@@ -92,18 +111,6 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['logs']}/confusion_matrix_test.png")
     if show:
         plt.show()
-
-
-def calculate_accuracy(df_predictions_expected: list, df_predictions_test: list) -> float:
-    """Calcule l'accuracy des prédictions."""
-    correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
-    total_predictions = len(df_predictions_expected)
-    if total_predictions <= 0:
-        raise ValueError("Total predictions must be greater than zero to calculate accuracy.")
-    accuracy = correct_predictions / total_predictions
-    print(f"[*] Test Accuracy: {accuracy:.4f} ({correct_predictions}/{total_predictions})")
-    cf.CONFIG["model"]["test_accuracy"] = accuracy
-    return accuracy
 
 
 if __name__ == "__main__":

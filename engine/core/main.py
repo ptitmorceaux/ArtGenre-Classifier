@@ -13,7 +13,7 @@ from engine.core.dataset import load_and_prepare_csv, load_images_from_filepaths
 from engine.core.preprocessing import standardize_data
 from engine.core.training import train_models
 from engine.core.persistence import save_trained_models, save_config_json
-from engine.core.evaluation import evaluate_models, plot_confusion_matrix, calculate_accuracy
+from engine.core.evaluation import evaluate_models, plot_confusion_matrix
 
 
 def parse_args() -> argparse.Namespace:
@@ -71,7 +71,6 @@ def main():
     print("\n# Etape 7 : Évaluation et Visualisation...")
     df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
     plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
-    calculate_accuracy(df_predictions_expected, df_predictions_test)
 
     # 8. Écriture des résultats finaux dans TensorBoard
     print("\n# Etape 8 : Écriture des résultats finaux dans TensorBoard...")
