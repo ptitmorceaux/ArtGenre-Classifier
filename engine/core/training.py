@@ -3,22 +3,7 @@ import tensorflow as tf
 import engine.core.config as cf
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
-
-
-def _write_tensorboard_logs(summary_writer: tf.summary.SummaryWriter, category: str, loss_history: list[float], accuracy_history: list[float] | None) -> None:
-    """Écrit les logs de perte et d'exactitude dans TensorBoard."""
-    with summary_writer.as_default():
-        for epoch in range(cf.CONFIG["model"]["epochs"]):
-            tf.summary.scalar(f"{category}/Loss", loss_history[epoch], step=epoch)
-            if accuracy_history is not None:
-                tf.summary.scalar(f"{category}/Accuracy", accuracy_history[epoch], step=epoch)
-    # Rend les événements immédiatement visibles dans TensorBoard.
-    # Les logs sont flushés après chaque catégorie, car le code C ne renvoie
-    # l'historique qu'une fois l'entraînement du modèle terminé.
-    summary_writer.flush()
-
-
-
+import engine.core.tensorboard as tb
 
 
 def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryWriter) -> dict[str, LinearModel]:
@@ -35,7 +20,7 @@ def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.Summa
             alpha=cf.CONFIG["model"]["alpha"],
             epochs=cf.CONFIG["model"]["epochs"]
         )
-        _write_tensorboard_logs(summary_writer, category, loss_history, acc_history)
+        tb.write_tensorboard_logs(summary_writer, category, loss_history, acc_history)
         print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
         
         if "final_accuracy_per_category" not in cf.CONFIG["model"].keys():
@@ -60,7 +45,7 @@ def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryW
             epochs=cf.CONFIG["model"]["epochs"],
             is_classification=True,
         )
-        _write_tensorboard_logs(summary_writer, category, loss_history, acc_history)
+        tb.write_tensorboard_logs(summary_writer, category, loss_history, acc_history)
         print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
         
         if "final_accuracy_per_category" not in cf.CONFIG["model"].keys():
@@ -87,7 +72,8 @@ def train_models(df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
             raise ValueError(f"train_models(): unknown model type '{model_type}'.")
 
         with summary_writer.as_default():
-            pass
+            for title, markdown in tb.get_summary_md().items():
+                tf.summary.text(title, markdown, step=0)
 
         return models
     finally:
