@@ -37,6 +37,6 @@ def get_training_md() -> dict[str, str]:
     accuracy_md = get_final_accuracy_md()
 
     if accuracy_md:
-        summary["0.Training/Final Train Accuracy"] = accuracy_md
+        summary["0. Training/Final Train Accuracy"] = accuracy_md
 
     return summary
