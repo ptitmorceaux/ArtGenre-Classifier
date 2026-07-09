@@ -65,11 +65,16 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         # FNR : parmi les vrais positifs, proportion prédite à tort comme négative (= 1 - TPR)
         FNR = FN / total_expected_positives if total_expected_positives > 0 else -1
 
+        # Balanced Accuracy : moyenne de TPR et TNR — traite les deux classes à poids égal,
+        # contrairement à l'accuracy simple qui est dominée par la classe majoritaire (négative).
+        balanced_accuracy = -1 if TPR == -1 or TNR == -1 else (TPR + TNR) / 2
+
         if "test_accuracy" not in cf.CONFIG["model"].keys():
             cf.CONFIG["model"]["test_accuracy"] = dict()
 
         cf.CONFIG["model"]["test_accuracy"][category] = {
-            "accuracy": accuracy,
+            "accuracy": accuracy, # pas forcement représentatif si dataset déséquilibré (ex: 95% de négatifs, 5% de positifs => accuracy = 95% même si le modèle ne prédit jamais de positifs)
+            "balanced_accuracy": balanced_accuracy, # mieux pour dataset déséquilibré
             "TP": TP,
             "TN": TN,
             "FP": FP,
@@ -81,7 +86,8 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         }
 
         print(f"    Accuracy for '{category}': {accuracy * 100:.1f}% ({correct_predictions}/{total_predictions})")
-        print(f"    TP: {TP} | TN: {TN} | FP: {FP} | FN: {FN}")
+        print(f"    Balanced Accuracy: {balanced_accuracy * 100:.1f}%")
+        # print(f"    TP: {TP} | TN: {TN} | FP: {FP} | FN: {FN}")
         print(f"    TPR: {TPR * 100:.1f}% | TNR: {TNR * 100:.1f}% | FPR: {FPR * 100:.1f}% | FNR: {FNR * 100:.1f}%")
 
     # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
