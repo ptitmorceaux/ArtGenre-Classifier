@@ -23,9 +23,9 @@ def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.Summa
         tb.write_training_logs(summary_writer, category, loss_history, acc_history)
         print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
         
-        if "final_accuracy_per_category" not in cf.CONFIG["model"].keys():
-            cf.CONFIG["model"]["final_accuracy_per_category"] = dict()
-        cf.CONFIG["model"]["final_accuracy_per_category"][category] = acc_history[-1]
+        if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
+        cf.CONFIG["model"]["train_last_accuracy_per_category"][category] = acc_history[-1]
     
     return models_per_category
 
@@ -48,9 +48,9 @@ def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryW
         tb.write_training_logs(summary_writer, category, loss_history, acc_history)
         print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.1f}%\n")
         
-        if "final_accuracy_per_category" not in cf.CONFIG["model"].keys():
-            cf.CONFIG["model"]["final_accuracy_per_category"] = dict()
-        cf.CONFIG["model"]["final_accuracy_per_category"][category] = acc_history[-1]
+        if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
+        cf.CONFIG["model"]["train_last_accuracy_per_category"][category] = acc_history[-1]
 
     return models_per_category
 

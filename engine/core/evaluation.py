@@ -93,6 +93,19 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     if show:
         plt.show()
 
+
+def calculate_accuracy(df_predictions_expected: list, df_predictions_test: list) -> float:
+    """Calcule l'accuracy des prédictions."""
+    correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
+    total_predictions = len(df_predictions_expected)
+    if total_predictions <= 0:
+        raise ValueError("Total predictions must be greater than zero to calculate accuracy.")
+    accuracy = correct_predictions / total_predictions
+    print(f"[*] Test Accuracy: {accuracy:.4f} ({correct_predictions}/{total_predictions})")
+    cf.CONFIG["model"]["test_accuracy"] = accuracy
+    return accuracy
+
+
 if __name__ == "__main__":
 
     sample_df_X = {
