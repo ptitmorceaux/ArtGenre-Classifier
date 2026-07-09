@@ -50,7 +50,7 @@ def write_images(
 
     with summary_writer.as_default():
         tf.summary.image(
-            "Evaluation/Confusion Matrix",
+            "0. Evaluation/Confusion Matrix",
             image,
             step=0
         )

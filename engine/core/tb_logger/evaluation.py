@@ -61,6 +61,6 @@ def get_evaluation_md() -> dict[str, str]:
     test_accuracy_md = get_test_accuracy_md()
 
     if test_accuracy_md:
-        summary["2. Evaluation/0. Test Accuracy"] = test_accuracy_md
+        summary["0. Evaluation/0. Test Accuracy"] = test_accuracy_md
 
     return summary
