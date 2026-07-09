@@ -27,8 +27,14 @@ def get_config_documentation() -> dict:
     Renvoie la documentation de la configuration sous forme de dictionnaire.
     Chaque section contient des clés avec leurs types, valeurs par défaut et options possibles.
     """
-    default_dataset_data_folder_path = os.path.join("dataset", "64x64")
-    default_dataset_data_csv_path = os.path.join("dataset")
+    default_dataset_data_csv_path = {
+        "test": os.path.join("dataset", "test"),
+        "train": os.path.join("dataset", "train"),
+    }
+    default_dataset_data_folder_path = {
+        "test": os.path.join(default_dataset_data_csv_path["test"], "64x64"),
+        "train": os.path.join(default_dataset_data_csv_path["train"], "64x64"),
+    }
     return {
         "lib": {
             "compile": {
@@ -75,21 +81,17 @@ def get_config_documentation() -> dict:
         "dataset": {
             "csv_path": {
                 "docs": "Chemin vers le fichier CSV du dataset.",
-                "type": (str,),
+                "type": (dict,),
                 "default": default_dataset_data_csv_path,
             },
             "data_folder_path": {
                 "docs": "Chemin vers le dossier contenant les images du dataset.",
-                "type": (str,),
+                "type": (dict,),
                 "default": default_dataset_data_folder_path,
             },
             "limit_per_category": {
                 "docs": "Limite de données par catégorie.",
                 "type": (int,),
-            },
-            "train_test_split_ratio": {
-                "docs": "Ratio de séparation entre les ensembles d'entraînement et de test.",
-                "type": (float,),
             },
             "normalization_method": {
                 "docs": "Méthode de normalisation des données.",
@@ -100,17 +102,33 @@ def get_config_documentation() -> dict:
                 "docs": "Dictionnaire des catégories avec leurs chemins de données et CSV. Ex: {'impressionism': {'data_folder_path': 'path/to/impressionism', 'csv_path': 'path/to/impressionism.csv'}, ...}",
                 "type": (dict,),
                 "default": {
-                    "impressionism": {
-                        "data_folder_path": os.path.join(default_dataset_data_folder_path, "impressionism"),
-                        "csv_path": os.path.join(default_dataset_data_csv_path, "impressionism_clean.csv")
+                    "test": {
+                        "impressionism": {
+                            "data_folder_path": os.path.join(default_dataset_data_folder_path["test"], "impressionism"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "impressionism_clean.csv"),
+                        },
+                        "realism": {
+                            "data_folder_path": os.path.join(default_dataset_data_folder_path["test"], "realism"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "realism_clean.csv"),
+                        },
+                        "romanticism": {
+                            "data_folder_path": os.path.join(default_dataset_data_folder_path["test"], "romanticism"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "romanticism_clean.csv"),
+                        },
                     },
-                    "realism": {
-                        "data_folder_path": os.path.join(default_dataset_data_folder_path, "realism"),
-                        "csv_path": os.path.join(default_dataset_data_csv_path, "realism_clean.csv")
-                    },
-                    "romanticism": {
-                        "data_folder_path": os.path.join(default_dataset_data_folder_path, "romanticism"),
-                        "csv_path": os.path.join(default_dataset_data_csv_path, "romanticism_clean.csv")
+                    "train": {
+                        "impressionism": {
+                            "data_folder_path": os.path.join(default_dataset_data_folder_path["train"], "impressionism"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "impressionism_clean.csv"),
+                        },
+                        "realism": {
+                            "data_folder_path": os.path.join(default_dataset_data_folder_path["train"], "realism"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "realism_clean.csv"),
+                        },
+                        "romanticism": {
+                            "data_folder_path": os.path.join(default_dataset_data_folder_path["train"], "romanticism"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "romanticism_clean.csv"),
+                        },
                     },
                 },
             },
@@ -186,10 +204,35 @@ def init_config(config: dict) -> dict:
             if section == "lib" and key == "seed":
                 config[section][key] = select_seed(config[section]["seeds_choice"], value)
     
+    # Ajoute les chemins de sortie pour les logs et les modèles
     date, time = get_date_time_now()
     config["output"]["logs"] = os.path.join(config["output"]["folder"], config["model"]["type"], date, time)
     config["output"]["models"] = os.path.join(config["output"]["logs"], "models")
     
+    return config
+
+
+def finalize_mlp_config(config: dict) -> dict:
+    """
+    Construit (ou vérifie) l'architecture 'npl' du MLP. À appeler APRÈS le chargement
+    des images, une fois que 'dataset.W_length' est connu.
+    """
+    if config["model"]["type"] != "mlp":
+        return config
+
+    if "npl" not in config["model"]:
+        config["model"]["npl"] = [config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1]
+    else:
+        W_length = config["model"]["npl"][0]
+        if W_length != config["dataset"]["W_length"]:
+            raise ValueError(f"finalize_mlp_config(): W_length incohérent. "
+                            f"Obtenu: {W_length}, Attendu: {config['dataset']['W_length']}")
+
+        npl = config["model"]["npl"][1:-1]
+        if npl != config["model"]["mlp_hidden_layers"]:
+            raise ValueError(f"finalize_mlp_config(): mlp_hidden_layers incohérent. "
+                            f"Obtenu: {npl}, Attendu: {config['model']['mlp_hidden_layers']}")
+
     return config
 
 

@@ -153,7 +153,7 @@ unsigned char predict_linear_classification(LinearModel* model, float* input, in
             - Mise à jour du biais  : b = b + (alpha * Erreur * 1) (car le biais on le multiplie par 1)
 */
 unsigned char train_linear_classification(LinearModel* model, float* dataset_inputs,
-        float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history, float* accuracy_history) {   
+        float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history, float* accuracy_history) {
     if (!model || !model->weights) return ERR_INVALID_PTR;
     /*
      * Début de l'entraînement par la règle de Rosenblatt.
