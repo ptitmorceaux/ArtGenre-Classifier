@@ -96,11 +96,7 @@ def get_test_multiclass_accuracy_md() -> str | None:
     categories_stats = test_multiclass["categories"]
     global_stats = test_multiclass["global"]
 
-    summary = "\n# Final Multiclass Result (Argmax)\n"
-    summary += _stats_table_md(categories_stats)
-    summary += _confusion_counts_md(categories_stats)
-
-    summary += f"""
+    summary = f"""
 ## Multiclass Global Metrics
 
 | Metric | Value |
@@ -108,6 +104,11 @@ def get_test_multiclass_accuracy_md() -> str | None:
 | Top-1 Accuracy | {_fmt_pct(global_stats['top1_accuracy'])} |
 | Average Balanced Accuracy | {_fmt_pct(global_stats['avg_balanced_accuracy'])} |
 """
+
+    summary += "\n## Final Multiclass Result (Argmax)\n"
+    summary += _stats_table_md(categories_stats)
+    summary += _confusion_counts_md(categories_stats)
+
     return summary
 
 
