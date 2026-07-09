@@ -1,7 +1,7 @@
 from .writer import (
-    write_training_logs,
-    write_images,
-    write_markdown_from_dict,
+    write_training_logs as write_training_logs,
+    write_images as write_images,
+    write_markdown_from_dict as write_markdown_from_dict,
 )
 
 from .experiment import get_experiment_md
