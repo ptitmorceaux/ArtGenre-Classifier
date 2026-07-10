@@ -76,7 +76,7 @@ def get_test_individual_accuracy_md() -> str | None:
     if test_individual_accuracy is None:
         return None
 
-    summary = "\n# Individual Models (One-vs-All)\n"
+    summary = "\n# Individual Models\n"
     summary += _stats_table_md(test_individual_accuracy)
     summary += _confusion_counts_md(test_individual_accuracy)
 
