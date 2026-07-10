@@ -1,6 +1,6 @@
 import os
+import sys
 from django.apps import AppConfig
-
 from engine.interop.loader import Loader
 from engine.core.config import CONFIG
 
@@ -9,6 +9,13 @@ class ApiConfig(AppConfig):
     name = 'api'
 
     def ready(self):
+        if 'runserver' not in sys.argv:
+            return
+
+        if not CONFIG:
+            print("Attention: CONFIG n'a pas pu être chargé.")
+            return
+
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         
         libc_folder = os.path.join(base_dir, CONFIG["lib"]["lib_folder"])
@@ -25,6 +32,5 @@ class ApiConfig(AppConfig):
             )
             print("Librairie C et specs JSON chargées avec succès pour l'API.")
         except RuntimeError as e:
-            
-            if "Library is already loaded" not in str(e):
+            if "already loaded" not in str(e).lower():
                 print(f"Erreur de chargement de la libc : {e}")

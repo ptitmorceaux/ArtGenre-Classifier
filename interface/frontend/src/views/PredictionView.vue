@@ -1,13 +1,46 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import PredictionResult from '../components/PredictionResult.vue'
 
-const selectedModel = ref('mlp')
+const availableModels = ref([])
+const selectedSessionId = ref('')
+const currentMetrics = ref(null)
+
 const selectedFile = ref(null)
 const imagePreview = ref(null)
 const isLoading = ref(false)
 const result = ref(null)
 const error = ref(null)
+
+// Liste les modèles entraînés disponibles depuis le backend
+onMounted(async () => {
+  try {
+    const res = await fetch('http://127.0.0.1:8000/api/models/')
+    const data = await res.json()
+    if (data.status === 'success' && data.models.length > 0) {
+      availableModels.value = data.models
+      selectedSessionId.value = data.models[0].id
+      fetchMetrics()
+    }
+  } catch (err) {
+    console.error("Impossible de charger les modèles :", err)
+  }
+})
+
+// Charge l'image de la matrice de confusion pour le modèle sélectionné
+const fetchMetrics = async () => {
+  if (!selectedSessionId.value) return
+  currentMetrics.value = null
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/models/${selectedSessionId.value}/metrics/`)
+    const data = await res.json()
+    if (data.status === 'success') {
+      currentMetrics.value = data
+    }
+  } catch (err) {
+    console.error("Impossible de charger les métriques :", err)
+  }
+}
 
 const handleFileChange = (event) => {
   const file = event.target.files[0]
@@ -20,14 +53,14 @@ const handleFileChange = (event) => {
 }
 
 const submitPrediction = async () => {
-  if (!selectedFile.value) return
+  if (!selectedFile.value || !selectedSessionId.value) return
   isLoading.value = true
   result.value = null
   error.value = null
 
   const formData = new FormData()
   formData.append('image', selectedFile.value)
-  formData.append('model', selectedModel.value)
+  formData.append('session_id', selectedSessionId.value)
 
   try {
     const res = await fetch('http://127.0.0.1:8000/api/predict/', {
@@ -50,38 +83,44 @@ const submitPrediction = async () => {
 
 <template>
   <div class="prediction-view">
-    <div class="card setup-card">
-      <h2>Analyser une œuvre</h2>
-      
-      <div class="form-group">
-        <label for="model-select">Modèle d'inférence :</label>
-        <select id="model-select" v-model="selectedModel">
-          <option value="mlp">Perceptron Multi-Couches (C)</option>
-          <option value="linear">Modèle Linéaire (C)</option>
-        </select>
+    <div class="column-left">
+      <div class="card setup-card">
+        <h2>Analyser une œuvre</h2>
+        <div class="form-group">
+          <label for="model-select">Modèle entraîné (Classé par performance) :</label>
+          <select id="model-select" v-model="selectedSessionId" @change="fetchMetrics">
+            <option disabled value="">Chargement des modèles...</option>
+            <option v-for="model in availableModels" :key="model.id" :value="model.id">
+              {{ model.label }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group upload-zone" :class="{ 'has-image': imagePreview }">
+          <label for="image-input" class="file-label">
+            <div v-if="!imagePreview" class="empty-state">
+              <span class="upload-icon">📁</span>
+              <p>Glissez ou cliquez pour uploader une image</p>
+            </div>
+            <img v-else :src="imagePreview" class="preview-img" alt="Aperçu" />
+          </label>
+          <input type="file" id="image-input" accept="image/*" @change="handleFileChange" style="display: none;" />
+        </div>
+        <button @click="submitPrediction" :disabled="!selectedFile || !selectedSessionId || isLoading" class="btn-primary">
+          <span v-if="isLoading" class="spinner">⚙️</span>
+          {{ isLoading ? 'Analyse en cours...' : 'Lancer la classification' }}
+        </button>
+
+        <div v-if="error" class="alert-error">
+          <strong>Erreur :</strong> {{ error }}
+        </div>
       </div>
-
-      <div class="form-group upload-zone" :class="{ 'has-image': imagePreview }">
-        <label for="image-input" class="file-label">
-          <div v-if="!imagePreview" class="empty-state">
-            <span class="upload-icon">📁</span>
-            <p>Glissez ou cliquez pour uploader une image</p>
-          </div>
-          <img v-else :src="imagePreview" class="preview-img" alt="Aperçu" />
-        </label>
-        <input type="file" id="image-input" accept="image/*" @change="handleFileChange" style="display: none;" />
-      </div>
-
-      <button @click="submitPrediction" :disabled="!selectedFile || isLoading" class="btn-primary">
-        <span v-if="isLoading" class="spinner">⚙️</span>
-        {{ isLoading ? 'Analyse en cours...' : 'Lancer la classification' }}
-      </button>
-
-      <div v-if="error" class="alert-error">
-        <strong>Erreur :</strong> {{ error }}
+      <div v-if="currentMetrics && currentMetrics.confusion_matrix" class="card metrics-card">
+        <h3 class="metrics-title">Performances du modèle (Validation)</h3>
+        <img :src="'data:image/png;base64,' + currentMetrics.confusion_matrix" alt="Matrice de Confusion" class="metric-img" />
       </div>
     </div>
 
+    <!-- RÉSULTATS D'INFERENCE (Histogramme Matplotlib des poids) -->
     <div class="results-container">
       <PredictionResult v-if="result" :data="result" />
     </div>
@@ -98,8 +137,14 @@ const submitPrediction = async () => {
 
 @media (min-width: 900px) {
   .prediction-view {
-    grid-template-columns: 400px 1fr; /* Le formulaire à gauche, les résultats à droite */
+    grid-template-columns: 400px 1fr;
   }
+}
+
+.column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .card {
@@ -132,11 +177,15 @@ select {
   padding: 12px;
   border: 1px solid #dfe6e9;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   background-color: #f8fafc;
   color: #2c3e50;
   outline: none;
   transition: border-color 0.2s;
+}
+
+select:focus {
+  border-color: #3498db;
 }
 
 select option {
@@ -165,8 +214,16 @@ select option {
   margin: 0;
 }
 
-.empty-state p { margin: 0; color: #636e72; font-size: 0.9rem; }
-.upload-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+.empty-state p {
+  margin: 0; color:
+  #636e72; font-size: 0.9rem;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
 
 .preview-img {
   width: 100%;
@@ -197,8 +254,6 @@ select option {
 .btn-primary:disabled {
   background: #bdc3c7;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 .alert-error {
@@ -210,4 +265,17 @@ select option {
   border-left: 4px solid #ef4444;
   font-size: 0.9rem;
 }
+
+.metrics-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.metric-img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  }
+  
 </style>
