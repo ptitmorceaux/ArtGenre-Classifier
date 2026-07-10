@@ -109,7 +109,7 @@ class MLP:
             alpha: float,
             epochs: int,
             is_classification: bool
-            ) -> None:
+            ) -> tuple[list[float], list[float] | None]:
         """Entraîne le MLP en utilisant la rétropropagation du gradient (SGD)."""
         
         # Vérifications
@@ -120,8 +120,9 @@ class MLP:
         # Conversions des listes Python en tableaux C
         c_dataset_inputs = (ctypes.c_float * len(dataset_inputs))(*dataset_inputs)
         c_expected_outputs = (ctypes.c_float * len(dataset_expected_outputs))(*dataset_expected_outputs)
-        
-        c_is_classification = ctypes.c_byte(1 if is_classification else 0)
+
+        c_loss_history = (ctypes.c_float * epochs)()
+        c_accuracy_history = (ctypes.c_float * epochs)() if is_classification else None
 
         Loader.call(
             "train_mlp",
@@ -131,9 +132,12 @@ class MLP:
             ctypes.c_uint32(data_size),
             ctypes.c_float(alpha),
             ctypes.c_uint32(epochs),
-            c_is_classification,
+            ctypes.c_byte(is_classification),
+            c_loss_history,
+            c_accuracy_history,
             prefix_errmsg="MLP.train()"
         )
+        return (c_loss_history[:epochs], c_accuracy_history[:epochs] if is_classification else None)
 
 
     # ===== GETTER / SETTER ======#

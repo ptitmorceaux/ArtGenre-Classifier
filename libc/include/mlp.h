@@ -23,6 +23,6 @@ DLLEXPORT unsigned char create_mlp(uint32_t* npl, uint32_t npl_size, MLP** res_m
 DLLEXPORT unsigned char free_mlp(MLP** model_ptr);
 DLLEXPORT unsigned char propagate_forward_mlp(MLP* model, float* input, char is_classification);
 DLLEXPORT unsigned char predict_mlp(MLP* model, float* input, char is_classification, float* outputs);
-DLLEXPORT unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, char is_classification);
+DLLEXPORT unsigned char train_mlp(MLP* model, float* dataset_inputs, float* dataset_expected_outputs, uint32_t dataset_size, float alpha, uint32_t epochs, char is_classification, float* loss_history, float* accuracy_history);
 
 #endif 

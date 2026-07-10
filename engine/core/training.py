@@ -1,75 +1,83 @@
-import os
-import datetime
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from engine.core.config import CONFIG, CATEGORIES
+import engine.core.config as cf
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
+import engine.core.tb_logger as tb
 
-def plot_and_save_metrics(loss_histories: dict, acc_histories: dict, session_id: str) -> tuple[str, str]:
-    """Génère et sauvegarde les courbes de Loss et d'Accuracy dans le dossier de la session."""
-    metrics_dir = os.path.join(CONFIG["output"]["outdir"], "metrics", session_id)
-    os.makedirs(metrics_dir, exist_ok=True)
-    
-    # 1. Courbe de Loss
-    plt.figure(figsize=(10, 5))
-    for category, loss_history in loss_histories.items():
-        plt.plot(loss_history, label=category)
-    plt.title(f"Loss Curve ({CONFIG['model']['type'].upper()})")
-    plt.xlabel("Epochs"); plt.ylabel("Loss"); plt.legend()
-    loss_filename = "loss_curve.png"
-    plt.savefig(os.path.join(metrics_dir, loss_filename), bbox_inches='tight')
-    plt.close()
-    
-    # 2. Courbe d'Accuracy
-    plt.figure(figsize=(10, 5))
-    for category, acc_history in acc_histories.items():
-        plt.plot(acc_history, label=category)
-    plt.title(f"Accuracy Curve ({CONFIG['model']['type'].upper()})")
-    plt.xlabel("Epochs"); plt.ylabel("Accuracy"); plt.legend()
-    acc_filename = "accuracy_curve.png"
-    plt.savefig(os.path.join(metrics_dir, acc_filename), bbox_inches='tight')
-    plt.close()
-    
-    return loss_filename, acc_filename
 
-def train_linear_models(df_X: dict, df_Y: dict, session_id: str):
+def train_linear_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryWriter) -> dict[str, LinearModel]:
+    """Entraîne un LinearModel par catégorie (One-vs-All)."""
     models_per_category = dict()
     loss_histories, acc_histories = dict(), dict()
 
-    # Création du dossier de log avec la date du jour (Train_JJ_MM)
-    date_folder = datetime.datetime.now().strftime("Train_%d_%m")
-    log_dir = os.path.join(CONFIG["output"]["logs"], "Linear_Classification", date_folder, session_id)
-    summary_writer = tf.summary.create_file_writer(log_dir)
-
-    for category in CATEGORIES:
-        models_per_category[category] = LinearModel.init_random(input_dim=CONFIG["dataset"]["W_length"])
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        print(f"\n> Training LinearModel for category: {category}")
+        models_per_category[category] = LinearModel.init_random(input_dim=cf.CONFIG["dataset"]["W_length"])
         loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=df_X["train"],
             dataset_expected_outputs=df_Y["train"][category],
             is_classification=True,
-            alpha=CONFIG["model"]["alpha"],
-            epochs=CONFIG["model"]["epochs"]
+            alpha=cf.CONFIG["model"]["alpha"],
+            epochs=cf.CONFIG["model"]["epochs"]
         )
+        tb.write_training_logs(summary_writer, category, loss_history, acc_history)
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%")
         
-        loss_histories[category] = loss_history
-        acc_histories[category] = acc_history
-
-        with summary_writer.as_default():
-            for epoch in range(CONFIG["model"]["epochs"]):
-                tf.summary.scalar(f"Loss/{category}", loss_history[epoch], step=epoch)
-                tf.summary.scalar(f"Accuracy/{category}", acc_history[epoch], step=epoch)
-                
-    summary_writer.flush()
-    loss_filename, acc_filename = plot_and_save_metrics(loss_histories, acc_histories, session_id)
+        if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
+        cf.CONFIG["model"]["train_last_accuracy_per_category"][category] = acc_history[-1]
     
-    return models_per_category, loss_filename, acc_filename
+    return models_per_category
 
-def train_models(df_X: dict, df_Y: dict, session_id: str) -> tuple[dict, str|None, str|None]:
-    model_type = CONFIG["model"]["type"]
-    if model_type == "linear":
-        return train_linear_models(df_X, df_Y, session_id)
-    elif model_type == "mlp":
-        # Pour le MLP, on renverra (models_per_category, None, None) pour l'instant
-        return train_mlp_models(df_X, df_Y, session_id), None, None
+
+def train_mlp_models(df_X: dict, df_Y: dict, summary_writer: tf.summary.SummaryWriter) -> dict[str, MLP]:
+    """Entraîne un MLP par catégorie (One-vs-All)."""
+    models_per_category = dict()
+
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        print(f"> Training MLP {cf.CONFIG['model']['npl']} for category: {category}")
+        models_per_category[category] = MLP(cf.CONFIG["model"]["npl"])
+        loss_history, acc_history = models_per_category[category].train(
+            dataset_inputs=df_X["train"],
+            dataset_expected_outputs=df_Y["train"][category],
+            data_size=len(df_Y["train"][category]),  # requis par MLP.train, pas par LinearModel.train
+            alpha=cf.CONFIG["model"]["alpha"],
+            epochs=cf.CONFIG["model"]["epochs"],
+            is_classification=True,
+        )
+        tb.write_training_logs(summary_writer, category, loss_history, acc_history)
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%\n")
+        
+        if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
+        cf.CONFIG["model"]["train_last_accuracy_per_category"][category] = acc_history[-1]
+
+    return models_per_category
+
+
+def train_models(summary_writer: tf.summary.SummaryWriter, df_X: dict, df_Y: dict) -> dict[str, LinearModel | MLP]:
+    """Dispatch vers LinearModel ou MLP selon cf.CONFIG['model']['type']."""
+    model_type = cf.CONFIG["model"]["type"]
+
+    print(f"\n[*] TensorBoard Logs directory: {cf.CONFIG['output']['logs']}")
+
+    print(f"\n========>>> TRAINING {model_type} MODELS <<<========")
+    models = dict()
+    
+    try:
+        # Choix du type de modèle à entraîner
+        if model_type == "linear":
+            models = train_linear_models(df_X, df_Y, summary_writer)
+        elif model_type == "mlp":
+            models = train_mlp_models(df_X, df_Y, summary_writer)
+        else:
+            raise ValueError(f"train_models(): unknown model type '{model_type}'.")
+        
+        print(f"\n========>>> TRAINING {model_type} MODELS COMPLETE <<<========")
+        return models
+    
+    except Exception as e:
+        summary_writer.close()
+        raise e

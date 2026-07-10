@@ -3,63 +3,56 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-from engine.core.config import CONFIG, CATEGORIES
+import engine.core.config as cf
 
 
 def load_and_prepare_csv() -> tuple[dict, dict]:
     """Charge les fichiers CSV des catégories et effectue le découpage Train/Test."""
 
     df_csv_categories = dict()
-    df_csv_all_shuffled = {
-        "train": pd.DataFrame(),
-        "test": pd.DataFrame()
+    df_csv_all_shuffled = dict()
+
+    cf.CONFIG["dataset"]["count_total_dataset"] = {
+        "test": { "total": 0 },
+        "train": { "total": 0 }
     }
 
-    CONFIG["dataset"]["count_total_dataset"] = dict()
-    CONFIG["dataset"]["count_total_dataset"]["total"] = 0
+    for step, categories in cf.CONFIG["dataset"]["categories"].items():
+        for category, paths in categories.items():
+            df = pd.read_csv(paths["csv_path"])
 
-    for category, paths in CATEGORIES.items():
-        df = pd.read_csv(paths["csv_path"])
+            if df.empty:
+                raise ValueError(f"Le fichier CSV pour la catégorie '{category}' est vide ou introuvable.")
 
-        if df.empty:
-            raise ValueError(f"Le fichier CSV pour la catégorie '{category}' est vide ou introuvable.")
+            if step == "train":
+                if cf.CONFIG["dataset"]["limit_per_category"] > 0:
+                    df = df.head(cf.CONFIG["dataset"]["limit_per_category"])
 
-        if CONFIG["dataset"]["limit_per_category"] > 0:
-            df = df.head(CONFIG["dataset"]["limit_per_category"])
+            cf.CONFIG["dataset"]["count_total_dataset"][step][category] = len(df)
+            cf.CONFIG["dataset"]["count_total_dataset"][step]["total"] += cf.CONFIG["dataset"]["count_total_dataset"][step][category]
 
-        CONFIG["dataset"]["count_total_dataset"][category] = len(df)
-        CONFIG["dataset"]["count_total_dataset"]["total"] += CONFIG["dataset"]["count_total_dataset"][category]
+            if "Nom_Fichier" not in df.columns:
+                raise ValueError("La colonne 'Nom_Fichier' n'existe pas dans le DataFrame.")
 
-        if "Nom_Fichier" not in df.columns:
-            raise ValueError("La colonne 'Nom_Fichier' n'existe pas dans le DataFrame.")
+            # Transformation du nom en chemin complet
+            df["filepath"] = df["Nom_Fichier"].apply(lambda x: os.path.join(paths["data_folder_path"], x))
 
-        # Transformation du nom en chemin complet
-        df["filepath"] = df["Nom_Fichier"].apply(lambda x: os.path.join(paths["data_folder_path"], x))
+            # Ajouter une colonne category (Y) avec Encodage One-vs-All (1 ou -1)
+            for c in cf.CONFIG["dataset"]["categories"]["train"].keys():
+                if c in df.columns:
+                    raise ValueError(f"La colonne '{c}' existe déjà dans le DataFrame. Veuillez renommer ou supprimer cette colonne.")
+                df[c] = 1 if c == category else -1
 
-        # Ajouter une colonne category (Y) avec Encodage One-vs-All (1 ou -1)
-        for c in CATEGORIES:
-            if c in df.columns:
-                raise ValueError(f"La colonne '{c}' existe déjà dans le DataFrame. Veuillez renommer ou supprimer cette colonne.")
-            df[c] = 1 if c == category else -1
-
-        # Split train / test
-        df_train = df.sample(frac=CONFIG["dataset"]["train_test_split_ratio"], random_state=CONFIG["lib"]["seed"])
-        df_test = df.drop(df_train.index)
-
-        # On stocke les DataFrames train et test pour chaque catégorie
-        df_csv_categories[category] = {"train": df_train, "test": df_test}
-
+            # On stocke les DataFrames train et test pour chaque catégorie
+            if step not in df_csv_categories:
+                df_csv_categories[step] = dict()
+            df_csv_categories[step][category] = df
+    
         # On concatène les DataFrames train et test pour toutes les catégories
-        if df_csv_all_shuffled["train"].empty:
-            df_csv_all_shuffled["train"] = df_train
-            df_csv_all_shuffled["test"] = df_test
-        else:
-            df_csv_all_shuffled["train"] = pd.concat([df_csv_all_shuffled["train"], df_train], ignore_index=True)
-            df_csv_all_shuffled["test"] = pd.concat([df_csv_all_shuffled["test"], df_test], ignore_index=True)
+        df_csv_all_shuffled[step] = pd.concat([df for df in df_csv_categories[step].values()], ignore_index=True)
 
-    # Mélange final des jeux de données complets
-    df_csv_all_shuffled["train"] = df_csv_all_shuffled["train"].sample(frac=1, random_state=CONFIG["lib"]["seed"]).reset_index(drop=True)
-    df_csv_all_shuffled["test"] = df_csv_all_shuffled["test"].sample(frac=1, random_state=CONFIG["lib"]["seed"]).reset_index(drop=True)
+    # Mélange final du jeu de données uniquement pour le TRAIN
+    df_csv_all_shuffled["train"] = df_csv_all_shuffled["train"].sample(frac=1, random_state=cf.CONFIG["lib"]["seed"]).reset_index(drop=True)
 
     # Extraction des labels (Y) et nettoyage des DataFrames
     df_X_filepaths = {
@@ -68,7 +61,7 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
     }
 
     df_Y = {"train": {}, "test": {}}
-    for category in CATEGORIES:
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         df_Y["train"][category] = list(df_csv_all_shuffled["train"][category])
         df_Y["test"][category] = list(df_csv_all_shuffled["test"][category])
         df_csv_all_shuffled["train"].drop(columns=[category], inplace=True)
@@ -89,15 +82,15 @@ def load_images_from_filepaths(df_X_filepaths: dict) -> dict:
 
         for i, filepath in enumerate(filepaths):
             if i % 50 == 0 or i == total - 1:
-                print(f"\rChargement {step}... {i+1}/{total} ({100*(i+1)/total:.1f}%)", end="", flush=True)
+                print(f"\rChargement {step}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
 
             img = Image.open(filepath).convert("RGB")
             img_array = (np.array(img).flatten()).astype(np.float32)
 
-            if "W_length" not in CONFIG["dataset"]:
-                CONFIG["dataset"]["W_length"] = len(img_array)
-            elif len(img_array) != CONFIG["dataset"]["W_length"]:
-                raise ValueError(f"Image at {filepath} has a different size ({len(img_array)}) than expected ({CONFIG['dataset']['W_length']}).")
+            if "W_length" not in cf.CONFIG["dataset"]:
+                cf.CONFIG["dataset"]["W_length"] = len(img_array)
+            elif len(img_array) != cf.CONFIG["dataset"]["W_length"]:
+                raise ValueError(f"Image at {filepath} has a different size ({len(img_array)}) than expected ({cf.CONFIG['dataset']['W_length']}).")
 
             df_X[step].append(img_array)
         print()

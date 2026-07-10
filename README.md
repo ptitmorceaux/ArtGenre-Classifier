@@ -27,7 +27,7 @@ Le projet est divisé en trois couches principales :
 
 ### Prérequis
 * GCC & Make: [Setup via MSYS2 sous Windows](./docs/setup_windows_msys2.md)
-* Python 3.8+
+* Python 3.11
 * Docker & Docker Compose
 
 ### Installation des dépendances Python

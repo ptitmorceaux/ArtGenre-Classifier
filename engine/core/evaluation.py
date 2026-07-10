@@ -8,50 +8,170 @@ from engine.core.config import CONFIG, CATEGORIES
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
+import engine.core.config as cf
+
+
 def _predict_scalar(model, x) -> float:
     output = model.predict(x, is_classification=False)
     return output[0] if isinstance(output, list) else output
 
-def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list, float]:
+
+def compute_binary_stats(expected: list, predicted: list, positive_value) -> dict:
+    """
+    Calcule les statistiques de classification binaire (ou One-vs-Rest si les valeurs
+    sont des catégories parmi plusieurs) : TP/TN/FP/FN, les taux dérivés
+    (TPR/TNR/FPR/FNR) et les accuracy (simple + balanced).
+
+    `positive_value` définit ce qui compte comme "positif" dans `expected`/`predicted`
+    (ex: 1 pour un modèle One-vs-All, ou le nom d'une catégorie pour un résultat
+    multiclasse du type argmax).
+
+    Réutilisée à la fois pour évaluer chaque modèle individuel (One-vs-All) et pour
+    évaluer le résultat final multiclasse (One-vs-Rest, une fois par catégorie).
+    """
+    total = len(expected)
+    if total == 0:
+        raise ValueError("compute_binary_stats(): 'expected' est vide, impossible de calculer les statistiques.")
+
+    total_expected_positives = sum(1 for e in expected if e == positive_value)
+    total_expected_negatives = total - total_expected_positives
+
+    FP = sum(1 for e, p in zip(expected, predicted) if e != positive_value and p == positive_value)
+    FN = sum(1 for e, p in zip(expected, predicted) if e == positive_value and p != positive_value)
+    TP = total_expected_positives - FN
+    TN = total_expected_negatives - FP
+
+    exact_match_accuracy = (TP + TN) / total  # pas forcement représentatif si dataset déséquilibré
+
+    # TPR / Recall / Sensibilité : accuracy de prédire vrai quand c'est vrai
+    TPR = TP / total_expected_positives if total_expected_positives > 0 else -1
+    # TNR / Spécificité : accuracy de prédire faux quand c'est faux
+    TNR = TN / total_expected_negatives if total_expected_negatives > 0 else -1
+    # FPR : parmi les vrais négatifs, proportion prédite à tort comme positive (= 1 - TNR)
+    FPR = FP / total_expected_negatives if total_expected_negatives > 0 else -1
+    # FNR : parmi les vrais positifs, proportion prédite à tort comme négative (= 1 - TPR)
+    FNR = FN / total_expected_positives if total_expected_positives > 0 else -1
+
+    # Balanced Accuracy : moyenne de TPR et TNR — traite les deux classes à poids égal,
+    # contrairement à l'accuracy simple qui est dominée par la classe majoritaire.
+    balanced_accuracy = -1 if (TPR == -1 or TNR == -1) else (TPR + TNR) / 2
+
+    return {
+        "exact_match_accuracy": exact_match_accuracy,
+        "balanced_accuracy": balanced_accuracy,
+        "TP": TP,
+        "TN": TN,
+        "FP": FP,
+        "FN": FN,
+        "TPR": TPR,
+        "TNR": TNR,
+        "FPR": FPR,
+        "FNR": FNR,
+    }
+
+
+def _print_stats(stats: dict, count_line: str | None = None) -> None:
+    """Affichage uniforme des statistiques, réutilisé pour les modèles individuels et le multiclasse."""
+    suffix = f" ({count_line})" if count_line is not None else ""
+    print(f"    Exact Match Accuracy: {stats['exact_match_accuracy'] * 100:.2f}%{suffix}")
+    print(f"    Balanced Accuracy: {stats['balanced_accuracy'] * 100:.2f}%")
+    print(f"    TPR: {stats['TPR'] * 100:.2f}% | TNR: {stats['TNR'] * 100:.2f}% | FPR: {stats['FPR'] * 100:.2f}% | FNR: {stats['FNR'] * 100:.2f}%")
+
+
+def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list]:
+    """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     predictions = dict()
 
-    for category in CATEGORIES:
-        print(f"Evaluating model for category: {category}")
+    # 1. Évaluation de chaque modèle individuel, stockée dans test_individual_accuracy
+    print("\n========>>> TEST: Evaluating individual models <<<========")
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        print(f"\n> Evaluating model for category: {category}")
+
         predictions[category] = dict()
         predictions[category]["values"] = [
             _predict_scalar(models_per_category[category], x) for x in df_X["test"]
         ]
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
 
+        expected = df_Y["test"][category]
+        predicted = predictions[category]["prediction"]
+
+        stats = compute_binary_stats(expected, predicted, positive_value=1)
+
+        if "test_individual_accuracy" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["test_individual_accuracy"] = dict()
+        cf.CONFIG["model"]["test_individual_accuracy"][category] = stats
+
+        correct = sum(1 for e, p in zip(expected, predicted) if (e == 1) == p)
+        _print_stats(stats, f"{correct}/{len(expected)}")
+
+    # Détermination de la catégorie prédite (Argmax de la valeur de sortie ou "unknown")
     df_predictions_test = list()
-    first_cat = list(CATEGORIES.keys())[0]
+    first_cat = list(cf.CONFIG["dataset"]["categories"]["train"].keys())[0]
 
     for i in range(len(predictions[first_cat]["prediction"])):
-        category_predicted = max(CATEGORIES.keys(), key=lambda c: predictions[c]["values"][i])
-        unknown_is_valid = CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != ""
+        category_predicted = max(cf.CONFIG["dataset"]["categories"]["train"].keys(), key=lambda c: predictions[c]["values"][i])
+
+        unknown_is_valid = cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != ""
 
         if unknown_is_valid and not predictions[category_predicted]["prediction"][i]:
-            df_predictions_test.append(CONFIG["global"]["unknown_category"])
+            df_predictions_test.append(cf.CONFIG["global"]["unknown_category"])
         else:
             df_predictions_test.append(category_predicted)
 
     df_predictions_expected = []
     for i in range(len(df_Y["test"][first_cat])):
-        category_expected = next((c for c in CATEGORIES if df_Y["test"][c][i] == 1), None)
+        category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
         df_predictions_expected.append(category_expected)
 
-    # CALCUL ACCURACY GLOB
-    correct = sum(1 for e, t in zip(df_predictions_expected, df_predictions_test) if e == t)
-    global_accuracy = correct / len(df_predictions_expected) if len(df_predictions_expected) > 0 else 0
-    print(f"[*] Précision (Accuracy) sur le Test Set : {global_accuracy * 100:.2f}%")
+    # 2. Évaluation du résultat final multiclasse (argmax), par catégorie,
+    #    stockée séparément dans test_multiclass_accuracy (même logique, autre positive_value).
+    print("\n========>>> TEST: Evaluating final multiclass predictions <<<========")
+    cf.CONFIG["model"]["test_multiclass_accuracy"] = {
+        "categories": dict(),
+        "global": dict()
+    }
 
-    return df_predictions_expected, df_predictions_test, global_accuracy
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        stats = compute_binary_stats(df_predictions_expected, df_predictions_test, positive_value=category)
+        cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"][category] = stats
 
-def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict, session_id: str) -> str:
+        correct = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if (e == category) == (p == category))
+        print(f"\n  > Category: {category}")
+        _print_stats(stats, f"{correct}/{len(df_predictions_expected)}")
+
+    # Accuracy globale "exact match" (toutes catégories confondues) : une seule
+    # valeur, différente du macro-average ci-dessous (utile pour vérifier la cohérence).
+    correct_predictions = sum(1 for expected, predicted in zip(df_predictions_expected, df_predictions_test) if expected == predicted)
+    total_predictions = len(df_predictions_expected)
+    top1_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+    cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["top1_accuracy"] = top1_accuracy
+
+    # "global" : macro-average des stats par catégorie (moyenne simple des dicts
+    # ci-dessus), pour rester un dict homogène avec les autres entrées et pouvoir
+    # itérer sans cas particulier dans tb_logger.
+    sum_balanced_accuracy = sum(stats["balanced_accuracy"] for stats in cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"].values())
+    len_global_stats = len(cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"])
+    avg_balanced_accuracy = sum_balanced_accuracy / len_global_stats if len_global_stats > 0 else 0
+    cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["avg_balanced_accuracy"] = avg_balanced_accuracy
+    print("\n========>>> TEST: Evaluation Results <<<========")
+
+    print("\n> Global Multiclass Stats:")
+    print(f"    Top-1 Accuracy: {top1_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})")
+    print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.2f}%")
+
+    print("\n========>>> TEST: Evaluation Complete <<<========\n")
+    return df_predictions_expected, df_predictions_test
+
+
+def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict, show: bool = True) -> None:
+    """Génère et affiche la matrice de confusion."""
+    
     fig, ax = plt.subplots(figsize=(10, 5.5))
-    labels = list(CATEGORIES.keys())
-    if CONFIG["global"]["unknown_category"] is not None and CONFIG["global"]["unknown_category"] != "":
-        labels.append(CONFIG["global"]["unknown_category"])
+
+    labels = list(cf.CONFIG["dataset"]["categories"]["train"].keys())
+    if cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != "":
+        labels.append(cf.CONFIG["global"]["unknown_category"])
 
     ConfusionMatrixDisplay.from_predictions(
         df_predictions_expected,
@@ -62,25 +182,50 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
         ax=ax
     )
 
-    length_X_test = len(df_X["test"])
-    length_X_train = CONFIG["dataset"]["count_total_dataset"]["total"] - length_X_test
+    length_X_test = cf.CONFIG["dataset"]["count_total_dataset"]["test"]["total"]
+    length_X_train = cf.CONFIG["dataset"]["count_total_dataset"]["train"]["total"]
 
     plt.title("Confusion Matrix")
     plt.suptitle(
-        f"Model: {CONFIG['model']['type']} | Norm: {CONFIG['dataset']['normalization_method']} | Session: {session_id}\n"
-        f"Alpha: {CONFIG['model']['alpha']} | Epochs: {CONFIG['model']['epochs']}\n"
+        f"Model: {cf.CONFIG['model']['type']} | Norm: {cf.CONFIG['dataset']['normalization_method']} | Seed: {cf.CONFIG['lib']['seed']}\n"
+        f"Alpha: {cf.CONFIG['model']['alpha']} | Epochs: {cf.CONFIG['model']['epochs']}\n"
         f"Train: {length_X_train}, Test: {length_X_test}",
         fontsize=9,
         y=0.95
     )
     plt.subplots_adjust(top=0.82, bottom=0.12)
 
-    # SAUVEGARDE DE LA MATRICE
-    metrics_dir = os.path.join(CONFIG["output"]["outdir"], "metrics", session_id)
-    os.makedirs(metrics_dir, exist_ok=True)
-    
-    filename = "confusion_matrix.png"
-    filepath = os.path.join(metrics_dir, filename)
-    plt.savefig(filepath, bbox_inches='tight')
-    plt.close()
-    return filename
+    cf.CONFIG["output"]["confusion_matrix_test"] = os.path.join(cf.CONFIG["output"]["logs"], "confusion_matrix_test.png")
+    plt.savefig(cf.CONFIG["output"]["confusion_matrix_test"], dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['confusion_matrix_test']}")
+    if show:
+        plt.show()
+
+
+if __name__ == "__main__":
+
+    sample_df_X = {
+        "train": [[0.1, 0.2, 0.3],
+                  [0.4, 0.5, 0.6]],
+        "test": [[0.7, 0.8, 0.9]]
+    }
+    sample_df_Y = {
+        "train": {
+            "impressionism": [1, 0],
+            "realism": [0, 1],
+            "romanticism": [0, 0]
+        },
+        "test": {
+            "impressionism": [0],
+            "realism": [1],
+            "romanticism": [0]
+        }
+    }
+    sample_df_predictions_expected = ["impressionism", "realism"]
+    sample_df_predictions_test = ["impressionism", "realism"]
+    cf.CONFIG["dataset"]["count_total_dataset"] = {
+        "test": {"total": "N/A"},
+        "train": {"total": "N/A"}
+    }
+    plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)
