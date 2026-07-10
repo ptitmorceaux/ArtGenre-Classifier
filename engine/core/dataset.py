@@ -26,7 +26,7 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
 
             if step == "train":
                 if cf.CONFIG["dataset"]["limit_per_category"] > 0:
-                    df = df.head(cf.CONFIG["dataset"]["limit_per_category"])
+                    df = df.sample(n=cf.CONFIG["dataset"]["limit_per_category"], random_state=cf.CONFIG["lib"]["seed"]).reset_index(drop=True)
 
             cf.CONFIG["dataset"]["count_total_dataset"][step][category] = len(df)
             cf.CONFIG["dataset"]["count_total_dataset"][step]["total"] += cf.CONFIG["dataset"]["count_total_dataset"][step][category]
@@ -70,33 +70,31 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
     return df_X_filepaths, df_Y
 
 
-def load_images_from_filepaths(df_X_filepaths: dict) -> dict:
-    """Charge et aplatit les images réelles en utilisant Pillow."""
-    df_X = dict()
+def load_images_from_filepaths(df_X_filepaths: list, is_train: bool) -> np.ndarray:
+    """
+    Charge et aplatit les images réelles en utilisant Pillow.
+    Si is_train est True, les images sont concaténées en un seul vecteur 1D (row-major).
+    Si is_train est False, les images sont retournées sous forme de tableau 2D (une image par ligne).
+    """
+    res = list()
+    total = len(df_X_filepaths)
 
-    for step in df_X_filepaths:
+    for i, filepath in enumerate(df_X_filepaths):
+        if i % 50 == 0 or i == total - 1:
+            print(f"\rChargement {'train' if is_train else 'test'}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
 
-        df_X[step] = list()
-        filepaths = df_X_filepaths[step]
-        total = len(filepaths)
+        img = Image.open(filepath).convert("RGB")
+        img_array = (np.array(img).flatten()).astype(np.float32)
 
-        for i, filepath in enumerate(filepaths):
-            if i % 50 == 0 or i == total - 1:
-                print(f"\rChargement {step}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
+        if "W_length" not in cf.CONFIG["dataset"]:
+            cf.CONFIG["dataset"]["W_length"] = len(img_array)
+        elif len(img_array) != cf.CONFIG["dataset"]["W_length"]:
+            raise ValueError(f"Image at {filepath} has a different size ({len(img_array)}) than expected ({cf.CONFIG['dataset']['W_length']}).")
 
-            img = Image.open(filepath).convert("RGB")
-            img_array = (np.array(img).flatten()).astype(np.float32)
-
-            if "W_length" not in cf.CONFIG["dataset"]:
-                cf.CONFIG["dataset"]["W_length"] = len(img_array)
-            elif len(img_array) != cf.CONFIG["dataset"]["W_length"]:
-                raise ValueError(f"Image at {filepath} has a different size ({len(img_array)}) than expected ({cf.CONFIG['dataset']['W_length']}).")
-
-            df_X[step].append(img_array)
-        print()
-
+        res.append(img_array)
+    print()
+    
     # Le train est concaténé en un seul vecteur 1D (row-major) pour nourrir directement
     # LinearModel.train(). Le test reste une liste d'images séparées, car on prédit
     # image par image dans evaluate_models().
-    df_X["train"] = np.concatenate(df_X["train"])
-    return df_X
+    return np.concatenate(res) if is_train else np.array(res)
