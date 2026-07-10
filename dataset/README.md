@@ -6,47 +6,31 @@ On enregistre pas de Dataset dans github (trop lourd) !
 
 ```
 │   README.md
-│   separate.py
 │
+├───images
+│   ├───256x256
+│   │   ├───impressionism
+│   │   ├───realism
+│   │   └───romanticism
+│   └───64x64
+│       ├───impressionism
+│       ├───realism
+│       └───romanticism
+|
 ├───all
-│   │   impressionism_clean.csv
-│   │   realism_clean.csv
-│   │   romanticism_clean.csv
-│   │
-│   ├───256x256
-│   │   ├───impressionism/
-│   │   ├───realism/
-│   │   └───romanticism/
-│   └───64x64
-│       ├───impressionism/
-│       ├───realism/
-│       └───romanticism/
+│       impressionism_clean.csv
+│       realism_clean.csv
+│       romanticism_clean.csv
+│
 ├───test
-│   │   impressionism_clean.csv
-│   │   realism_clean.csv
-│   │   romanticism_clean.csv
-│   │
-│   ├───256x256
-│   │   ├───impressionism/
-│   │   ├───realism/
-│   │   └───romanticism/
-│   └───64x64
-│       ├───impressionism/
-│       ├───realism/
-│       └───romanticism/
+│       test.impressionism_clean.csv
+│       test.realism_clean.csv
+│       test.romanticism_clean.csv
+│
 └───train
-    │   impressionism_clean.csv
-    │   realism_clean.csv
-    │   romanticism_clean.csv
-    │
-    ├───256x256
-    │   ├───impressionism/
-    │   ├───realism/
-    │   └───romanticism/
-    └───64x64
-        ├───impressionism/
-        ├───realism/
-        └───romanticism/
+        train.impressionism_clean.csv
+        train.realism_clean.csv
+        train.romanticism_clean.csv
 ```
 
 # Separation

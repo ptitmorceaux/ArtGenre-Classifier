@@ -32,8 +32,8 @@ def get_config_documentation() -> dict:
         "train": os.path.join("dataset", "train"),
     }
     default_dataset_data_folder_path = {
-        "test": os.path.join(default_dataset_data_csv_path["test"], "64x64"),
-        "train": os.path.join(default_dataset_data_csv_path["train"], "64x64"),
+        "test": os.path.join("dataset", "images", "64x64"),
+        "train": os.path.join("dataset", "images", "64x64"),
     }
     return {
         "lib": {
@@ -105,29 +105,29 @@ def get_config_documentation() -> dict:
                     "test": {
                         "impressionism": {
                             "data_folder_path": os.path.join(default_dataset_data_folder_path["test"], "impressionism"),
-                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "impressionism_clean.csv"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "test.impressionism_clean.csv"),
                         },
                         "realism": {
                             "data_folder_path": os.path.join(default_dataset_data_folder_path["test"], "realism"),
-                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "realism_clean.csv"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "test.realism_clean.csv"),
                         },
                         "romanticism": {
                             "data_folder_path": os.path.join(default_dataset_data_folder_path["test"], "romanticism"),
-                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "romanticism_clean.csv"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["test"], "test.romanticism_clean.csv"),
                         },
                     },
                     "train": {
                         "impressionism": {
                             "data_folder_path": os.path.join(default_dataset_data_folder_path["train"], "impressionism"),
-                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "impressionism_clean.csv"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "train.impressionism_clean.csv"),
                         },
                         "realism": {
                             "data_folder_path": os.path.join(default_dataset_data_folder_path["train"], "realism"),
-                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "realism_clean.csv"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "train.realism_clean.csv"),
                         },
                         "romanticism": {
                             "data_folder_path": os.path.join(default_dataset_data_folder_path["train"], "romanticism"),
-                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "romanticism_clean.csv"),
+                            "csv_path": os.path.join(default_dataset_data_csv_path["train"], "train.romanticism_clean.csv"),
                         },
                     },
                 },
