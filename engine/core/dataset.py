@@ -30,7 +30,7 @@ def load_and_prepare_csv() -> dict:
 
         if step not in ["train", "test"]:
             raise ValueError(f"load_and_prepare_csv(): step invalide '{step}'. Doit être 'train' ou 'test'.")
-        
+
         if step not in cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]:
             cf.CONFIG["dataset"]["count_total_dataset"]["loaded"][step] = {"total": 0, "categories": dict()}
 
@@ -129,10 +129,11 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
     N_pos au moment du chargement des images).
 
     Enregistre aussi, pour ce modèle, le nombre d'images réellement utilisées par
-    catégorie dans cf.CONFIG["dataset"]["count_total_dataset"]["used"]["train"]["model_<category>"]
+    catégorie dans
+    cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"]["model_<category>"]["categories"]
     (ex: {"impressionism": 500, "realism": 250, "romanticism": 250}).
     """
-    # On prends celles ont le plus de données (other_categories) pour éviter de dépasser le nombre d'images disponibles
+    # On prend celles qui ont le plus de données (other_categories) pour éviter de dépasser le nombre d'images disponibles
     sorted_other_categories = sorted(
         data["train"]["img"].keys(),
         key=lambda c: cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]["train"]["categories"][c],
