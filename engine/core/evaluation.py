@@ -140,7 +140,7 @@ def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
         cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"][category] = stats
 
         correct = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if (e == category) == (p == category))
-        print(f"\n> Category: {category}")
+        print(f"\n  > Category: {category}")
         _print_stats(stats, f"{correct}/{len(df_predictions_expected)}")
 
     # Accuracy globale "exact match" (toutes catégories confondues) : une seule
@@ -161,7 +161,6 @@ def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
 
     print("\n> Global Multiclass Stats:")
     print(f"    Top-1 Accuracy: {top1_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})")
-    print(f"    Average Balanced Accuracy: {avg_balanced_accuracy * 100:.2f}%")
 
     print("\n========>>> TEST: Evaluation Complete <<<========\n")
     return df_predictions_expected, df_predictions_test

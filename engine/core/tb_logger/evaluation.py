@@ -17,6 +17,9 @@ def _stats_table_md(stats_per_category: dict) -> str:
     Génère un tableau markdown Exact Match Accuracy/Balanced Accuracy/TPR/TNR/FPR/FNR par catégorie
     + une ligne de moyenne par colonne, réutilisé pour test_individual_accuracy et pour
     test_multiclass_accuracy['categories'] (même format de stats dans les deux cas).
+
+    Cette ligne "Mean" est la SEULE source de vérité pour la balanced accuracy moyenne :
+    ne pas la reafficher ailleurs dans le rapport (cf. get_test_multiclass_accuracy_md).
     """
     columns = ["exact_match_accuracy", "balanced_accuracy", "TPR", "TNR", "FPR", "FNR"]
     means = {col: _mean([stats[col] for stats in stats_per_category.values()]) for col in columns}
@@ -86,7 +89,14 @@ def get_test_individual_accuracy_md() -> str | None:
 def get_test_multiclass_accuracy_md() -> str | None:
     """Résumé du résultat final multiclasse (argmax entre les modèles) : pour chaque
     catégorie, comment se comporte la décision finale du pipeline en One-vs-Rest, plus
-    les métriques globales (exact match + balanced accuracy moyenne)."""
+    la métrique globale de décision (Top-1 Accuracy).
+
+    La balanced accuracy moyenne n'est PAS répétée ici : elle est déjà visible via la
+    ligne "Mean" du tableau _stats_table_md juste en dessous (colonne Balanced Accuracy),
+    ce n'est pas une métrique de même nature que Top-1 (qui évalue le choix final à 3
+    classes, alors que la moyenne des balanced accuracy n'est qu'un agrégat des lignes
+    déjà affichées par catégorie).
+    """
 
     test_multiclass = cf.CONFIG["model"].get("test_multiclass_accuracy")
 
@@ -102,7 +112,6 @@ def get_test_multiclass_accuracy_md() -> str | None:
 | Metric | Value |
 |---|---:|
 | Top-1 Accuracy | {_fmt_pct(global_stats['top1_accuracy'])} |
-| Average Balanced Accuracy | {_fmt_pct(global_stats['avg_balanced_accuracy'])} |
 """
 
     summary += "\n## Final Multiclass Result (Argmax)\n"
