@@ -98,6 +98,17 @@ def get_config_documentation() -> dict:
                 "type": (str,),
                 "options": ["standard", "per_column"],
             },
+            "train_positive_ratio": {
+                "docs": (
+                    "Ratio cible de positifs dans le dataset d'entraînement One-vs-All, par catégorie. "
+                    "-1 = pas de rework (ratio naturel, toutes les négatives gardées). "
+                    "Sinon valeur dans ]0, 1[ (ex: 0.5 = 50% positifs ; les négatifs sont SOUS-échantillonnés, "
+                    "jamais dupliqués, et répartis le plus équitablement possible entre les autres catégories). "
+                    "S'applique APRÈS 'limit_per_category'."
+                ),
+                "type": (float, int),
+                "default": -1,
+            },
             "categories": {
                 "docs": "Dictionnaire des catégories avec leurs chemins de données et CSV. Ex: {'impressionism': {'data_folder_path': 'path/to/impressionism', 'csv_path': 'path/to/impressionism.csv'}, ...}",
                 "type": (dict,),
@@ -203,6 +214,13 @@ def init_config(config: dict) -> dict:
 
             if section == "lib" and key == "seed":
                 config[section][key] = select_seed(config[section]["seeds_choice"], value)
+
+            if section == "dataset" and key == "train_positive_ratio":
+                if value != -1 and not (0 < value < 1):
+                    raise ValueError(
+                        f"init_config(): 'dataset.train_positive_ratio' doit être -1 ou dans ]0, 1[. "
+                        f"Obtenu: {value}"
+                    )
     
     # Ajoute les chemins de sortie pour les logs et les modèles
     date, time = get_date_time_now()

@@ -48,38 +48,39 @@ def main():
     compile_c_library()
     load_c_library()
 
-    # 3. Préparation des données
+    # 3. Préparation des données (CSV des deux steps + images du train uniquement)
     print("\n# Etape 3 : Préparation des données (chargement des images train uniquement)...")
-    df_X_filepaths, df_Y = load_and_prepare_csv()
-    df_X = { "train": load_images_from_filepaths(df_X_filepaths["train"], is_train=True) }
+    data = load_and_prepare_csv()
+    data["train"]["img"] = load_images_from_filepaths(data, step="train")
     cf.CONFIG = cf.finalize_mlp_config(cf.CONFIG)
-    df_X, scaler = standardize_train_data(df_X)
+    data, scaler = standardize_train_data(data)
 
     ### TENSORBOARD SUMMARY WRITER ###
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
 
     # 4. Entraînement
     print("\n# Etape 4 : Entraînement des modèles et enregistrement des logs pour tensorboard...")
-    models_per_category = train_models(summary_writer, df_X, df_Y)
+    models_per_category = train_models(summary_writer, data)
 
     # 5. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
     print("\n# Etape 5 : Sauvegarde des modèles entraînés...")
     save_trained_models(models_per_category, scaler, cf.CONFIG["output"]["models"], cf.CONFIG["model"]["type"])
 
-    # 6. Chargement des images de test et normalisation avec le scaler du train (on libère la mémoire des images du train).
+    # 6. Libère la RAM des images du train, charge les images de test et normalise
+    #    avec le scaler du train (jamais refit sur le test).
     print("\n# Etape 6 : Chargement des images de test et normalisation...")
-    del df_X  # Libère la mémoire des images du train
-    df_X = { "test": load_images_from_filepaths(df_X_filepaths["test"], is_train=False) }
-    df_X["test"] = standardize_test_data_from_scaler(df_X["test"], scaler)
+    del data["train"]["img"]  # plus aucune référence -> libéré par le GC
+    data["test"]["img"] = load_images_from_filepaths(data, step="test")
+    data = standardize_test_data_from_scaler(data, scaler)
 
     # 7. Évaluation et Visualisation
     print("\n# Etape 7 : Évaluation et Visualisation...")
-    df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
-    
+    df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, data)
+
     # 8. Sauvegarde de la matrice de confusion test
     print("\n# Etape 8 : Sauvegarde de la matrice de confusion...")
-    plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
+    plot_confusion_matrix(df_predictions_expected, df_predictions_test, show=False)
 
     # 9. Sauvegarde de la configuration en json
     print("\n# Etape 9 : Sauvegarde de la configuration...")

@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import engine.core.config as cf
+from engine.core.dataset import build_multiclass_test_arrays
 
 
 def _predict_scalar(model, x) -> float:
@@ -81,8 +82,9 @@ def _print_stats(stats: dict, count_line: str | None = None) -> None:
     print(f"    TPR: {stats['TPR'] * 100:.2f}% | TNR: {stats['TNR'] * 100:.2f}% | FPR: {stats['FPR'] * 100:.2f}% | FNR: {stats['FNR'] * 100:.2f}%")
 
 
-def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[list, list]:
+def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
+    X_test, expected_categories = build_multiclass_test_arrays(data)
     predictions = dict()
 
     # 1. Évaluation de chaque modèle individuel, stockée dans test_individual_accuracy
@@ -92,11 +94,11 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
 
         predictions[category] = dict()
         predictions[category]["values"] = [
-            _predict_scalar(models_per_category[category], x) for x in df_X["test"]
+            _predict_scalar(models_per_category[category], x) for x in X_test
         ]
         predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
 
-        expected = df_Y["test"][category]
+        expected = [1 if e == category else -1 for e in expected_categories]
         predicted = predictions[category]["prediction"]
 
         stats = compute_binary_stats(expected, predicted, positive_value=1)
@@ -122,11 +124,8 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
         else:
             df_predictions_test.append(category_predicted)
 
-    # Détermination de la catégorie attendue
-    df_predictions_expected = []
-    for i in range(len(df_Y["test"][first_cat])):
-        category_expected = next((c for c in cf.CONFIG["dataset"]["categories"]["train"].keys() if df_Y["test"][c][i] == 1), None)
-        df_predictions_expected.append(category_expected)
+    # Catégorie attendue : déjà disponible directement (une entrée par image, même ordre que X_test)
+    df_predictions_expected = expected_categories
 
     # 2. Évaluation du résultat final multiclasse (argmax), par catégorie,
     #    stockée séparément dans test_multiclass_accuracy (même logique, autre positive_value).
@@ -168,9 +167,9 @@ def evaluate_models(models_per_category: dict, df_X: dict, df_Y: dict) -> tuple[
     return df_predictions_expected, df_predictions_test
 
 
-def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, df_X: dict, show: bool = True) -> None:
+def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: list, show: bool = True) -> None:
     """Génère et affiche la matrice de confusion."""
-    
+
     fig, ax = plt.subplots(figsize=(10, 5.5))
 
     labels = list(cf.CONFIG["dataset"]["categories"]["train"].keys())
@@ -186,8 +185,18 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
         ax=ax
     )
 
-    length_X_test = cf.CONFIG["dataset"]["count_total_dataset"]["test"]["total"]
-    length_X_train = cf.CONFIG["dataset"]["count_total_dataset"]["train"]["total"]
+    length_X_test = cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]["test"]["total"]
+
+    # Le "total train" n'existe plus tel quel (la répartition dépend du modèle) :
+    # on le reconstruit via la diagonale (train_counts["model_<cat>"][cat] = nb
+    # d'images chargées pour cette catégorie, jamais affecté par le ratio car
+    # seuls les négatifs sont sous-échantillonnés).
+    train_counts = cf.CONFIG["dataset"]["count_total_dataset"]["used"]["train"]
+    categories = list(cf.CONFIG["dataset"]["categories"]["train"].keys())
+    
+    # TODO: ICI la logique doit être modifiée pour prendre en compte la nouvelle structure de counts_used
+    
+    length_X_train = sum(train_counts[f"model_{cat}"][cat] for cat in categories)
 
     plt.title("Confusion Matrix")
 
@@ -207,31 +216,3 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     print(f"[*] Confusion matrix saved to: {cf.CONFIG['output']['confusion_matrix_test']}")
     if show:
         plt.show()
-
-
-if __name__ == "__main__":
-
-    sample_df_X = {
-        "train": [[0.1, 0.2, 0.3],
-                  [0.4, 0.5, 0.6]],
-        "test": [[0.7, 0.8, 0.9]]
-    }
-    sample_df_Y = {
-        "train": {
-            "impressionism": [1, 0],
-            "realism": [0, 1],
-            "romanticism": [0, 0]
-        },
-        "test": {
-            "impressionism": [0],
-            "realism": [1],
-            "romanticism": [0]
-        }
-    }
-    sample_df_predictions_expected = ["impressionism", "realism"]
-    sample_df_predictions_test = ["impressionism", "realism"]
-    cf.CONFIG["dataset"]["count_total_dataset"] = {
-        "test": {"total": "N/A"},
-        "train": {"total": "N/A"}
-    }
-    plot_confusion_matrix(sample_df_predictions_expected, sample_df_predictions_test, sample_df_X)

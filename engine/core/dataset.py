@@ -6,30 +6,49 @@ from PIL import Image
 import engine.core.config as cf
 
 
-def load_and_prepare_csv() -> tuple[dict, dict]:
-    """Charge les fichiers CSV des catégories et effectue le découpage Train/Test."""
-
-    df_csv_categories = dict()
-    df_csv_all_shuffled = dict()
+def load_and_prepare_csv() -> dict:
+    """
+    Charge les CSV par catégorie (train/test) et construit la structure imbriquée :
+    {
+        "train": {"csv": {category: DataFrame}, "img": {}},
+        "test":  {"csv": {category: DataFrame}, "img": {}},
+    }
+    Le découpage One-vs-All (1/-1) n'est plus pré-calculé ici : il se fait à la volée
+    dans build_one_vs_all_train_arrays(), une fois les images chargées.
+    """
+    data = {
+        "train": {"csv": dict(), "img": dict()},
+        "test": {"csv": dict(), "img": dict()},
+    }
 
     cf.CONFIG["dataset"]["count_total_dataset"] = {
-        "test": { "total": 0 },
-        "train": { "total": 0 }
+        "loaded": dict(),
+        "used_during_train": { "total": 0 },
     }
 
     for step, categories in cf.CONFIG["dataset"]["categories"].items():
+
+        if step not in ["train", "test"]:
+            raise ValueError(f"load_and_prepare_csv(): step invalide '{step}'. Doit être 'train' ou 'test'.")
+        
+        if step not in cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]:
+            cf.CONFIG["dataset"]["count_total_dataset"]["loaded"][step] = {"total": 0, "categories": dict()}
+
         for category, paths in categories.items():
             df = pd.read_csv(paths["csv_path"])
 
             if df.empty:
                 raise ValueError(f"Le fichier CSV pour la catégorie '{category}' est vide ou introuvable.")
 
-            if step == "train":
-                if cf.CONFIG["dataset"]["limit_per_category"] > 0:
-                    df = df.sample(n=cf.CONFIG["dataset"]["limit_per_category"], random_state=cf.CONFIG["lib"]["seed"]).reset_index(drop=True)
+            if step == "train" and cf.CONFIG["dataset"]["limit_per_category"] > 0:
+                df = df.sample(
+                    n=cf.CONFIG["dataset"]["limit_per_category"],
+                    random_state=cf.CONFIG["lib"]["seed"]
+                ).reset_index(drop=True)
 
-            cf.CONFIG["dataset"]["count_total_dataset"][step][category] = len(df)
-            cf.CONFIG["dataset"]["count_total_dataset"][step]["total"] += cf.CONFIG["dataset"]["count_total_dataset"][step][category]
+            n_df = len(df)
+            cf.CONFIG["dataset"]["count_total_dataset"]["loaded"][step]["categories"][category] = n_df
+            cf.CONFIG["dataset"]["count_total_dataset"]["loaded"][step]["total"] += n_df
 
             if "Nom_Fichier" not in df.columns:
                 raise ValueError("La colonne 'Nom_Fichier' n'existe pas dans le DataFrame.")
@@ -37,64 +56,153 @@ def load_and_prepare_csv() -> tuple[dict, dict]:
             # Transformation du nom en chemin complet
             df["filepath"] = df["Nom_Fichier"].apply(lambda x: os.path.join(paths["data_folder_path"], x))
 
-            # Ajouter une colonne category (Y) avec Encodage One-vs-All (1 ou -1)
-            for c in cf.CONFIG["dataset"]["categories"]["train"].keys():
-                if c in df.columns:
-                    raise ValueError(f"La colonne '{c}' existe déjà dans le DataFrame. Veuillez renommer ou supprimer cette colonne.")
-                df[c] = 1 if c == category else -1
+            data[step]["csv"][category] = df
 
-            # On stocke les DataFrames train et test pour chaque catégorie
-            if step not in df_csv_categories:
-                df_csv_categories[step] = dict()
-            df_csv_categories[step][category] = df
-    
-        # On concatène les DataFrames train et test pour toutes les catégories
-        df_csv_all_shuffled[step] = pd.concat([df for df in df_csv_categories[step].values()], ignore_index=True)
+    cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]["total"] = sum(
+        cf.CONFIG["dataset"]["count_total_dataset"]["loaded"][step]["total"] for step in cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]
+    )
 
-    # Mélange final du jeu de données uniquement pour le TRAIN
-    df_csv_all_shuffled["train"] = df_csv_all_shuffled["train"].sample(frac=1, random_state=cf.CONFIG["lib"]["seed"]).reset_index(drop=True)
+    return data
 
-    # Extraction des labels (Y) et nettoyage des DataFrames
-    df_X_filepaths = {
-        "train": df_csv_all_shuffled["train"]["filepath"].tolist(),
-        "test": df_csv_all_shuffled["test"]["filepath"].tolist()
+
+def load_images_from_filepaths(data: dict, step: str) -> dict[str, np.ndarray]:
+    """
+    Charge (Pillow) les images de toutes les catégories du `step` donné ('train' ou
+    'test') et RENVOIE un dict {category: np.ndarray} (une image aplatie par ligne).
+
+    Ne mute pas `data` : c'est à l'appelant d'assigner le résultat, ex.
+    `data[step]["img"] = load_images_from_filepaths(data, step)`.
+
+    Ne charge qu'un seul step à la fois : permet de libérer la RAM du train avant
+    de charger le test (cf. main.py).
+    """
+    images_per_category = dict()
+
+    for category, df in data[step]["csv"].items():
+        filepaths = df["filepath"].tolist()
+        total = len(filepaths)
+        images = list()
+
+        for i, filepath in enumerate(filepaths):
+            if i % 50 == 0 or i == total - 1:
+                print(f"\rChargement {step}/{category}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
+
+            img = Image.open(filepath).convert("RGB")
+            img_array = np.array(img).flatten().astype(np.float32)
+
+            if "W_length" not in cf.CONFIG["dataset"]:
+                cf.CONFIG["dataset"]["W_length"] = len(img_array)
+            elif len(img_array) != cf.CONFIG["dataset"]["W_length"]:
+                raise ValueError(
+                    f"Image at {filepath} has a different size ({len(img_array)}) "
+                    f"than expected ({cf.CONFIG['dataset']['W_length']})."
+                )
+
+            images.append(img_array)
+        print()
+
+        images_per_category[category] = np.array(images)
+
+    return images_per_category
+
+
+def _split_negative_quota(total_negatives_needed: int, n_other_categories: int) -> list[int]:
+    """
+    Répartit le nombre total de négatifs nécessaires le plus équitablement possible
+    entre les autres catégories (ex: 10 négatifs / 3 catégories -> [4, 3, 3]).
+    """
+    base = total_negatives_needed // n_other_categories
+    remainder = total_negatives_needed % n_other_categories
+    return [base + 1 if i < remainder else base for i in range(n_other_categories)]
+
+
+def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray, list[int]]:
+    """
+    Construit (X, Y) One-vs-All pour le TRAIN d'un modèle donné :
+    positifs = data["train"]["img"][category], négatifs = toutes les autres catégories.
+    X est renvoyé APLATI (1D, row-major) pour alimenter directement model.train().
+
+    Si cf.CONFIG["dataset"]["train_positive_ratio"] != -1, les négatifs sont
+    SOUS-échantillonnés (jamais dupliqués) pour atteindre ce ratio de positifs,
+    en répartissant le budget de négatifs le plus équitablement possible entre
+    les autres catégories. S'applique APRÈS limit_per_category (qui a déjà fixé
+    N_pos au moment du chargement des images).
+
+    Enregistre aussi, pour ce modèle, le nombre d'images réellement utilisées par
+    catégorie dans cf.CONFIG["dataset"]["count_total_dataset"]["used"]["train"]["model_<category>"]
+    (ex: {"impressionism": 500, "realism": 250, "romanticism": 250}).
+    """
+    # On prends celles ont le plus de données (other_categories) pour éviter de dépasser le nombre d'images disponibles
+    sorted_other_categories = sorted(
+        data["train"]["img"].keys(),
+        key=lambda c: cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]["train"]["categories"][c],
+        reverse=True
+    )
+
+    positives = data["train"]["img"][category]
+    n_positives = len(positives)
+    other_categories = [c for c in sorted_other_categories if c != category]
+
+    if not other_categories:
+        raise ValueError("build_one_vs_all_train_arrays(): il faut au moins 2 catégories pour du One-vs-All.")
+
+    rng = np.random.default_rng(cf.CONFIG["lib"]["seed"])
+    ratio = cf.CONFIG["dataset"]["train_positive_ratio"]
+    if ratio != -1 and (ratio <= 0 or ratio >= 1):
+        raise ValueError("build_one_vs_all_train_arrays(): ratio invalide. Doit être compris entre 0 et 1 exclus (ou -1 pour tous).")
+
+    counts_used = {
+        "total": n_positives,
+        "categories": { category: n_positives }
     }
+    negatives_parts = []
 
-    df_Y = {"train": {}, "test": {}}
-    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
-        df_Y["train"][category] = list(df_csv_all_shuffled["train"][category])
-        df_Y["test"][category] = list(df_csv_all_shuffled["test"][category])
-        df_csv_all_shuffled["train"].drop(columns=[category], inplace=True)
-        df_csv_all_shuffled["test"].drop(columns=[category], inplace=True)
+    if ratio == -1:
+        for cat in other_categories:
+            available = data["train"]["img"][cat]
+            negatives_parts.append(available)
+            counts_used["categories"][cat] = len(available)
+    else:
+        total_negatives_needed = round(n_positives * (1 - ratio) / ratio)
+        quotas = _split_negative_quota(total_negatives_needed, len(other_categories))
 
-    return df_X_filepaths, df_Y
+        for cat, quota in zip(other_categories, quotas):
+            available = data["train"]["img"][cat]
+            n_available = len(available)
+            if quota > n_available:
+                raise ValueError(
+                    f"build_one_vs_all_train_arrays(): ratio {ratio} pour '{category}' demande "
+                    f"{quota} négatifs depuis '{cat}' mais seulement {n_available} disponibles. "
+                    f"Augmente 'limit_per_category' ou remonte le ratio."
+                )
+            idx = rng.choice(n_available, size=quota, replace=False)
+            negatives_parts.append(available[idx])
+            counts_used["categories"][cat] = quota
+
+    cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"][f"model_{category}"] = counts_used
+    cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"]["total"] += sum(counts_used["categories"].values())
+
+    negatives = np.concatenate(negatives_parts, axis=0)
+
+    X = np.concatenate([positives, negatives], axis=0)
+    Y = [1] * len(positives) + [-1] * len(negatives)
+
+    perm = rng.permutation(len(Y))
+    X = X[perm]
+    Y = [Y[i] for i in perm]
+
+    return X.flatten(), Y
 
 
-def load_images_from_filepaths(df_X_filepaths: list, is_train: bool) -> np.ndarray:
+def build_multiclass_test_arrays(data: dict) -> tuple[np.ndarray, list[str]]:
     """
-    Charge et aplatit les images réelles en utilisant Pillow.
-    Si is_train est True, les images sont concaténées en un seul vecteur 1D (row-major).
-    Si is_train est False, les images sont retournées sous forme de tableau 2D (une image par ligne).
+    Construit le tableau de test 2D combiné (toutes catégories, une image par
+    ligne) et la liste des catégories attendues (même ordre), pour l'évaluation
+    multiclasse.
     """
-    res = list()
-    total = len(df_X_filepaths)
+    X_parts, expected = [], []
+    for category, imgs in data["test"]["img"].items():
+        X_parts.append(imgs)
+        expected.extend([category] * len(imgs))
 
-    for i, filepath in enumerate(df_X_filepaths):
-        if i % 50 == 0 or i == total - 1:
-            print(f"\rChargement {'train' if is_train else 'test'}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
-
-        img = Image.open(filepath).convert("RGB")
-        img_array = (np.array(img).flatten()).astype(np.float32)
-
-        if "W_length" not in cf.CONFIG["dataset"]:
-            cf.CONFIG["dataset"]["W_length"] = len(img_array)
-        elif len(img_array) != cf.CONFIG["dataset"]["W_length"]:
-            raise ValueError(f"Image at {filepath} has a different size ({len(img_array)}) than expected ({cf.CONFIG['dataset']['W_length']}).")
-
-        res.append(img_array)
-    print()
-    
-    # Le train est concaténé en un seul vecteur 1D (row-major) pour nourrir directement
-    # LinearModel.train(). Le test reste une liste d'images séparées, car on prédit
-    # image par image dans evaluate_models().
-    return np.concatenate(res) if is_train else np.array(res)
+    return np.concatenate(X_parts, axis=0), expected
