@@ -86,13 +86,12 @@ def main():
     print("\n# Etape 9 : Sauvegarde de la configuration...")
     save_config_json(cf.CONFIG["output"]["logs"], cf.CONFIG)
 
-    # 10. Écriture des résultats finaux dans TensorBoard
+    # 10. Écriture des résultats finaux dans TensorBoard + sauvegarde locale du même rapport
     print("\n# Etape 10 : Écriture des résultats finaux dans TensorBoard...\n")
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
-    tb.write_markdown_from_dict(
-        summary_writer,
-        tb.get_summary_md_dict()
-    )
+    summaries = tb.get_summary_md_dict()
+    tb.write_markdown_from_dict(summary_writer, summaries)
+    tb.save_markdown_report(summaries, cf.CONFIG["output"]["logs"])
     tb.write_images(summary_writer)
 
     ### TENSORBOARD SUMMARY WRITER CLOSE ###

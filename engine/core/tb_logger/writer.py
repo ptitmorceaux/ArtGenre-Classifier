@@ -71,3 +71,29 @@ def write_markdown_from_dict(
             )
 
     summary_writer.flush()
+
+
+def save_markdown_report(
+    summaries: dict[str, str],
+    output_folder: str,
+    filename: str = "report.md"
+) -> None:
+    """
+    Sauvegarde EN LOCAL (dans output_folder/filename) le même contenu Markdown que
+    celui écrit dans TensorBoard via write_markdown_from_dict(), pour pouvoir
+    consulter le rapport sans avoir à lancer TensorBoard.
+
+    Les sections sont triées par titre (même ordre que l'affichage TensorBoard,
+    qui trie aussi les tags alphabétiquement : "0. Evaluation/...", "1. Training/...",
+    "2. Experiment/...").
+    """
+    os.makedirs(output_folder, exist_ok=True)
+    filepath = os.path.join(output_folder, filename)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        for title in sorted(summaries.keys()):
+            f.write(f"# {title}\n\n")
+            f.write(summaries[title])
+            f.write("\n\n---\n\n")
+
+    print(f"[*] Rapport Markdown sauvegardé : {filepath}")
