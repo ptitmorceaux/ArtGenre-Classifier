@@ -23,7 +23,7 @@ def load_and_prepare_csv() -> dict:
 
     cf.CONFIG["dataset"]["count_total_dataset"] = {
         "loaded": dict(),
-        "used_during_train": { "total": 0 },
+        "used_during_train": dict(),
     }
 
     for step, categories in cf.CONFIG["dataset"]["categories"].items():
@@ -162,7 +162,9 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
         for cat in other_categories:
             available = data["train"]["img"][cat]
             negatives_parts.append(available)
-            counts_used["categories"][cat] = len(available)
+            n_available = len(available)
+            counts_used["categories"][cat] = n_available
+            counts_used["total"] += n_available
     else:
         total_negatives_needed = round(n_positives * (1 - ratio) / ratio)
         quotas = _split_negative_quota(total_negatives_needed, len(other_categories))
@@ -179,9 +181,9 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
             idx = rng.choice(n_available, size=quota, replace=False)
             negatives_parts.append(available[idx])
             counts_used["categories"][cat] = quota
+            counts_used["total"] += quota
 
     cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"][f"model_{category}"] = counts_used
-    cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"]["total"] += sum(counts_used["categories"].values())
 
     negatives = np.concatenate(negatives_parts, axis=0)
 
