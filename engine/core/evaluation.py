@@ -149,14 +149,7 @@ def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
     total_predictions = len(df_predictions_expected)
     top1_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
     cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["top1_accuracy"] = top1_accuracy
-
-    # "global" : macro-average des stats par catégorie (moyenne simple des dicts
-    # ci-dessus), pour rester un dict homogène avec les autres entrées et pouvoir
-    # itérer sans cas particulier dans tb_logger.
-    sum_balanced_accuracy = sum(stats["balanced_accuracy"] for stats in cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"].values())
-    len_global_stats = len(cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"])
-    avg_balanced_accuracy = sum_balanced_accuracy / len_global_stats if len_global_stats > 0 else 0
-    cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["avg_balanced_accuracy"] = avg_balanced_accuracy
+    
     print("\n========>>> TEST: Evaluation Results <<<========")
 
     print("\n> Global Multiclass Stats:")
