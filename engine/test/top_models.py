@@ -19,6 +19,7 @@ from pathlib import Path
 
 
 DEFAULT_PATTERN = "engine/core/output/*/*/*/*.json"
+UNKNOWN = "?"
 
 
 def parse_args() -> argparse.Namespace:
@@ -55,13 +56,16 @@ def extract_run_info(config: dict) -> dict:
     model = config.get("model", {})
     dataset = config.get("dataset", {})
     lib = config.get("lib", {})
+    output = config.get("output", {})
 
     return {
-        "model_type": model.get("type", "?"),
-        "alpha": model.get("alpha", "?"),
-        "epochs": model.get("epochs", "?"),
-        "seed": lib.get("seed", "?"),
-        "ratio": dataset.get("train_positive_ratio", "?"),
+        "model_type": model.get("type", UNKNOWN),
+        "alpha": model.get("alpha", UNKNOWN),
+        "epochs": model.get("epochs", UNKNOWN),
+        "seed": lib.get("seed", UNKNOWN),
+        "limit_per_category": dataset.get("limit_per_category", UNKNOWN),
+        "ratio": dataset.get("train_positive_ratio", UNKNOWN),
+        "path": output.get("logs", UNKNOWN)
     }
 
 
@@ -90,7 +94,7 @@ def collect_runs(pattern: str) -> list[dict]:
             print(f"[!] '{filepath}' ne contient pas de top1_accuracy (run incomplet ?), ignoré.", file=sys.stderr)
             continue
 
-        run = {"path": filepath, "top1_accuracy": top1_accuracy}
+        run = { "top1_accuracy": top1_accuracy }
         run.update(extract_run_info(config))
         runs.append(run)
 
@@ -107,7 +111,7 @@ def print_top_runs(runs: list[dict], n: int) -> None:
     if n > 0:
         top_runs = top_runs[:n]
 
-    headers = ["#", "Top-1 Acc", "Model", "Alpha", "Epochs", "Seed", "Ratio", "Path"]
+    headers = ["#", "Top-1 Acc", "Model", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Path"]
     rows = [
         [
             str(i + 1),
@@ -116,7 +120,8 @@ def print_top_runs(runs: list[dict], n: int) -> None:
             str(run["alpha"]),
             str(run["epochs"]),
             str(run["seed"]),
-            str(run["ratio"]),
+            str(run["limit_per_category"]),
+            f"{run['ratio'] * 100:.2f}%" if isinstance(run["ratio"], float) else str(run["ratio"]),
             str(run["path"]),
         ]
         for i, run in enumerate(top_runs)
