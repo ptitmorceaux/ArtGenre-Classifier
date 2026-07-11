@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
         dest="n",
         type=int,
         default=10,
-        help="Nombre de runs à afficher (défaut: 10).",
+        help="Nombre de runs à afficher (défaut: 10). Si <= 0, affiche tous les runs valides.",
     )
     parser.add_argument(
         "--pattern",
@@ -103,7 +103,9 @@ def print_top_runs(runs: list[dict], n: int) -> None:
         print("Aucun run valide à afficher.")
         return
 
-    top_runs = sorted(runs, key=lambda r: r["top1_accuracy"], reverse=True)[:n]
+    top_runs = sorted(runs, key=lambda r: r["top1_accuracy"], reverse=True)
+    if n > 0:
+        top_runs = top_runs[:n]
 
     headers = ["#", "Top-1 Acc", "Model", "Alpha", "Epochs", "Seed", "Ratio", "Path"]
     rows = [
@@ -125,7 +127,8 @@ def print_top_runs(runs: list[dict], n: int) -> None:
     def format_row(cells: list[str]) -> str:
         return " | ".join(cell.ljust(widths[i]) for i, cell in enumerate(cells))
 
-    print(f"\nTop {len(top_runs)} runs par Top-1 Accuracy ({len(runs)} runs valides trouvés au total)\n")
+    label = "tous les" if n <= 0 else f"top {len(top_runs)}"
+    print(f"\nAffichage de {label} runs par Top-1 Accuracy ({len(runs)} runs valides trouvés au total)\n")
     print(format_row(headers))
     print("-+-".join("-" * w for w in widths))
     for row in rows:
