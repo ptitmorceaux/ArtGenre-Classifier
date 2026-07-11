@@ -139,8 +139,10 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
     - Si le ratio demandé est INFÉRIEUR au ratio naturel (il faudrait plus de négatifs
       que ce qui existe) : impossible d'ajouter des négatifs sans dupliquer, donc on
       utilise TOUS les négatifs disponibles et on réduit les POSITIFS à la place, pour
-      atteindre exactement le ratio demandé. Un warning est affiché car ça réduit la
-      taille du dataset positif en dessous de 'limit_per_category'.
+      atteindre exactement le ratio demandé.
+
+    Dans tous les cas (ratio -1, >= naturel, ou < naturel), une ligne [INFO] est
+    affichée avec le nombre de positifs/négatifs utilisés et le ratio obtenu.
 
     S'applique APRÈS limit_per_category (qui a déjà fixé N_pos au moment du chargement
     des images).
@@ -214,14 +216,6 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
             # réduit les POSITIFS pour atteindre exactement le ratio demandé.
             n_positives_target = round(total_negatives_available * ratio / (1 - ratio))
 
-            print(f"\n{'!' * 78}")
-            print(f"[WARNING] '{category}': ratio {ratio} < ratio naturel ({natural_ratio:.3f}).")
-            print(f"          Impossible d'atteindre ce ratio en ajoutant des négatifs (ça dupliquerait")
-            print(f"          des images). Les POSITIFS sont donc réduits de {n_positives_available} à")
-            print(f"          {n_positives_target} pour respecter exactement le ratio demandé, en gardant")
-            print(f"          TOUS les négatifs disponibles ({total_negatives_available}).")
-            print(f"{'!' * 78}\n")
-
             idx = rng.choice(n_positives_available, size=n_positives_target, replace=False)
             positives = positives_available[idx]
             negatives_parts = [data["train"]["img"][c] for c in other_categories]
@@ -231,6 +225,12 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
                 available = data["train"]["img"][cat]
                 counts_used["categories"][cat] = len(available)
                 counts_used["total"] += len(available)
+
+    n_pos_final = counts_used["categories"][category]
+    n_neg_final = counts_used["total"] - n_pos_final
+    achieved_ratio = n_pos_final / counts_used["total"]
+    target_label = "natural" if ratio == -1 else f"{ratio:.3f}"
+    print(f"[INFO] '{category}': {n_pos_final} pos / {n_neg_final} neg (ratio={achieved_ratio:.3f}, target={target_label})")
 
     cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"][f"model_{category}"] = counts_used
 
