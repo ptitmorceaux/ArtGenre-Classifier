@@ -41,8 +41,15 @@ def load_and_prepare_csv() -> dict:
                 raise ValueError(f"Le fichier CSV pour la catégorie '{category}' est vide ou introuvable.")
 
             if step == "train" and cf.CONFIG["dataset"]["limit_per_category"] > 0:
+                limit = cf.CONFIG["dataset"]["limit_per_category"]
+                if limit > len(df):
+                    raise ValueError(
+                        f"load_and_prepare_csv(): 'limit_per_category' ({limit}) dépasse le nombre "
+                        f"d'images disponibles pour la catégorie '{category}' ({len(df)}). "
+                        f"Baisse 'limit_per_category' à {len(df)} ou moins."
+                    )
                 df = df.sample(
-                    n=cf.CONFIG["dataset"]["limit_per_category"],
+                    n=limit,
                     random_state=cf.CONFIG["lib"]["seed"]
                 ).reset_index(drop=True)
 
