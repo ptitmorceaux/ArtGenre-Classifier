@@ -129,11 +129,21 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
     positifs = data["train"]["img"][category], négatifs = toutes les autres catégories.
     X est renvoyé APLATI (1D, row-major) pour alimenter directement model.train().
 
-    Si cf.CONFIG["dataset"]["train_positive_ratio"] != -1, les négatifs sont
-    SOUS-échantillonnés (jamais dupliqués) pour atteindre ce ratio de positifs,
-    en répartissant le budget de négatifs le plus équitablement possible entre
-    les autres catégories. S'applique APRÈS limit_per_category (qui a déjà fixé
-    N_pos au moment du chargement des images).
+    Si cf.CONFIG["dataset"]["train_positive_ratio"] != -1, le dataset est rééquilibré
+    SANS JAMAIS dupliquer d'images (uniquement du sous-échantillonnage) :
+
+    - Si le ratio demandé est atteignable en gardant TOUS les positifs (ratio >= ratio
+      naturel = positifs / (positifs + négatifs disponibles)) : les négatifs sont
+      sous-échantillonnés, répartis le plus équitablement possible entre les autres
+      catégories.
+    - Si le ratio demandé est INFÉRIEUR au ratio naturel (il faudrait plus de négatifs
+      que ce qui existe) : impossible d'ajouter des négatifs sans dupliquer, donc on
+      utilise TOUS les négatifs disponibles et on réduit les POSITIFS à la place, pour
+      atteindre exactement le ratio demandé. Un warning est affiché car ça réduit la
+      taille du dataset positif en dessous de 'limit_per_category'.
+
+    S'applique APRÈS limit_per_category (qui a déjà fixé N_pos au moment du chargement
+    des images).
 
     Enregistre aussi, pour ce modèle, le nombre d'images réellement utilisées par
     catégorie dans
@@ -147,8 +157,8 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
         reverse=True
     )
 
-    positives = data["train"]["img"][category]
-    n_positives = len(positives)
+    positives_available = data["train"]["img"][category]
+    n_positives_available = len(positives_available)
     other_categories = [c for c in sorted_other_categories if c != category]
 
     if not other_categories:
@@ -159,36 +169,68 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
     if ratio != -1 and (ratio <= 0 or ratio >= 1):
         raise ValueError("build_one_vs_all_train_arrays(): ratio invalide. Doit être compris entre 0 et 1 exclus (ou -1 pour tous).")
 
-    counts_used = {
-        "total": n_positives,
-        "categories": { category: n_positives }
-    }
-    negatives_parts = []
+    total_negatives_available = sum(len(data["train"]["img"][c]) for c in other_categories)
 
     if ratio == -1:
+        # Pas de rework : tout est gardé tel quel.
+        positives = positives_available
+        negatives_parts = [data["train"]["img"][c] for c in other_categories]
+        counts_used = {"total": n_positives_available, "categories": {category: n_positives_available}}
         for cat in other_categories:
             available = data["train"]["img"][cat]
-            negatives_parts.append(available)
-            n_available = len(available)
-            counts_used["categories"][cat] = n_available
-            counts_used["total"] += n_available
-    else:
-        total_negatives_needed = round(n_positives * (1 - ratio) / ratio)
-        quotas = _split_negative_quota(total_negatives_needed, len(other_categories))
+            counts_used["categories"][cat] = len(available)
+            counts_used["total"] += len(available)
 
-        for cat, quota in zip(other_categories, quotas):
-            available = data["train"]["img"][cat]
-            n_available = len(available)
-            if quota > n_available:
-                raise ValueError(
-                    f"build_one_vs_all_train_arrays(): ratio {ratio} pour '{category}' demande "
-                    f"{quota} négatifs depuis '{cat}' mais seulement {n_available} disponibles. "
-                    f"Augmente 'limit_per_category' ou remonte le ratio."
-                )
-            idx = rng.choice(n_available, size=quota, replace=False)
-            negatives_parts.append(available[idx])
-            counts_used["categories"][cat] = quota
-            counts_used["total"] += quota
+    else:
+        natural_ratio = n_positives_available / (n_positives_available + total_negatives_available)
+
+        if ratio >= natural_ratio:
+            # Cas standard : on garde TOUS les positifs, on sous-échantillonne les négatifs.
+            positives = positives_available
+            total_negatives_needed = round(n_positives_available * (1 - ratio) / ratio)
+            quotas = _split_negative_quota(total_negatives_needed, len(other_categories))
+
+            negatives_parts = []
+            counts_used = {"total": n_positives_available, "categories": {category: n_positives_available}}
+            for cat, quota in zip(other_categories, quotas):
+                available = data["train"]["img"][cat]
+                n_available = len(available)
+                if quota > n_available:
+                    # Filet de sécurité : ne devrait pas arriver puisque ratio >= natural_ratio
+                    # garantit que le total est atteignable, mais une répartition très inégale
+                    # entre catégories pourrait ponctuellement dépasser une catégorie précise.
+                    raise ValueError(
+                        f"build_one_vs_all_train_arrays(): ratio {ratio} pour '{category}' demande "
+                        f"{quota} négatifs depuis '{cat}' mais seulement {n_available} disponibles."
+                    )
+                idx = rng.choice(n_available, size=quota, replace=False)
+                negatives_parts.append(available[idx])
+                counts_used["categories"][cat] = quota
+                counts_used["total"] += quota
+
+        else:
+            # Ratio demandé en dessous du ratio naturel : impossible d'ajouter des négatifs
+            # sans dupliquer. On garde TOUS les négatifs disponibles (déjà le maximum) et on
+            # réduit les POSITIFS pour atteindre exactement le ratio demandé.
+            n_positives_target = round(total_negatives_available * ratio / (1 - ratio))
+
+            print(f"\n{'!' * 78}")
+            print(f"[WARNING] '{category}': ratio {ratio} < ratio naturel ({natural_ratio:.3f}).")
+            print(f"          Impossible d'atteindre ce ratio en ajoutant des négatifs (ça dupliquerait")
+            print(f"          des images). Les POSITIFS sont donc réduits de {n_positives_available} à")
+            print(f"          {n_positives_target} pour respecter exactement le ratio demandé, en gardant")
+            print(f"          TOUS les négatifs disponibles ({total_negatives_available}).")
+            print(f"{'!' * 78}\n")
+
+            idx = rng.choice(n_positives_available, size=n_positives_target, replace=False)
+            positives = positives_available[idx]
+            negatives_parts = [data["train"]["img"][c] for c in other_categories]
+
+            counts_used = {"total": n_positives_target, "categories": {category: n_positives_target}}
+            for cat in other_categories:
+                available = data["train"]["img"][cat]
+                counts_used["categories"][cat] = len(available)
+                counts_used["total"] += len(available)
 
     cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"][f"model_{category}"] = counts_used
 
