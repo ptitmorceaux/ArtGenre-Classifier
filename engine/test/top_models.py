@@ -8,6 +8,7 @@ config.json files saved by each training run.
 Usage:
     python list_top_models.py
     python list_top_models.py -n 5
+    python list_top_models.py -m mlp
     python list_top_models.py -n 20 --pattern "engine/core/output/*/*/*/*.json"
 """
 
@@ -46,6 +47,13 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=DEFAULT_PATTERN,
         help=f"Glob pattern to the config.json files (default: '{DEFAULT_PATTERN}').",
+    )
+    parser.add_argument(
+        "-m", "--model",
+        dest="model",
+        type=str,
+        default=None,
+        help="Filter runs by model type (e.g. 'mlp', 'linear', 'rbf'). Case-insensitive.",
     )
     return parser.parse_args()
 
@@ -101,26 +109,29 @@ def format_time_ago(path: str) -> str:
         elapsed_seconds = max((now_dt - run_dt).total_seconds(), 0)
 
         if elapsed_seconds < 60:
-            return f"{int(elapsed_seconds)} s"
+            return f"{int(elapsed_seconds)}s"
 
         elapsed_minutes = elapsed_seconds / 60
         if elapsed_minutes < 60:
-            return f"{int(elapsed_minutes)} min"
+            return f"{int(elapsed_minutes)}min"
 
         elapsed_hours = elapsed_minutes / 60
         if elapsed_hours < 24:
-            return f"{int(elapsed_hours)} h"
+            return f"{int(elapsed_hours)}h"
 
         elapsed_days = elapsed_hours / 24
-        return f"{int(elapsed_days)} d"
+        return f"{int(elapsed_days)}d"
 
     except (ValueError, IndexError):
         return UNKNOWN
 
 
-def collect_runs(pattern: str) -> list[dict]:
+def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
     """Walks through every file matching `pattern`, extracts the useful info, and
-    silently skips (with a warning on stderr) unreadable or incomplete files."""
+    silently skips (with a warning on stderr) unreadable or incomplete files.
+
+    If `model_filter` is given, only runs whose model type matches it (case- and
+    whitespace-insensitive) are kept."""
     runs = list()
 
     filepaths = sorted(Path(p) for p in glob.glob(pattern))
@@ -128,6 +139,8 @@ def collect_runs(pattern: str) -> list[dict]:
     if not filepaths:
         print(f"[!] No file found for pattern '{pattern}'.", file=sys.stderr)
         return runs
+
+    normalized_filter = model_filter.lower().strip() if model_filter is not None else None
 
     for filepath in filepaths:
         try:
@@ -144,6 +157,10 @@ def collect_runs(pattern: str) -> list[dict]:
 
         run = { "top1_accuracy": top1_accuracy }
         run.update(extract_run_info(config))
+
+        if normalized_filter is not None and str(run["model_type"]).lower().strip() != normalized_filter:
+            continue
+
         run["elapsed"] = format_time_ago(run["path"])
         runs.append(run)
 
@@ -193,7 +210,7 @@ def print_top_runs(runs: list[dict], n: int) -> None:
 
 def main() -> None:
     args = parse_args()
-    runs = collect_runs(args.pattern)
+    runs = collect_runs(args.pattern, args.model)
     print_top_runs(runs, args.n)
 
 
