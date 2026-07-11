@@ -74,6 +74,21 @@ def extract_top1_accuracy(config: dict) -> float | None:
         return None
 
 
+def extract_extra_info(config: dict) -> str:
+    """
+    Extracts extra, model-type-specific info to display in the 'Info' column.
+    Currently only populated for MLP runs (shows the 'npl' architecture);
+    empty string for any other model type.
+    """
+    model = config.get("model", {})
+    model_type = str(model.get("type", "")).lower().strip()
+
+    if model_type == "mlp":
+        return f"npl={model.get('npl', UNKNOWN)}"
+
+    return ""
+
+
 def extract_run_info(config: dict) -> dict:
     """Extracts a few useful fields to identify/compare runs in the display."""
     model = config.get("model", {})
@@ -171,6 +186,7 @@ def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
 
         run = { "top1_accuracy": top1_accuracy }
         run.update(extract_run_info(config))
+        run["info"] = extract_extra_info(config)
 
         if normalized_filter is not None and str(run["model_type"]).lower().strip() != normalized_filter:
             continue
@@ -215,7 +231,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
     headers = ["#"]
     if sort_by_ago:
         headers.append("Rank")
-    headers += ["Top-1 Acc", "Model", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Path"]
+    headers += ["Top-1 Acc", "Model", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
     for i, run in enumerate(display_runs):
@@ -231,6 +247,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
             str(run["limit_per_category"]),
             f"{run['ratio'] * 100:.2f}%" if isinstance(run["ratio"], float) else str(run["ratio"]),
             str(run["elapsed"]),
+            str(run["info"]),
             str(run["path"]),
         ]
         rows.append(row)

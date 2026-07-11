@@ -229,8 +229,8 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
     n_pos_final = counts_used["categories"][category]
     n_neg_final = counts_used["total"] - n_pos_final
     achieved_ratio = n_pos_final / counts_used["total"]
-    target_label = "natural" if ratio == -1 else f"{ratio:.3f}"
-    print(f"[INFO] '{category}': {n_pos_final} pos / {n_neg_final} neg (ratio={achieved_ratio:.3f}, target={target_label})")
+    suffix = ", natural" if ratio == -1 else ""
+    print(f"[INFO] '{category}': {n_pos_final} pos / {n_neg_final} neg (ratio={achieved_ratio:.3f}{suffix})")
 
     cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"][f"model_{category}"] = counts_used
 
