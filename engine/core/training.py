@@ -40,7 +40,7 @@ def train_mlp_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> di
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
         X, Y = build_one_vs_all_train_arrays(data, category)
 
-        print(f"> Training MLP {cf.CONFIG['model']['npl']} for category: {category}")
+        print(f"\n> Training MLP {cf.CONFIG['model']['npl']} for category: {category}")
         models_per_category[category] = MLP(cf.CONFIG["model"]["npl"])
         loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=X,
@@ -51,7 +51,7 @@ def train_mlp_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> di
             is_classification=True,
         )
         tb.write_training_logs(summary_writer, category, loss_history, acc_history)
-        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%\n")
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%")
 
         if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
             cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
