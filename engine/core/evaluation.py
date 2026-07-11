@@ -188,15 +188,13 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     length_X_test = cf.CONFIG["dataset"]["count_total_dataset"]["loaded"]["test"]["total"]
 
     # Le "total train" n'existe plus tel quel (la répartition dépend du modèle) :
-    # on le reconstruit via la diagonale (train_counts["model_<cat>"][cat] = nb
-    # d'images chargées pour cette catégorie, jamais affecté par le ratio car
+    # on le reconstruit via la diagonale (used_during_train["model_<cat>"]["categories"][cat]
+    # = nb d'images chargées pour cette catégorie, jamais affecté par le ratio car
     # seuls les négatifs sont sous-échantillonnés).
-    train_counts = cf.CONFIG["dataset"]["count_total_dataset"]["used"]["train"]
+    train_counts = cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"]
     categories = list(cf.CONFIG["dataset"]["categories"]["train"].keys())
-    
-    # TODO: ICI la logique doit être modifiée pour prendre en compte la nouvelle structure de counts_used
-    
-    length_X_train = sum(train_counts[f"model_{cat}"][cat] for cat in categories)
+
+    length_X_train = sum(train_counts[f"model_{cat}"]["categories"][cat] for cat in categories)
 
     plt.title("Confusion Matrix")
 
