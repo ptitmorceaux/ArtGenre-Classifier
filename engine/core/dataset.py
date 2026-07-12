@@ -36,17 +36,20 @@ def load_and_prepare_csv() -> dict:
 
         for category, paths in categories.items():
             df = pd.read_csv(paths["csv_path"])
-
+    
             if df.empty:
                 raise ValueError(f"Le fichier CSV pour la catégorie '{category}' est vide ou introuvable.")
 
-            if step == "train" and cf.CONFIG["dataset"]["limit_per_category"] > 0:
-                limit = cf.CONFIG["dataset"]["limit_per_category"]
-                if limit > len(df):
+            limit_config = cf.CONFIG["dataset"]["limit_per_category"]
+            limit = limit_config.get(category, -1) if isinstance(limit_config, dict) else limit_config
+
+            if step == "train" and limit > 0:
+                n_df = len(df)
+                if limit > n_df:
                     raise ValueError(
                         f"load_and_prepare_csv(): 'limit_per_category' ({limit}) dépasse le nombre "
-                        f"d'images disponibles pour la catégorie '{category}' ({len(df)}). "
-                        f"Baisse 'limit_per_category' à {len(df)} ou moins."
+                        f"d'images disponibles pour la catégorie '{category}' ({n_df}). "
+                        f"Baisse 'limit_per_category' à {n_df} ou moins."
                     )
                 df = df.sample(
                     n=limit,
