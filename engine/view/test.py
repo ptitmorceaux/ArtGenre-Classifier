@@ -7,9 +7,19 @@ Top-1 Accuracy multiclasse, ou un run donné via --model_path), charge une image
 (par défaut ./engine/view/test.png), vérifie qu'il s'agit bien d'une image
 valide, la redimensionne en 64x64 et l'aplatit en ndarray 1D. L'image est
 ensuite normalisée avec le scaler sauvegardé avec le modèle, puis chaque
-modèle de catégorie (One-vs-All) prédit un score brut (pas de classe -1/1).
-Les scores sont affichés dans le terminal, la catégorie la plus probable
-(score le plus élevé) étant mise en évidence.
+modèle de catégorie (One-vs-All) prédit un score de confiance. Les scores sont
+affichés dans le terminal, la catégorie la plus probable (score le plus élevé)
+étant mise en évidence.
+
+Le mode de prédiction (`is_classification`) dépend du type de modèle du run
+(`config.json` -> model.type) :
+- "mlp"    -> is_classification=True  : le MLP a une vraie couche d'activation
+              (tanh) en sortie, le score est donc borné dans ]-1, 1[.
+- "linear" -> is_classification=False : un modèle linéaire n'a pas de fonction
+              d'activation, `predict_linear_classification`/`predict_linear_regression`
+              renvoient tous les deux la même somme brute w·x+b (non bornée) ;
+              is_classification=False évite juste l'aller-retour inutile par
+              `predict_linear_classification`.
 
 Se base sur/réutilise les fonctions existantes du moteur :
 - engine.core.build.load_c_library()          -> charge la lib C (déjà compilée)
@@ -201,15 +211,20 @@ def load_and_preprocess_image(image_path: str) -> np.ndarray:
 
 #====== Prédiction ======#
 
-def predict_all_categories(models_per_category: dict, X: list) -> dict[str, float]:
+def predict_all_categories(models_per_category: dict, X: list, is_classification: bool) -> dict[str, float]:
     """
-    Renvoie, pour chaque catégorie, le score BRUT (régression, is_classification=False)
-    -- pas la classe -1/1 -- exactement comme utilisé pour l'argmax multiclasse dans
-    evaluation.evaluate_models().
+    Renvoie, pour chaque catégorie, le score de confiance de son modèle One-vs-All.
+
+    `is_classification` doit être déterminé par l'appelant à partir du type de
+    modèle du run (cf. main()) :
+    - MLP    -> True  : applique tanh en sortie -> score borné dans ]-1, 1[.
+    - Linear -> False : pas d'activation -> score brut w·x+b, non borné
+                        (identique au score utilisé pour l'argmax multiclasse
+                        dans evaluation.evaluate_models()).
     """
     scores = dict()
     for category, model in models_per_category.items():
-        output = model.predict(X, is_classification=False)
+        output = model.predict(X, is_classification=is_classification)
         scores[category] = float(output[0] if isinstance(output, list) else output)
     return scores
 
@@ -222,7 +237,7 @@ def _enable_ansi_on_windows() -> None:
         os.system("")
 
 
-def print_predictions(scores: dict[str, float]) -> None:
+def print_predictions(scores: dict[str, float], is_classification: bool) -> None:
     """Affiche le score de chaque catégorie (triés du plus élevé au plus bas),
     en mettant en évidence la catégorie la plus probable (score le plus élevé)."""
     _enable_ansi_on_windows()
@@ -231,9 +246,9 @@ def print_predictions(scores: dict[str, float]) -> None:
     best_category = max(scores, key=lambda c: scores[c])
     width = max(len(c) for c in scores) + 2
 
-    print("\n========>>> PREDICTION (scores bruts, pas de classes) <<<========\n")
+    label = "score tanh, borné ]-1, 1[" if is_classification else "score brut w·x+b, non borné"
+    print(f"\n========>>> PREDICTION ({label}) <<<========\n")
     for category, value in sorted(scores.items(), key=lambda kv: kv[1], reverse=True):
-        row = f"    {category.ljust(width)}: {value:+.6f}"
         if category == best_category:
             print(f"{BOLD}{GREEN}  ==> {category.ljust(width)}: {value:+.6f}   <== PLUS PROBABLE{RESET}")
         else:
@@ -264,13 +279,19 @@ def main() -> None:
     models_per_category, scaler = load_models_for_run(run_path, run_config)
     print(f"[*] {len(models_per_category)} modèle(s) chargé(s) : {list(models_per_category.keys())}")
 
+    # Seul le MLP a une vraie fonction d'activation en sortie (tanh) : on ne
+    # demande is_classification=True que dans ce cas (cf. docstring du module).
+    model_type = run_config["model"]["type"]
+    is_classification = (model_type == "mlp")
+    print(f"[*] Type de modèle : '{model_type}' -> is_classification={is_classification}")
+
     print(f"[*] Chargement de l'image : '{args.image_path}'")
     img_array = load_and_preprocess_image(args.image_path)
 
     X_normalized = scaler.transform(img_array)
 
-    scores = predict_all_categories(models_per_category, X_normalized)
-    print_predictions(scores)
+    scores = predict_all_categories(models_per_category, X_normalized, is_classification)
+    print_predictions(scores, is_classification)
 
 
 if __name__ == "__main__":
