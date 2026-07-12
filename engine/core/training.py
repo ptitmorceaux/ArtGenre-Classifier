@@ -38,9 +38,9 @@ def train_mlp_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> di
     models_per_category = dict()
 
     for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        print(f"\n> Training MLP {cf.CONFIG['model']['npl']} for category: {category}")
         X, Y = build_one_vs_all_train_arrays(data, category)
 
-        print(f"\n> Training MLP {cf.CONFIG['model']['npl']} for category: {category}")
         models_per_category[category] = MLP(cf.CONFIG["model"]["npl"])
         loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=X,
