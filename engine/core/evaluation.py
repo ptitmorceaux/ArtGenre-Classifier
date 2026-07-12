@@ -10,13 +10,13 @@ import engine.core.config as cf
 from engine.core.dataset import build_multiclass_test_arrays
 
 
-def _predict_scalar(model, x) -> float:
+def _predict_scalar(model, x, is_classification: bool) -> float:
     """
     Renvoie la sortie scalaire du modèle, quel que soit son type.
     LinearModel.predict() renvoie un scalaire, MLP.predict() renvoie une liste
     (même à une seule sortie) — sans ce helper, tanh(value) planterait sur un MLP.
     """
-    output = model.predict(x, is_classification=False)
+    output = model.predict(x, is_classification=is_classification)
     return output[0] if isinstance(output, list) else output
 
 
@@ -86,6 +86,8 @@ def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     X_test, expected_categories = build_multiclass_test_arrays(data)
     predictions = dict()
+    
+    is_classification = cf.CONFIG["model"]["type"] in [ "mlp" ]
 
     # 1. Évaluation de chaque modèle individuel, stockée dans test_individual_accuracy
     print("\n========>>> TEST: Evaluating individual models <<<========")
@@ -94,9 +96,9 @@ def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
 
         predictions[category] = dict()
         predictions[category]["values"] = [
-            _predict_scalar(models_per_category[category], x) for x in X_test
+            _predict_scalar(models_per_category[category], x, is_classification) for x in X_test
         ]
-        predictions[category]["prediction"] = [tanh(value) >= 0 for value in predictions[category]["values"]]
+        predictions[category]["prediction"] = [value >= 0 for value in predictions[category]["values"]]
 
         expected = [1 if e == category else -1 for e in expected_categories]
         predicted = predictions[category]["prediction"]
