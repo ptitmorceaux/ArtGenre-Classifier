@@ -2,6 +2,7 @@ from .writer import (
     write_training_logs as write_training_logs,
     write_images as write_images,
     write_markdown_from_dict as write_markdown_from_dict,
+    save_markdown_report as save_markdown_report,
 )
 
 from .experiment import get_experiment_md

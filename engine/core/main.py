@@ -10,7 +10,7 @@ import engine.core.config as cf
 import engine.core.tb_logger as tb
 from engine.core.build import compile_c_library, load_c_library
 from engine.core.dataset import load_and_prepare_csv, load_images_from_filepaths
-from engine.core.preprocessing import standardize_data
+from engine.core.preprocessing import standardize_train_data, standardize_test_data_from_scaler
 from engine.core.training import train_models
 from engine.core.persistence import save_trained_models, save_config_json
 from engine.core.evaluation import evaluate_models, plot_confusion_matrix
@@ -48,44 +48,50 @@ def main():
     compile_c_library()
     load_c_library()
 
-    # 3. Préparation des données
-    print("\n# Etape 3 : Préparation des données...")
-    df_X_filepaths, df_Y = load_and_prepare_csv()
-    df_X = load_images_from_filepaths(df_X_filepaths)
+    # 3. Préparation des données (CSV des deux steps + images du train uniquement)
+    print("\n# Etape 3 : Préparation des données (chargement des images train uniquement)...")
+    data = load_and_prepare_csv()
+    data["train"]["img"] = load_images_from_filepaths(data, step="train")
     cf.CONFIG = cf.finalize_mlp_config(cf.CONFIG)
-    df_X, scaler = standardize_data(df_X)
+    data, scaler = standardize_train_data(data)
 
     ### TENSORBOARD SUMMARY WRITER ###
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
 
     # 4. Entraînement
     print("\n# Etape 4 : Entraînement des modèles et enregistrement des logs pour tensorboard...")
-    models_per_category = train_models(summary_writer, df_X, df_Y)
+    models_per_category = train_models(summary_writer, data)
 
     # 5. Sauvegarde des modèles entraînés + du scaler utilisé (un fichier par catégorie).
     #    Les modèles restent en mémoire ensuite pour l'évaluation ci-dessous.
     print("\n# Etape 5 : Sauvegarde des modèles entraînés...")
     save_trained_models(models_per_category, scaler, cf.CONFIG["output"]["models"], cf.CONFIG["model"]["type"])
 
-    # 6. Évaluation et Visualisation
-    print("\n# Etape 6 : Évaluation et Visualisation...")
-    df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, df_X, df_Y)
-    
-    # 7. Sauvegarde de la matrice de confusion test
-    print("\n# Etape 7 : Sauvegarde de la matrice de confusion...")
-    plot_confusion_matrix(df_predictions_expected, df_predictions_test, df_X, show=False)
+    # 6. Libère la RAM des images du train, charge les images de test et normalise
+    #    avec le scaler du train (jamais refit sur le test).
+    print("\n# Etape 6 : Chargement des images de test et normalisation...")
+    del data["train"]["img"]  # plus aucune référence -> libéré par le GC
+    data["test"]["img"] = load_images_from_filepaths(data, step="test")
+    data = standardize_test_data_from_scaler(data, scaler)
 
-    # 8. Sauvegarde de la configuration en json
-    print("\n# Etape 8 : Sauvegarde de la configuration...")
+    # 7. Évaluation et Visualisation
+    print("\n# Etape 7 : Évaluation et Visualisation...")
+    df_predictions_expected, df_predictions_test = evaluate_models(models_per_category, data)
+
+    # 8. Sauvegarde de la matrice de confusion test
+    print("\n# Etape 8 : Sauvegarde de la matrice de confusion...")
+    plot_confusion_matrix(df_predictions_expected, df_predictions_test, show=False)
+
+    # 9. Sauvegarde de la configuration en json
+    print("\n# Etape 9 : Sauvegarde de la configuration...")
     save_config_json(cf.CONFIG["output"]["logs"], cf.CONFIG)
 
-    # 9. Écriture des résultats finaux dans TensorBoard
-    print("\n# Etape 9 : Écriture des résultats finaux dans TensorBoard...\n")
+    # 10. Écriture des résultats finaux dans TensorBoard + sauvegarde locale du même rapport
+    print("\n# Etape 10 : Écriture des résultats finaux dans TensorBoard...\n")
     summary_writer = tf.summary.create_file_writer(cf.CONFIG["output"]["logs"])
-    tb.write_markdown_from_dict(
-        summary_writer,
-        tb.get_summary_md_dict()
-    )
+    summaries = tb.get_summary_md_dict()
+    tb.write_markdown_from_dict(summary_writer, summaries)
+    tb.save_markdown_report(summaries, cf.CONFIG["output"]["logs"])
     tb.write_images(summary_writer)
 
     ### TENSORBOARD SUMMARY WRITER CLOSE ###

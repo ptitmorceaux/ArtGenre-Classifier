@@ -69,7 +69,7 @@ def get_config_documentation() -> dict:
             },
             "seeds_choice": {
                 "docs": "Liste des graines pour le choix aléatoire. Si 'seed' et 'seeds_choice' sont None, une graine est choisie aléatoirement dans l'intervalle [0, 2**32 - 1] (uint32).",
-                "type": (list,type(None)),
+                "type": (list, type(None)),
                 "default": None,
             },
             "seed": {
@@ -90,13 +90,24 @@ def get_config_documentation() -> dict:
                 "default": default_dataset_data_folder_path,
             },
             "limit_per_category": {
-                "docs": "Limite de données par catégorie.",
-                "type": (int,),
+                "docs": "Limite de données par catégorie (int uniforme, ou dict[str, int] {catégorie: limite}).",
+                "type": (dict, int,),
             },
             "normalization_method": {
                 "docs": "Méthode de normalisation des données.",
                 "type": (str,),
                 "options": ["standard", "per_column"],
+            },
+            "train_positive_ratio": {
+                "docs": (
+                    "Ratio cible de positifs dans le dataset d'entraînement One-vs-All, par catégorie. "
+                    "-1 = pas de rework (ratio naturel, toutes les négatives gardées). "
+                    "Sinon valeur dans ]0, 1[ (ex: 0.5 = 50% positifs ; les négatifs sont SOUS-échantillonnés, "
+                    "jamais dupliqués, et répartis le plus équitablement possible entre les autres catégories). "
+                    "S'applique APRÈS 'limit_per_category'."
+                ),
+                "type": (float, int),
+                "default": -1,
             },
             "categories": {
                 "docs": "Dictionnaire des catégories avec leurs chemins de données et CSV. Ex: {'impressionism': {'data_folder_path': 'path/to/impressionism', 'csv_path': 'path/to/impressionism.csv'}, ...}",
@@ -203,6 +214,20 @@ def init_config(config: dict) -> dict:
 
             if section == "lib" and key == "seed":
                 config[section][key] = select_seed(config[section]["seeds_choice"], value)
+
+            elif section == "dataset" and key == "train_positive_ratio":
+                if value != -1 and not (0 < value < 1):
+                    raise ValueError(
+                        f"init_config(): 'dataset.train_positive_ratio' doit être -1 ou dans ]0, 1[. "
+                        f"Obtenu: {value}"
+                    )
+            
+            elif section == "dataset" and key == "limit_per_category":
+                if isinstance(value, dict):
+                    for cat, limit in value.items():
+                        if not isinstance(limit, int):
+                            raise TypeError(f"init_config(): Type incorrect pour {section}.{key}[{cat}]. "
+                                            f"Attendu: int, Obtenu: {type(limit)}")
     
     # Ajoute les chemins de sortie pour les logs et les modèles
     date, time = get_date_time_now()
