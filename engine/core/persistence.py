@@ -43,4 +43,3 @@ def save_config_json(output_folder: str, config: dict) -> None:
     with open(filepath, "w") as f:
         json.dump(config, f, indent=4)
     print(f"[*] Configuration sauvegardée : {filepath}")
-    

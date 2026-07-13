@@ -5,13 +5,14 @@
         "seed": null
     },
     "dataset": {
-        "limit_per_category": 500,
+        "train_positive_ratio": 0.25,
+        "limit_per_category": 6000,
         "normalization_method": "per_column"
     },
     "model": {
         "type": "mlp",
         "alpha": 0.001,
         "epochs": 100,
-        "mlp_hidden_layers": [16, 16]
+        "mlp_hidden_layers": [128, 128]
     }
 }
