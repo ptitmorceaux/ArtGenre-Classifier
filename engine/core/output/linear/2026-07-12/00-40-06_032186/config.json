@@ -1,0 +1,218 @@
+{
+    "lib": {
+        "compile": false,
+        "seeds_choice": [
+            42,
+            1337,
+            2024,
+            1234,
+            5678
+        ],
+        "seed": 1234,
+        "lib_name": "libc",
+        "lib_folder": "libc",
+        "build_folder": "libc\\build",
+        "specs_folder": "libc\\specs",
+        "dependencies_folder": "C:\\msys64\\mingw64\\bin"
+    },
+    "dataset": {
+        "train_positive_ratio": 0.2,
+        "limit_per_category": 6000,
+        "normalization_method": "per_column",
+        "csv_path": {
+            "test": "dataset\\test",
+            "train": "dataset\\train"
+        },
+        "data_folder_path": {
+            "test": "dataset\\images\\64x64",
+            "train": "dataset\\images\\64x64"
+        },
+        "categories": {
+            "test": {
+                "impressionism": {
+                    "data_folder_path": "dataset\\images\\64x64\\impressionism",
+                    "csv_path": "dataset\\test\\test.impressionism_clean.csv"
+                },
+                "realism": {
+                    "data_folder_path": "dataset\\images\\64x64\\realism",
+                    "csv_path": "dataset\\test\\test.realism_clean.csv"
+                },
+                "romanticism": {
+                    "data_folder_path": "dataset\\images\\64x64\\romanticism",
+                    "csv_path": "dataset\\test\\test.romanticism_clean.csv"
+                }
+            },
+            "train": {
+                "impressionism": {
+                    "data_folder_path": "dataset\\images\\64x64\\impressionism",
+                    "csv_path": "dataset\\train\\train.impressionism_clean.csv"
+                },
+                "realism": {
+                    "data_folder_path": "dataset\\images\\64x64\\realism",
+                    "csv_path": "dataset\\train\\train.realism_clean.csv"
+                },
+                "romanticism": {
+                    "data_folder_path": "dataset\\images\\64x64\\romanticism",
+                    "csv_path": "dataset\\train\\train.romanticism_clean.csv"
+                }
+            }
+        },
+        "count_total_dataset": {
+            "loaded": {
+                "test": {
+                    "total": 13004,
+                    "categories": {
+                        "impressionism": 4427,
+                        "realism": 4341,
+                        "romanticism": 4236
+                    }
+                },
+                "train": {
+                    "total": 18000,
+                    "categories": {
+                        "impressionism": 6000,
+                        "realism": 6000,
+                        "romanticism": 6000
+                    }
+                },
+                "total": 31004
+            },
+            "used_during_train": {
+                "model_impressionism": {
+                    "total": 15000,
+                    "categories": {
+                        "impressionism": 3000,
+                        "realism": 6000,
+                        "romanticism": 6000
+                    }
+                },
+                "model_realism": {
+                    "total": 15000,
+                    "categories": {
+                        "realism": 3000,
+                        "impressionism": 6000,
+                        "romanticism": 6000
+                    }
+                },
+                "model_romanticism": {
+                    "total": 15000,
+                    "categories": {
+                        "romanticism": 3000,
+                        "impressionism": 6000,
+                        "realism": 6000
+                    }
+                }
+            }
+        },
+        "W_length": 12288
+    },
+    "model": {
+        "type": "linear",
+        "alpha": 0.001,
+        "epochs": 100,
+        "mlp_hidden_layers": [
+            128,
+            128
+        ],
+        "train_last_accuracy_per_category": {
+            "impressionism": 0.8273333311080933,
+            "realism": 0.7943333387374878,
+            "romanticism": 0.8070666790008545
+        },
+        "saved_models": {
+            "impressionism": "engine\\core\\output\\linear\\2026-07-12\\00-40-06_032186\\models\\linear__impressionism__2026-07-12_00-41-23_114.bin",
+            "realism": "engine\\core\\output\\linear\\2026-07-12\\00-40-06_032186\\models\\linear__realism__2026-07-12_00-41-23_114.bin",
+            "romanticism": "engine\\core\\output\\linear\\2026-07-12\\00-40-06_032186\\models\\linear__romanticism__2026-07-12_00-41-23_114.bin"
+        },
+        "test_individual_accuracy": {
+            "impressionism": {
+                "exact_match_accuracy": 0.639111042756075,
+                "balanced_accuracy": 0.5461908478711788,
+                "TP": 1129,
+                "TN": 7182,
+                "FP": 1395,
+                "FN": 3298,
+                "TPR": 0.2550259769595663,
+                "TNR": 0.8373557187827911,
+                "FPR": 0.1626442812172088,
+                "FNR": 0.7449740230404337
+            },
+            "realism": {
+                "exact_match_accuracy": 0.6098892648415872,
+                "balanced_accuracy": 0.5356152221437154,
+                "TP": 1355,
+                "TN": 6576,
+                "FP": 2087,
+                "FN": 2986,
+                "TPR": 0.31214005989403365,
+                "TNR": 0.7590903843933972,
+                "FPR": 0.2409096156066028,
+                "FNR": 0.6878599401059664
+            },
+            "romanticism": {
+                "exact_match_accuracy": 0.6311135035373732,
+                "balanced_accuracy": 0.5919206592088666,
+                "TP": 2031,
+                "TN": 6176,
+                "FP": 2592,
+                "FN": 2205,
+                "TPR": 0.4794617563739377,
+                "TNR": 0.7043795620437956,
+                "FPR": 0.2956204379562044,
+                "FNR": 0.5205382436260623
+            }
+        },
+        "test_multiclass_accuracy": {
+            "categories": {
+                "impressionism": {
+                    "exact_match_accuracy": 0.6373423561980929,
+                    "balanced_accuracy": 0.5616815939603869,
+                    "TP": 1437,
+                    "TN": 6851,
+                    "FP": 1726,
+                    "FN": 2990,
+                    "TPR": 0.3245990512762593,
+                    "TNR": 0.7987641366445144,
+                    "FPR": 0.2012358633554856,
+                    "FNR": 0.6754009487237407
+                },
+                "realism": {
+                    "exact_match_accuracy": 0.5973546601045832,
+                    "balanced_accuracy": 0.5458026564478944,
+                    "TP": 1696,
+                    "TN": 6072,
+                    "FP": 2591,
+                    "FN": 2645,
+                    "TPR": 0.3906933886201336,
+                    "TNR": 0.7009119242756551,
+                    "FPR": 0.2990880757243449,
+                    "FNR": 0.6093066113798664
+                },
+                "romanticism": {
+                    "exact_match_accuracy": 0.617348508151338,
+                    "balanced_accuracy": 0.6046529723503098,
+                    "TP": 2407,
+                    "TN": 5621,
+                    "FP": 3147,
+                    "FN": 1829,
+                    "TPR": 0.5682247403210576,
+                    "TNR": 0.6410812043795621,
+                    "FPR": 0.35891879562043794,
+                    "FNR": 0.4317752596789424
+                }
+            },
+            "global": {
+                "top1_accuracy": 0.4260227622270071
+            }
+        }
+    },
+    "output": {
+        "folder": "engine\\core\\output",
+        "logs": "engine\\core\\output\\linear\\2026-07-12\\00-40-06_032186",
+        "models": "engine\\core\\output\\linear\\2026-07-12\\00-40-06_032186\\models",
+        "confusion_matrix_test": "engine\\core\\output\\linear\\2026-07-12\\00-40-06_032186\\confusion_matrix_test.png"
+    },
+    "global": {
+        "unknown_category": null
+    }
+}
