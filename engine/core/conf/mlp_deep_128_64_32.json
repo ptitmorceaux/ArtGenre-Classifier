@@ -1,0 +1,17 @@
+{
+    "lib": {
+        "seeds_choice": [42, 1337, 2024, 1234, 5678],
+        "seed": 42
+    },
+    "dataset": {
+        "limit_per_category": 1000,
+        "train_test_split_ratio": 0.7,
+        "normalization_method": "per_column"
+    },
+    "model": {
+        "type": "mlp",
+        "alpha": 0.001,
+        "epochs": 50,
+        "mlp_hidden_layers": [128, 64, 32]
+    }
+}
