@@ -17,9 +17,13 @@ class ArtClassifierService:
 
     @staticmethod
     def process_image(image_file):
-        img = Image.open(image_file).convert('RGB')
+        # img = Image.open(image_file).convert('RGB')
+        # resample = getattr(Image, "Resampling", Image).LANCZOS
+        # img = img.resize((64, 64), resample)
+        
+        img = Image.open(image_file).convert('L')
         resample = getattr(Image, "Resampling", Image).LANCZOS
-        img = img.resize((64, 64), resample)
+        img = img.resize((32, 32), resample)
         
         img_array = np.array(img).flatten().astype(np.float32)
         return img_array.tolist()

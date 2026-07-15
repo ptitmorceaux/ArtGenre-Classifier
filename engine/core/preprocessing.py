@@ -27,9 +27,13 @@ def standard_scaler(data: dict) -> tuple[dict, StandardScaler]:
 
 
 def standard_column_scaler(data: dict) -> tuple[dict, StandardPerColumnScaler]:
-    """Standardisation PAR CANAL (r, g, b) : FIT sur tout le train, TRANSFORM catégorie par catégorie."""
+    """Standardisation PAR CANAL : FIT sur tout le train, TRANSFORM catégorie par catégorie."""
     all_train = np.concatenate(list(data["train"]["img"].values()), axis=0)
-    _, means, stds = fit_and_normalize_by_columns(all_train.flatten(), n_columns=3)
+    
+    # --- ANCIEN CODE (RGB = 3 canaux) ---
+    # _, means, stds = fit_and_normalize_by_columns(all_train.flatten(), n_columns=3)
+    _, means, stds = fit_and_normalize_by_columns(all_train.flatten(), n_columns=1)
+    
     scaler = StandardPerColumnScaler(mean=means, std=stds)
 
     for category, imgs in data["train"]["img"].items():

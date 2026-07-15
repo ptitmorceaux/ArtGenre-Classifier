@@ -31,9 +31,14 @@ def get_config_documentation() -> dict:
         "test": os.path.join("dataset", "test"),
         "train": os.path.join("dataset", "train"),
     }
+    # default_dataset_data_folder_path = {
+    #     "test": os.path.join("dataset", "images", "64x64"),
+    #     "train": os.path.join("dataset", "images", "64x64"),
+    # }
+
     default_dataset_data_folder_path = {
-        "test": os.path.join("dataset", "images", "64x64"),
-        "train": os.path.join("dataset", "images", "64x64"),
+        "test": os.path.join("dataset", "images", "32x32_gray"),
+        "train": os.path.join("dataset", "images", "32x32_gray"),
     }
     return {
         "lib": {

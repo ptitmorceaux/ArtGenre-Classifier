@@ -2,17 +2,17 @@
     "lib": {
         "compile": false,
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
-        "seed": null
+        "seed": 42
     },
     "dataset": {
-        "train_positive_ratio": 0.25,
-        "limit_per_category": 2000,
+        "train_positive_ratio": 0.5,
+        "limit_per_category": 9884,
         "normalization_method": "per_column"
     },
     "model": {
         "type": "mlp",
-        "alpha": 0.001,
-        "epochs": 100,
-        "mlp_hidden_layers": [128, 128, 128]
+        "alpha": 0.0005,
+        "epochs": 150,
+        "mlp_hidden_layers": [256, 128]
     }
 }

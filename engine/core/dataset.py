@@ -97,7 +97,9 @@ def load_images_from_filepaths(data: dict, step: str) -> dict[str, np.ndarray]:
             if i % 50 == 0 or i == total - 1:
                 print(f"\rChargement {step}/{category}... {i+1}/{total} ({100*(i+1)/total:.2f}%)", end="", flush=True)
 
-            img = Image.open(filepath).convert("RGB")
+            # img = Image.open(filepath).convert("RGB")
+            img = Image.open(filepath).convert("L")
+            
             img_array = np.array(img).flatten().astype(np.float32)
 
             if "W_length" not in cf.CONFIG["dataset"]:
