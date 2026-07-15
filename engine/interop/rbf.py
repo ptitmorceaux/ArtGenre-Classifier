@@ -43,21 +43,23 @@ class RBF:
 
     #====== Prédiction ======#
 
-    def predict(self, input_data: list[float]) -> int:
+    def predict(self, input_data: list[float], is_classification: bool = True) -> float | int:
         """
-        Fait une prédiction de classification.
+        Fait une prédiction (Forward pass).
+        Si is_classification = True : prédit une classe binaire signée (-1 ou 1).
+        Si is_classification = False : prédit une valeur continue (régression).
         """
-        # Vérification de la taille d'entrée
+       # Vérification de la taille d'entrée
         if len(input_data) != self.input_dim:
             raise ValueError(f"RBF.predict(): input_data doit être de taille {self.input_dim}")
 
         c_input_array = (ctypes.c_float * len(input_data))(*input_data)
-        
-        # Le modèle linéaire de classification renvoie un seul int32_t
-        c_res_output = ctypes.c_int32()
+
+        # Le type du résultat dépend du mode : int32 pour la classe, float pour la valeur continue
+        c_res_output = ctypes.c_int32() if is_classification else ctypes.c_float()
 
         Loader.call(
-            "predict_rbf",
+            "predict_rbf" if is_classification else "predict_rbf_regression",
             self.ptr,
             c_input_array,
             ctypes.byref(c_res_output),
@@ -73,10 +75,13 @@ class RBF:
             dataset_expected_outputs: list[float],
             data_size: int,
             alpha: float,
-            epochs: int
+            epochs: int,
+            is_classification: bool = True
             ) -> None:
         """
-        Entraîne le RBF (Phase 1: K-Means / Phase 2: Règle de Rosenblatt).
+        Entraîne le RBF (Phase 1: K-Means / Phase 2: calcul de Gamma).
+        Si is_classification = True : Phase 3 = règle de Rosenblatt (classification -1/1).
+        Si is_classification = False : Phase 3 = descente de gradient (régression).
         """
         
         # Vérifications des primitives (Sécurité Ctypes)
@@ -89,7 +94,7 @@ class RBF:
         c_expected_outputs = (ctypes.c_float * len(dataset_expected_outputs))(*dataset_expected_outputs)
 
         Loader.call(
-            "train_rbf",
+            "train_rbf" if is_classification else "train_rbf_regression",
             self.ptr,
             c_dataset_inputs,
             c_expected_outputs,
