@@ -15,7 +15,7 @@ drawio/
 
 # *.bin
 *.tmp
-*.png
+#*.png
 
 engine/core/output/*
 
