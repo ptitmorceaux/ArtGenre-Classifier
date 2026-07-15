@@ -93,8 +93,10 @@ def predict_view(request):
         image_file = request.FILES.get('image')
         session_id = request.data.get('session_id')
 
-        if not image_file: return Response({"status": "error", "message": "Aucune image."}, status=400)
-        if not session_id: return Response({"status": "error", "message": "Aucune session sélectionnée."}, status=400)
+        if not image_file: 
+            return Response({"status": "error", "message": "Aucune image."}, status=400)
+        if not session_id: 
+            return Response({"status": "error", "message": "Aucune session sélectionnée."}, status=400)
 
         prediction_result = ArtClassifierService.predict(session_id, image_file)
 
