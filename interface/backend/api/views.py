@@ -56,32 +56,25 @@ def get_trained_models(request):
 
 @api_view(['GET'])
 def get_model_metrics(request, session_id):
-    """Récupère l'image de la matrice de confusion en Base64 de manière dynamique."""
     output_dir = os.path.join(BASE_DIR, "engine", "core", "output")
-    matrix_path = None
     session_dir = None
 
     for root, dirs, files in os.walk(output_dir):
-        if os.path.basename(root) == session_id and "config.json" in files:
+        if os.path.basename(root) == session_id:
             session_dir = root
-            with open(os.path.join(root, "config.json"), 'r') as f:
-                config_data = json.load(f)
-                matrix_path = config_data.get("output", {}).get("confusion_matrix_test")
             break
     
-    if not matrix_path or not session_dir:
-        return Response({"status": "error", "message": "Matrice introuvable pour cette session"}, status=404)
-    
-    normalized_matrix_path = matrix_path.replace('\\', '/')
-    matrix_filename = os.path.basename(normalized_matrix_path)
-    full_path = os.path.join(session_dir, matrix_filename)
+    if not session_dir:
+        return Response({"status": "error", "message": "Session introuvable"}, status=404)
+
+    full_path = os.path.join(session_dir, "confusion_matrix_test.png")
     
     if os.path.exists(full_path):
         with open(full_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
             return Response({"status": "success", "confusion_matrix": encoded_string})
             
-    return Response({"status": "error", "message": "Fichier image inexistant sur le disque"}, status=404)
+    return Response({"status": "error", "message": "Fichier image inexistant sur le disque pour cette session"}, status=404)
 
 @api_view(['GET', 'POST'])
 @parser_classes([MultiPartParser, FormParser])
