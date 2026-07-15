@@ -1,0 +1,33 @@
+[
+  {
+    "id": 52,
+    "title": "MLP [128, 64, 32] — seed 1453555868, limit=6000, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[128, 64, 32]",
+    "seed": 1453555868,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 45.7,
+    "analysis": {
+      "recall": {
+        "impressionism": 44.9,
+        "realism": 45.2,
+        "romanticism": 47.1
+      },
+      "train_accuracy": {
+        "impressionism": 88.6,
+        "realism": 82.2,
+        "romanticism": 83.8
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-14/16-55-39_070407.",
+        "train_positive_ratio=0.25."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-14/16-55-39_070407"
+  }
+]

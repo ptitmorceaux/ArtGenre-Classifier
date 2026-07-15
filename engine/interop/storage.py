@@ -4,6 +4,7 @@ import os
 from engine.interop.loader import Loader
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
+from engine.interop.rbf import RBF
 from engine.interop.normalization import StandardScaler, _CStandardScaler, StandardPerColumnScaler, _CStandardPerColumnScaler
 
 
@@ -30,6 +31,9 @@ def _init_model_from_ptr(model_ptr: ctypes.c_void_p, model_type: str) -> LinearM
         
         case "MLP":
             return MLP._init_from_model_ptr(model_ptr)
+        
+        case "RBFMODEL":
+            return RBF._init_from_model_ptr(model_ptr)
         
         case _:
             raise ValueError(f"init_model_from_ptr(): unknown model type '{model_type}'.")
@@ -94,6 +98,9 @@ def _get_model_type(model: LinearModel | MLP) -> ctypes.c_ubyte:
         
     elif isinstance(model, MLP):
         return ctypes.c_ubyte(1)
+    
+    elif isinstance(model, RBF):
+        return ctypes.c_ubyte(2)
 
     raise ValueError(f"get_model_type(): unknown model type '{type(model)}'.")
 

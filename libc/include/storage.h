@@ -8,6 +8,7 @@
 #include "normalization.h"
 #include "linearModel.h"
 #include "mlp.h"
+#include "rbf.h"
 
 /*  Structure du fichier binaire :
 
@@ -23,6 +24,7 @@
     | BLOC MODÈLE (Taille variable selon le ModelType)                      |
     | - Si ModelType_LINEAR : uint32_t (length) + [length * float32]        |
     | - Si ModelType_MLP    : (Nb layers, architecture, etc.) + [poids...]  |
+    | - Si ModelType_RBF    : (Input dimension, number of centers, gamma) + [centers...] + [output_layer...] |
     +-----------------------------------------------------------------------+
 */
 
@@ -35,6 +37,7 @@ unsigned char save_standard_normalization(FILE* file, StandardNormalizationData*
 unsigned char save_standard_per_column_normalization(FILE* file, StandardPerColumnNormalizationData* normalization_data);
 unsigned char save_linear_model(FILE* file, LinearModel* model);
 unsigned char save_mlp_model(FILE* file, MLP* model);
+unsigned char save_rbf_model(FILE* file, RBF* model);
 unsigned char save_normalization_data(FILE* file, NormalizationMethod normalization_method, void* normalization_data);
 unsigned char save_model_data(FILE* file, ModelType model_type, void* model);
 
@@ -43,6 +46,7 @@ unsigned char load_standard_normalization(FILE* file, StandardNormalizationData*
 unsigned char load_standard_per_column_normalization(FILE* file, StandardPerColumnNormalizationData** normalization_data);
 unsigned char load_linear_model(FILE* file, LinearModel** model);
 unsigned char load_mlp_model(FILE* file, MLP** model);
+unsigned char load_rbf_model(FILE* file, RBF** model);
 unsigned char load_normalization_data(FILE* file, NormalizationMethod normalization_method, void** normalization_data);
 unsigned char load_model_data(FILE* file, ModelType model_type, void** model);
 

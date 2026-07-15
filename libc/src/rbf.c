@@ -208,6 +208,29 @@ unsigned char free_rbf(RBF** model_ptr) {
 
 
 /** ==============================================
+ * Calcul des activations de la couche cachée (Fonction interne)
+ * ===============================================
+**/
+/*
+    # Formule pour chaque centre i : activation_i = exp(-gamma * distance(input, centre_i)^2)
+    # Identique en classification et en régression -> factorisé ici pour ne pas dupliquer
+    # ce calcul dans predict_rbf() et predict_rbf_regression().
+*/
+static unsigned char _rbf_compute_hidden_activations(RBF* model, float* input, float* out_activations) {
+    if (!model || !input || !out_activations) return ERR_INVALID_PTR;
+
+    for (uint32_t i = 0; i < model->num_centers; i++) {
+        float dist = 0.0f;
+        unsigned char status = euclidean_distance(&input[0], &model->centers[i * model->input_dim], model->input_dim, &dist);
+        if (status != RES_EXIT_SUCCESS) return status;
+
+        out_activations[i] = expf(-model->gamma * dist * dist);
+    }
+    return RES_EXIT_SUCCESS;
+}
+
+
+/** ==============================================
  * Fonction de Prédiction (Forward Pass)
  * ===============================================
 */
@@ -225,20 +248,46 @@ unsigned char predict_rbf(RBF* model, float* input, int32_t* outputs) {
     float* hidden_activations = (float*) malloc(model->num_centers * sizeof(float));
     if (!hidden_activations) return ERR_MEMORY_ALLOCATION;
 
-    // Étape 1 : Calcul des activations gaussiennes
-    for (uint32_t i = 0; i < model->num_centers; i++) {
-        float dist = 0.0f;
-        unsigned char status = euclidean_distance(&input[0], &model->centers[i * model->input_dim], model->input_dim, &dist);
-        if (status != RES_EXIT_SUCCESS) {
-            free(hidden_activations);
-            return status;
-        }
-        hidden_activations[i] = expf(-model->gamma * dist * dist);
+        // Étape 1 : Calcul des activations gaussiennes (espace transformé)
+    unsigned char status = _rbf_compute_hidden_activations(model, input, hidden_activations);
+    if (status != RES_EXIT_SUCCESS) {
+        free(hidden_activations);
+        return status;
     }
 
-    // Étape 2 : On passe le relais à la couche de classification linéaire
-    unsigned char status = predict_linear_classification(model->output_layer, hidden_activations, outputs);
+    // Étape 2 : On passe le relais à la couche de classification linéaire (-1 ou 1)
+    status = predict_linear_classification(model->output_layer, hidden_activations, outputs);
     
+    free(hidden_activations);
+    return status;
+}
+
+
+/** ==============================================
+ * Fonction de Prédiction en Régression (Forward Pass)
+ * ===============================================
+*/
+/*
+    # Différence avec predict_rbf() : le calcul des activations cachées (Étape 1) est
+    # identique. Seule la couche de sortie change : on renvoie la valeur continue via
+    # predict_linear_regression au lieu de la classe (-1/1).
+*/
+unsigned char predict_rbf_regression(RBF* model, float* input, float* output) {
+    if (!model || !output) return ERR_INVALID_PTR;
+
+    float* hidden_activations = (float*) malloc(model->num_centers * sizeof(float));
+    if (!hidden_activations) return ERR_MEMORY_ALLOCATION;
+
+    // Étape 1 : Calcul des activations gaussiennes (identique à la classification)
+    unsigned char status = _rbf_compute_hidden_activations(model, input, hidden_activations);
+    if (status != RES_EXIT_SUCCESS) {
+        free(hidden_activations);
+        return status;
+    }
+
+    // Étape 2 : On passe le relais à la couche de régression linéaire (valeur continue)
+    status = predict_linear_regression(model->output_layer, hidden_activations, output);
+
     free(hidden_activations);
     return status;
 }
@@ -262,14 +311,15 @@ unsigned char predict_rbf(RBF* model, float* input, int32_t* outputs) {
           Les données transformées sont envoyées à l'algorithme de Rosenblatt du modèle linéaire.
 */
 unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expected_outputs,
-        uint32_t dataset_size, float alpha, uint32_t epochs) {
+        uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history, float* accuracy_history) {
     
     if (!model || !dataset_inputs || !dataset_expected_outputs) return ERR_INVALID_PTR;
 
     // ==============================================================================
     // PHASE 1 : Entraînement non supervisé (Trouver la position des centres)
     // ==============================================================================
-    rbf_kmeans(dataset_inputs, dataset_size, model->input_dim, model->num_centers, model->centers, 100);
+    unsigned char status = rbf_kmeans(dataset_inputs, dataset_size, model->input_dim, model->num_centers, model->centers, 100);
+    if (status != RES_EXIT_SUCCESS) return status;
 
     // ==============================================================================
     // PHASE 2 : Ajustement de Gamma et Transformation du dataset
@@ -281,7 +331,84 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
     for (uint32_t i = 0; i < model->num_centers; i++) {
         for (uint32_t j = i + 1 ; j < model->num_centers; j++) {
             float dist = 0.0f;
-            unsigned char status = euclidean_distance(&model->centers[i * model->input_dim], &model->centers[j * model->input_dim], model->input_dim, &dist);
+            status = euclidean_distance(&model->centers[i * model->input_dim], &model->centers[j * model->input_dim], model->input_dim, &dist);
+            if (dist > dmax) dmax = dist;
+        }
+    }
+
+    // Si un seul centre (dmax == 0), on retombe sur une valeur par défaut pour éviter une division par zéro
+    float sigma = (dmax == 0.0f) ? 1.0f : (dmax / sqrtf(2.0f * (float)model->num_centers));
+    model->gamma = 1.0f / (2.0f * sigma * sigma);
+
+    // b. Transformation de l'espace (Matrice Phi)
+    //    On transforme la matrice [dataset_size * input_dim] en [dataset_size * num_centers]
+    float* transformed_inputs = (float*) malloc(dataset_size * model->num_centers * sizeof(float));
+    if (!transformed_inputs) return ERR_MEMORY_ALLOCATION;
+
+    for (uint32_t i = 0; i < dataset_size; i++) {
+        for (uint32_t j = 0; j < model->num_centers; j++) {
+            float dist = 0.0f;
+            status = euclidean_distance(&dataset_inputs[i * model->input_dim], &model->centers[j * model->input_dim], model->input_dim, &dist);
+            if (status != RES_EXIT_SUCCESS) {
+                free(transformed_inputs);
+                return status;
+            }
+            // Application de la fonction d'activation de base radiale
+            transformed_inputs[i * model->num_centers + j] = expf(-model->gamma * dist * dist);
+        }
+    }
+
+    // ==============================================================================
+    // PHASE 3 : Entraînement supervisé (Règle de Rosenblatt sur la couche de sortie)
+    // ==============================================================================
+    status = train_linear_classification(
+        model->output_layer,
+        transformed_inputs,
+        dataset_expected_outputs,
+        dataset_size,
+        alpha,
+        epochs,
+        loss_history,
+        accuracy_history
+    );
+
+    free(transformed_inputs);
+    return status;
+}
+
+/** ==============================================
+ * Fonction d'entraînement globale - Régression
+ * ===============================================
+*/
+/*
+    # Mêmes 3 phases que train_rbf(), seule la Phase 3 change :
+        - Phase 1 (Non Supervisé) : K-Means pour placer les centres.
+        - Phase 2 (Heuristique) : Calcul de Gamma + transformation en matrice Phi.
+        - Phase 3 (Supervisé) : Descente de gradient stochastique (régression) au lieu
+          de la règle de Rosenblatt, pour apprendre à prédire une valeur continue.
+*/
+unsigned char train_rbf_regression(RBF* model, float* dataset_inputs, float* dataset_expected_outputs,
+        uint32_t dataset_size, float alpha, uint32_t epochs) {
+
+    if (!model || !dataset_inputs || !dataset_expected_outputs) return ERR_INVALID_PTR;
+
+    // ==============================================================================
+    // PHASE 1 : Entraînement non supervisé (Trouver la position des centres)
+    // ==============================================================================
+    unsigned char status = rbf_kmeans(dataset_inputs, dataset_size, model->input_dim, model->num_centers, model->centers, 100);
+    if (status != RES_EXIT_SUCCESS) return status;
+
+    // ==============================================================================
+    // PHASE 2 : Ajustement de Gamma et Transformation du dataset
+    // ==============================================================================
+
+    // a. Calcul heuristique du Gamma : gamma = 1 / (2 * sigma^2)
+    //    où sigma est calculé à partir de la distance maximale (dmax) entre deux centres.
+    float dmax = 0.0f;
+    for (uint32_t i = 0; i < model->num_centers; i++) {
+        for (uint32_t j = i + 1; j < model->num_centers; j++) {
+            float dist = 0.0f;
+            status = euclidean_distance(&model->centers[i * model->input_dim], &model->centers[j * model->input_dim], model->input_dim, &dist);
             if (status != RES_EXIT_SUCCESS) return status;
             if (dist > dmax) dmax = dist;
         }
@@ -298,28 +425,25 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
     for (uint32_t i = 0; i < dataset_size; i++) {
         for (uint32_t j = 0; j < model->num_centers; j++) {
             float dist = 0.0f;
-            unsigned char status = euclidean_distance(&dataset_inputs[i * model->input_dim], &model->centers[j * model->input_dim], model->input_dim, &dist);
+            status = euclidean_distance(&dataset_inputs[i * model->input_dim], &model->centers[j * model->input_dim], model->input_dim, &dist);
             if (status != RES_EXIT_SUCCESS) {
                 free(transformed_inputs);
                 return status;
             }
-            // Application de la fonction d'activation de base radiale
             transformed_inputs[i * model->num_centers + j] = expf(-model->gamma * dist * dist);
         }
     }
 
     // ==============================================================================
-    // PHASE 3 : Entraînement supervisé (Règle de Rosenblatt sur la couche de sortie)
+    // PHASE 3 : Entraînement supervisé (Descente de gradient sur la couche de sortie)
     // ==============================================================================
-    unsigned char status = train_linear_classification(
+    status = train_linear_regression(
         model->output_layer,
         transformed_inputs,
         dataset_expected_outputs,
         dataset_size,
         alpha,
-        epochs,
-        NULL,
-        NULL
+        epochs
     );
 
     free(transformed_inputs);

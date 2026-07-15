@@ -26,8 +26,6 @@ DEFAULT_PATTERN = "engine/core/output/*/*/*/*.json"
 UNKNOWN = "?"
 
 # A run's path looks like: .../<model_type>/<YYYY-mm-dd>/<HH-MM-SS_ms>
-# (see config.py -> get_date_time_now(), which produces these two segments
-# using the Europe/Paris timezone).
 RUN_TIMEZONE = ZoneInfo("Europe/Paris")
 
 
@@ -74,11 +72,20 @@ def extract_top1_accuracy(config: dict) -> float | None:
         return None
 
 
+def extract_train_accuracy(config: dict) -> float | str:
+    """Calcule la moyenne de l'accuracy d'entraînement sur toutes les catégories."""
+    try:
+        acc_dict = config["model"]["train_last_accuracy_per_category"]
+        if not acc_dict:
+            return UNKNOWN
+        return sum(acc_dict.values()) / len(acc_dict)
+    except (KeyError, TypeError):
+        return UNKNOWN
+
+
 def extract_extra_info(config: dict) -> str:
     """
     Extracts extra, model-type-specific info to display in the 'Info' column.
-    Currently only populated for MLP runs (shows the 'npl' architecture);
-    empty string for any other model type.
     """
     model = config.get("model", {})
     model_type = str(model.get("type", "")).lower().strip()
@@ -98,6 +105,7 @@ def extract_run_info(config: dict) -> dict:
 
     return {
         "model_type": model.get("type", UNKNOWN),
+        "norm": dataset.get("normalization_method", UNKNOWN),
         "alpha": model.get("alpha", UNKNOWN),
         "epochs": model.get("epochs", UNKNOWN),
         "seed": lib.get("seed", UNKNOWN),
@@ -108,14 +116,8 @@ def extract_run_info(config: dict) -> dict:
 
 
 def parse_run_datetime(path: str) -> datetime | None:
-    """
-    Parses the last 2 segments of the path (.../<date>/<time_ms>) into an aware
-    datetime. Returns None if the path doesn't match the expected format
-    (e.g. 'YYYY-mm-dd/HH-MM-SS_ms').
-    """
     if path == UNKNOWN:
         return None
-
     try:
         parts = Path(path).parts
         date_str, time_str = parts[-2], parts[-1]
@@ -127,42 +129,30 @@ def parse_run_datetime(path: str) -> datetime | None:
             f"{date_str} {hours}:{minutes}:{seconds}",
             "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=RUN_TIMEZONE)
-
     except (ValueError, IndexError):
         return None
 
 
 def format_time_ago(run_dt: datetime | None) -> str:
-    """Formats how long ago `run_dt` was, or UNKNOWN if `run_dt` is None."""
     if run_dt is None:
         return UNKNOWN
-
     now_dt = datetime.now(RUN_TIMEZONE)
     elapsed_seconds = max((now_dt - run_dt).total_seconds(), 0)
 
     if elapsed_seconds < 60:
         return f"{int(elapsed_seconds)}s"
-
     elapsed_minutes = elapsed_seconds / 60
     if elapsed_minutes < 60:
         return f"{int(elapsed_minutes)}min"
-
     elapsed_hours = elapsed_minutes / 60
     if elapsed_hours < 24:
         return f"{int(elapsed_hours)}h"
-
     elapsed_days = elapsed_hours / 24
     return f"{int(elapsed_days)}d"
 
 
 def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
-    """Walks through every file matching `pattern`, extracts the useful info, and
-    silently skips (with a warning on stderr) unreadable or incomplete files.
-
-    If `model_filter` is given, only runs whose model type matches it (case- and
-    whitespace-insensitive) are kept."""
     runs = list()
-
     filepaths = sorted(Path(p) for p in glob.glob(pattern))
 
     if not filepaths:
@@ -181,10 +171,13 @@ def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
 
         top1_accuracy = extract_top1_accuracy(config)
         if top1_accuracy is None:
-            print(f"[!] '{filepath}' has no top1_accuracy (incomplete run?), skipping.", file=sys.stderr)
-            continue
+            # Assigne une valeur sentinelle pour permettre l'affichage des runs en cours ou en échec
+            top1_accuracy = -1.0
 
-        run = { "top1_accuracy": top1_accuracy }
+        run = { 
+            "top1_accuracy": top1_accuracy,
+            "train_accuracy": extract_train_accuracy(config)
+        }
         run.update(extract_run_info(config))
         run["info"] = extract_extra_info(config)
 
@@ -199,20 +192,13 @@ def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
 
 
 def assign_accuracy_ranks(runs: list[dict]) -> None:
-    """Assigns each run its rank (1 = highest top1_accuracy) among the given runs, in place."""
-    for rank, run in enumerate(sorted(runs, key=lambda r: r["top1_accuracy"], reverse=True), start=1):
+    # Ignore les runs sans précision finale pour le classement
+    valid_runs = [r for r in runs if r["top1_accuracy"] != -1.0]
+    for rank, run in enumerate(sorted(valid_runs, key=lambda r: r["top1_accuracy"], reverse=True), start=1):
         run["rank"] = rank
 
 
 def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
-    """
-    Displays runs in an aligned table.
-
-    Default: sorted by descending Top-1 Accuracy, truncated to the first n.
-    With sort_by_ago=True: sorted by most recent first (runs with an unparsable
-    path are pushed to the end), and a 'Rank' column is added showing each run's
-    Top-1 Accuracy rank among all matching runs (computed before truncation).
-    """
     if not runs:
         print("No valid run to display.")
         return
@@ -231,16 +217,23 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
     headers = ["#"]
     if sort_by_ago:
         headers.append("Rank")
-    headers += ["Top-1 Acc", "Model", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
+    headers += ["Top-1 Acc", "Train Acc", "Model", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
     for i, run in enumerate(display_runs):
         row = [str(i + 1)]
         if sort_by_ago:
-            row.append(str(run["rank"]))
+            row.append(str(run.get("rank", UNKNOWN)))
+
+        # Formatage conditionnel pour repérer les WIP et les float vs str
+        top1_str = f"{run['top1_accuracy'] * 100:.2f}%" if run['top1_accuracy'] != -1.0 else "WIP/Err"
+        train_str = f"{run['train_accuracy'] * 100:.2f}%" if isinstance(run['train_accuracy'], float) else str(run['train_accuracy'])
+
         row += [
-            f"{run['top1_accuracy'] * 100:.2f}%",
+            top1_str,
+            train_str,
             str(run["model_type"]),
+            str(run["norm"]),
             str(run["alpha"]),
             str(run["epochs"]),
             str(run["seed"]),
@@ -259,7 +252,8 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
 
     count_label = "all" if n <= 0 else f"top {len(display_runs)}"
     order_label = "most recent first" if sort_by_ago else "by Top-1 Accuracy"
-    print(f"\nShowing {count_label} runs, {order_label} ({len(runs)} valid runs found in total)\n")
+    print(f"\nShowing {count_label} runs, {order_label} ({len(runs)} runs found in total)\n")
+
     print(format_row(headers))
     print("-+-".join("-" * w for w in widths))
     for row in rows:

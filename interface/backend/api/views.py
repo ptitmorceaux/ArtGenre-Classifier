@@ -1,83 +1,101 @@
-# interface/backend/api/views.py
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from PIL import Image
+import os
+import base64
+import json
 
-# Import de votre service de classification existant
-from .services import ArtClassifierService 
+from .services import ArtClassifierService
 
-# Configuration du garde-fou pour la taille (ex: 5 Mo maximum)
-MAX_IMAGE_SIZE = 5 * 1024 * 1024 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-@api_view(['POST'])
+@api_view(['GET'])
+def get_trained_models(request):
+    """Recherche infaillible de tous les config.json et extraction des hyperparamètres."""
+    output_dir = os.path.join(BASE_DIR, "engine", "core", "output")
+    results = []
+
+    for root, dirs, files in os.walk(output_dir):
+        if "config.json" in files:
+            filepath = os.path.join(root, "config.json")
+            try:
+                with open(filepath, 'r') as f:
+                    data = json.load(f)
+                
+                session_id = os.path.basename(root)
+                model_type = data.get("model", {}).get("type", "unknown").lower()
+                
+                try:
+                    acc = data["model"]["test_multiclass_accuracy"]["global"]["top1_accuracy"]
+                except KeyError:
+                    try:
+                        acc = data["model"]["test_multiclass_accuracy"]["global"]["avg_balanced_accuracy"]
+                    except KeyError:
+                        acc = 0
+                
+                acc_pct = f"{acc * 100:.1f}%" if acc else "N/A"
+                
+                results.append({
+                    "id": session_id,
+                    "type": model_type,
+                    "accuracy": acc or 0,
+                    "label": f"Précision: {acc_pct} | {session_id}",
+                    "hyperparameters": {
+                        "alpha": data.get("model", {}).get("alpha", "N/A"),
+                        "epochs": data.get("model", {}).get("epochs", "N/A"),
+                        "npl": str(data.get("model", {}).get("npl", "N/A")),
+                        "normalization": data.get("dataset", {}).get("normalization_method", "N/A")
+                    }
+                })
+            except Exception as e:
+                print(f"Erreur de lecture sur {filepath}: {e}")
+                continue
+            
+    results = sorted(results, key=lambda x: x["accuracy"], reverse=True)
+    return Response({"status": "success", "models": results})
+
+@api_view(['GET'])
+def get_model_metrics(request, session_id):
+    output_dir = os.path.join(BASE_DIR, "engine", "core", "output")
+    session_dir = None
+
+    for root, dirs, files in os.walk(output_dir):
+        if os.path.basename(root) == session_id:
+            session_dir = root
+            break
+    
+    if not session_dir:
+        return Response({"status": "error", "message": "Session introuvable"}, status=404)
+
+    full_path = os.path.join(session_dir, "confusion_matrix_test.png")
+    
+    if os.path.exists(full_path):
+        with open(full_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+            return Response({"status": "success", "confusion_matrix": encoded_string})
+            
+    return Response({"status": "error", "message": "Fichier image inexistant sur le disque pour cette session"}, status=404)
+
+@api_view(['GET', 'POST'])
 @parser_classes([MultiPartParser, FormParser])
 def predict_view(request):
-    """Predict the output based on the input image data."""
+    if request.method == 'GET':
+        return Response({"status": "Ready"})
+
     try:
-        # 1. Récupération de l'image et du modèle depuis la requête FormData
         image_file = request.FILES.get('image')
-        model_type = request.data.get('model')
+        session_id = request.data.get('session_id')
 
-        # 2. Vérifications de base (présence des données)
-        if not image_file:
-            return Response({"status": "error", "message": "Aucune image fournie."}, status=400)
-            
-        if not model_type:
-            return Response({"status": "error", "message": "Aucun modèle sélectionné."}, status=400)
+        if not image_file: 
+            return Response({"status": "error", "message": "Aucune image."}, status=400)
+        if not session_id: 
+            return Response({"status": "error", "message": "Aucune session sélectionnée."}, status=400)
 
-        # 3. Garde-fou 1 : Limite de poids du fichier (évite la saturation de la mémoire)
-        if image_file.size > MAX_IMAGE_SIZE:
-            return Response({
-                "status": "error", 
-                "message": f"L'image est trop volumineuse. Taille maximum : {MAX_IMAGE_SIZE / (1024*1024)} Mo."
-            }, status=400)
-
-        # 4. Garde-fou 2 : Détection des "fausses" images (Vérification du format réel)
-        try:
-            # On tente d'ouvrir le fichier avec Pillow
-            with Image.open(image_file) as img:
-                # verify() inspecte les en-têtes internes du fichier pour confirmer le type réel
-                img.verify()
-                
-                # Optionnel : Vous pouvez aussi restreindre strictement aux formats voulus (PNG, JPEG)
-                if img.format not in ['PNG', 'JPEG', 'MPO']: # Note: MPO est souvent lié au JPEG
-                    return Response({
-                        "status": "error", 
-                        "message": f"Format réel de l'image ({img.format}) non supporté. Seuls PNG et JPEG sont acceptés."
-                    }, status=400)
-        except Exception:
-            # Si Pillow n'arrive pas à ouvrir ou vérifier le fichier, c'est une fausse image (ex: un .txt renommé en .png)
-            return Response({
-                "status": "error", 
-                "message": "Le fichier envoyé est corrompu ou n'est pas une véritable image valide."
-            }, status=400)
-
-        # 5. Application du choix du modèle (.lower() et nettoyage)
-        model_type = str(model_type).strip().lower()
-        
-        if model_type not in ["mlp", "linear"]:
-            return Response({
-                "status": "error", 
-                "message": f"Modèle '{model_type}' non supporté. Veuillez choisir 'mlp' ou 'linear'."
-            }, status=400)
-
-        # 6. Appel du service de prédiction (l'image est maintenant sûre)
-        prediction_result = ArtClassifierService.predict(model_type, image_file)
+        prediction_result = ArtClassifierService.predict(session_id, image_file)
 
         if 'error' in prediction_result:
-            return Response({
-                "status": "error",
-                "message": prediction_result['error']
-            }, status=400)
+            return Response({"status": "error", "message": prediction_result['error']}, status=400)
 
-        return Response({
-            "status": "success",
-            "data": prediction_result
-        })
-
+        return Response({"status": "success", "data": prediction_result})
     except Exception as e:
-        return Response({
-            "status": "error",
-            "message": f"Erreur interne du serveur: {str(e)}"
-        }, status=500)
+        return Response({"status": "error", "message": f"Erreur serveur: {str(e)}"}, status=500)

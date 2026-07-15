@@ -1,0 +1,343 @@
+[
+  {
+    "id": 53,
+    "title": "MLP [16, 16] — seed 1234, limit=500, pos_ratio=None (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 1500,
+    "test": 13004,
+    "accuracy": 38.2,
+    "analysis": {
+      "recall": {
+        "impressionism": 40.0,
+        "realism": 34.6,
+        "romanticism": 40.2
+      },
+      "train_accuracy": {
+        "impressionism": 78.2,
+        "realism": 78.3,
+        "romanticism": 79.5
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-09/20-15-20_053794.",
+        "train_positive_ratio=None | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-09/20-15-20_053794"
+  },
+  {
+    "id": 54,
+    "title": "MLP [6, 6] — seed 42, limit=500, pos_ratio=None (batch import)",
+    "model": "mlp",
+    "architecture": "[6, 6]",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 50,
+    "normalization": "per_column",
+    "train": 1500,
+    "test": 13004,
+    "accuracy": 37.7,
+    "analysis": {
+      "recall": {
+        "impressionism": 38.6,
+        "realism": 41.9,
+        "romanticism": 32.3
+      },
+      "train_accuracy": {
+        "impressionism": 69.5,
+        "realism": 66.4,
+        "romanticism": 66.7
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-09/20-27-16_613983.",
+        "train_positive_ratio=None | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-09/20-27-16_613983"
+  },
+  {
+    "id": 55,
+    "title": "MLP [256, 128] — seed 1337, limit=1000, pos_ratio=None (batch import)",
+    "model": "mlp",
+    "architecture": "[256, 128]",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 50,
+    "normalization": "per_column",
+    "train": 3000,
+    "test": 13004,
+    "accuracy": 41.6,
+    "analysis": {
+      "recall": {
+        "impressionism": 46.0,
+        "realism": 39.4,
+        "romanticism": 39.1
+      },
+      "train_accuracy": {
+        "impressionism": 85.3,
+        "realism": 82.3,
+        "romanticism": 80.2
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-10/17-56-47_468659.",
+        "train_positive_ratio=None | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-10/17-56-47_468659"
+  },
+  {
+    "id": 56,
+    "title": "MLP [16, 16] — seed 1234, limit=500, pos_ratio=None (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 1500,
+    "test": 13004,
+    "accuracy": 39.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 40.7,
+        "realism": 38.8,
+        "romanticism": 38.6
+      },
+      "train_accuracy": {
+        "impressionism": 82.5,
+        "realism": 82.3,
+        "romanticism": 78.3
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-10/18-14-16_499052.",
+        "train_positive_ratio=None | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-10/18-14-16_499052"
+  },
+  {
+    "id": 57,
+    "title": "MLP [16, 16] — seed 2024, limit=500, pos_ratio=0.5 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 39.6,
+    "analysis": {
+      "recall": {
+        "impressionism": 42.9,
+        "realism": 36.6,
+        "romanticism": 39.2
+      },
+      "train_accuracy": {
+        "impressionism": 82.0,
+        "realism": 80.9,
+        "romanticism": 79.3
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/20-08-33_181855.",
+        "train_positive_ratio=0.5 | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/20-08-33_181855"
+  },
+  {
+    "id": 58,
+    "title": "MLP [16, 16] — seed 42, limit=500, pos_ratio=0.5 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 38.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 37.4,
+        "realism": 37.5,
+        "romanticism": 40.4
+      },
+      "train_accuracy": {
+        "impressionism": 77.2,
+        "realism": 76.5,
+        "romanticism": 77.1
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/20-25-36_439699.",
+        "train_positive_ratio=0.5 | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/20-25-36_439699"
+  },
+  {
+    "id": 59,
+    "title": "Linear — seed 1337, limit=1000, pos_ratio=None (batch import)",
+    "model": "linear",
+    "architecture": "perceptron (Rosenblatt), one-vs-rest",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 3000,
+    "test": 13004,
+    "accuracy": 40.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 41.0,
+        "realism": 36.9,
+        "romanticism": 43.6
+      },
+      "train_accuracy": {
+        "impressionism": 94.7,
+        "realism": 91.5,
+        "romanticism": 92.4
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/linear/2026-07-09/20-08-04_286040.",
+        "train_positive_ratio=None | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/linear/2026-07-09/20-08-04_286040"
+  },
+  {
+    "id": 60,
+    "title": "Linear — seed 42, limit=500, pos_ratio=None (batch import)",
+    "model": "linear",
+    "architecture": "perceptron (Rosenblatt), one-vs-rest",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 50,
+    "normalization": "per_column",
+    "train": 1500,
+    "test": 13004,
+    "accuracy": 39.7,
+    "analysis": {
+      "recall": {
+        "impressionism": 36.5,
+        "realism": 39.1,
+        "romanticism": 43.5
+      },
+      "train_accuracy": {
+        "impressionism": 93.6,
+        "realism": 92.1,
+        "romanticism": 89.7
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/linear/2026-07-09/20-24-29_322064.",
+        "train_positive_ratio=None | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/linear/2026-07-09/20-24-29_322064"
+  },
+  {
+    "id": 61,
+    "title": "Linear — seed 42, limit=1000, pos_ratio=None (batch import)",
+    "model": "linear",
+    "architecture": "perceptron (Rosenblatt), one-vs-rest",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 3000,
+    "test": 13004,
+    "accuracy": 41.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 33.2,
+        "realism": 41.6,
+        "romanticism": 49.8
+      },
+      "train_accuracy": {
+        "impressionism": 94.5,
+        "realism": 91.3,
+        "romanticism": 91.9
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/linear/2026-07-10/16-01-51_195321.",
+        "train_positive_ratio=None | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/linear/2026-07-10/16-01-51_195321"
+  },
+  {
+    "id": 62,
+    "title": "Linear — seed 2024, limit=500, pos_ratio=0.5 (batch import)",
+    "model": "linear",
+    "architecture": "perceptron (Rosenblatt), one-vs-rest",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 41.0,
+    "analysis": {
+      "recall": {
+        "impressionism": 41.2,
+        "realism": 37.1,
+        "romanticism": 44.9
+      },
+      "train_accuracy": {
+        "impressionism": 98.5,
+        "realism": 98.3,
+        "romanticism": 97.6
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-40-30_864336.",
+        "train_positive_ratio=0.5 | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/linear/2026-07-11/20-40-30_864336"
+  },
+  {
+    "id": 63,
+    "title": "Linear — seed 1234, limit=500, pos_ratio=0.3333333333333333 (batch import)",
+    "model": "linear",
+    "architecture": "perceptron (Rosenblatt), one-vs-rest",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 40.5,
+    "analysis": {
+      "recall": {
+        "impressionism": 32.9,
+        "realism": 37.8,
+        "romanticism": 51.1
+      },
+      "train_accuracy": {
+        "impressionism": 97.5,
+        "realism": 97.1,
+        "romanticism": 96.1
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-51-33_554804.",
+        "train_positive_ratio=0.3333333333333333 | limit_per_category=500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/linear/2026-07-11/20-51-33_554804"
+  }
+]
