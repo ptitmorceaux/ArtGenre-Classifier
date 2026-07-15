@@ -1,0 +1,436 @@
+[
+  {
+    "id": 24,
+    "title": "MLP [16, 16] — seed 2024, limit=1000, pos_ratio=0.3333333333333333 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 40.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 43.1,
+        "realism": 33.7,
+        "romanticism": 44.5
+      },
+      "train_accuracy": {
+        "impressionism": 79.1,
+        "realism": 78.3,
+        "romanticism": 79.3
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-14-54_836787.",
+        "train_positive_ratio=0.3333333333333333 | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/21-14-54_836787"
+  },
+  {
+    "id": 25,
+    "title": "MLP [16, 16] — seed 5678, limit=1000, pos_ratio=0.5 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 39.6,
+    "analysis": {
+      "recall": {
+        "impressionism": 42.5,
+        "realism": 36.8,
+        "romanticism": 39.4
+      },
+      "train_accuracy": {
+        "impressionism": 83.1,
+        "realism": 76.9,
+        "romanticism": 77.1
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-30-14_564265.",
+        "train_positive_ratio=0.5 | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/21-30-14_564265"
+  },
+  {
+    "id": 26,
+    "title": "MLP [16, 16, 16] — seed 42, limit=1500, pos_ratio=0.3333333333333333 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16, 16]",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 41.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 46.7,
+        "realism": 42.6,
+        "romanticism": 34.5
+      },
+      "train_accuracy": {
+        "impressionism": 82.9,
+        "realism": 75.6,
+        "romanticism": 78.8
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-34-26_983380.",
+        "train_positive_ratio=0.3333333333333333 | limit_per_category=1500."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/21-34-26_983380"
+  },
+  {
+    "id": 27,
+    "title": "MLP [8, 8, 8] — seed 42, limit=3000, pos_ratio=0.3333333333333333 (batch import)",
+    "model": "mlp",
+    "architecture": "[8, 8, 8]",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 41.1,
+    "analysis": {
+      "recall": {
+        "impressionism": 47.3,
+        "realism": 39.5,
+        "romanticism": 36.2
+      },
+      "train_accuracy": {
+        "impressionism": 70.9,
+        "realism": 69.3,
+        "romanticism": 70.2
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-03-39_195707.",
+        "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/22-03-39_195707"
+  },
+  {
+    "id": 28,
+    "title": "MLP [64, 64] — seed 2024, limit=3000, pos_ratio=0.3333333333333333 (batch import)",
+    "model": "mlp",
+    "architecture": "[64, 64]",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 43.9,
+    "analysis": {
+      "recall": {
+        "impressionism": 43.9,
+        "realism": 40.0,
+        "romanticism": 48.1
+      },
+      "train_accuracy": {
+        "impressionism": 93.8,
+        "realism": 90.2,
+        "romanticism": 91.4
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-11-15_800568.",
+        "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/22-11-15_800568"
+  },
+  {
+    "id": 29,
+    "title": "MLP [128, 128] — seed 42, limit=3000, pos_ratio=0.3333333333333333 (batch import)",
+    "model": "mlp",
+    "architecture": "[128, 128]",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 45.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 43.3,
+        "realism": 44.9,
+        "romanticism": 48.0
+      },
+      "train_accuracy": {
+        "impressionism": 94.2,
+        "realism": 91.4,
+        "romanticism": 91.4
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-41-36_963888.",
+        "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-11/22-41-36_963888"
+  },
+  {
+    "id": 30,
+    "title": "MLP [128, 128] — seed 2024, limit=6000, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[128, 128]",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 47.1,
+    "analysis": {
+      "recall": {
+        "impressionism": 44.2,
+        "realism": 44.9,
+        "romanticism": 52.5
+      },
+      "train_accuracy": {
+        "impressionism": 93.0,
+        "realism": 90.6,
+        "romanticism": 91.3
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-12/01-04-05_375385.",
+        "train_positive_ratio=0.25."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-12/01-04-05_375385"
+  },
+  {
+    "id": 31,
+    "title": "MLP [10, 10] — seed 1234, limit=6, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[10, 10]",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 10,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 37.1,
+    "analysis": {
+      "recall": {
+        "impressionism": 32.2,
+        "realism": 41.4,
+        "romanticism": 37.8
+      },
+      "train_accuracy": {
+        "impressionism": 68.8,
+        "realism": 62.5,
+        "romanticism": 68.8
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-12/03-06-02_267716.",
+        "train_positive_ratio=0.25 | limit_per_category=6."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-12/03-06-02_267716"
+  },
+  {
+    "id": 32,
+    "title": "MLP [16, 16] — seed 5678, limit={'impressionism': 12, 'realism': 22, 'romanticism': 32}, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 5678,
+    "alpha": 0.01,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 35.2,
+    "analysis": {
+      "recall": {
+        "impressionism": 23.8,
+        "realism": 40.2,
+        "romanticism": 41.9
+      },
+      "train_accuracy": {
+        "impressionism": 100.0,
+        "realism": 100.0,
+        "romanticism": 97.8
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-12/13-54-29_862006.",
+        "train_positive_ratio=0.25 | limit_per_category={'impressionism': 12, 'realism': 22, 'romanticism': 32}."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-12/13-54-29_862006"
+  },
+  {
+    "id": 33,
+    "title": "MLP [16, 16] — seed 1337, limit={'impressionism': 56, 'realism': 12, 'romanticism': 32}, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[16, 16]",
+    "seed": 1337,
+    "alpha": 0.01,
+    "epochs": 50,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 35.7,
+    "analysis": {
+      "recall": {
+        "impressionism": 27.4,
+        "realism": 41.7,
+        "romanticism": 38.3
+      },
+      "train_accuracy": {
+        "impressionism": 96.6,
+        "realism": 87.5,
+        "romanticism": 93.4
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-12/14-02-18_912919.",
+        "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-12/14-02-18_912919"
+  },
+  {
+    "id": 34,
+    "title": "MLP [64, 64, 64] — seed 5678, limit=6000, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[64, 64, 64]",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 45.3,
+    "analysis": {
+      "recall": {
+        "impressionism": 47.2,
+        "realism": 44.0,
+        "romanticism": 44.6
+      },
+      "train_accuracy": {
+        "impressionism": 89.4,
+        "realism": 83.1,
+        "romanticism": 85.8
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-12/20-50-23_426125.",
+        "train_positive_ratio=0.25."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-12/20-50-23_426125"
+  },
+  {
+    "id": 35,
+    "title": "MLP [128, 64, 64] — seed 1234, limit=6000, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[128, 64, 64]",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 45.5,
+    "analysis": {
+      "recall": {
+        "impressionism": 44.5,
+        "realism": 44.6,
+        "romanticism": 47.5
+      },
+      "train_accuracy": {
+        "impressionism": 88.4,
+        "realism": 83.7,
+        "romanticism": 85.0
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-12/22-30-25_776689.",
+        "train_positive_ratio=0.25."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-12/22-30-25_776689"
+  },
+  {
+    "id": 36,
+    "title": "MLP [256, 256] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[256, 256]",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 49.5,
+    "analysis": {
+      "recall": {
+        "impressionism": 50.3,
+        "realism": 52.4,
+        "romanticism": 45.8
+      },
+      "train_accuracy": {
+        "impressionism": 88.7,
+        "realism": 86.6,
+        "romanticism": 86.0
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-13/17-06-45_581095.",
+        "train_positive_ratio=0.25 | limit_per_category=-1."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-13/17-06-45_581095"
+  },
+  {
+    "id": 37,
+    "title": "MLP [32] — seed 5678, limit=1000, pos_ratio=-1 (batch import)",
+    "model": "mlp",
+    "architecture": "[32]",
+    "seed": 5678,
+    "alpha": 0.01,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 41.5,
+    "analysis": {
+      "recall": {
+        "impressionism": 35.1,
+        "realism": 49.4,
+        "romanticism": 40.2
+      },
+      "train_accuracy": {
+        "impressionism": 78.0,
+        "realism": 73.7,
+        "romanticism": 75.0
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-14/14-37-01_871539.",
+        "train_positive_ratio=-1 | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-14/14-37-01_871539"
+  }
+]

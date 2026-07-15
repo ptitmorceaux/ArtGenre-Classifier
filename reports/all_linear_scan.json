@@ -1,0 +1,1223 @@
+[OK] engine/core/output/linear/2026-07-09/20-08-04_286040 | linear | seed=1337 | alpha=0.001 | epochs=100 | arch=[32] | limit=1000 | pos_ratio=None | acc=40.4% | tfevents=True
+[OK] engine/core/output/linear/2026-07-09/20-24-29_322064 | linear | seed=42 | alpha=0.001 | epochs=50 | arch=[16, 16] | limit=500 | pos_ratio=None | acc=39.7% | tfevents=True
+[OK] engine/core/output/linear/2026-07-10/16-01-51_195321 | linear | seed=42 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=1000 | pos_ratio=None | acc=41.4% | tfevents=True
+[OK] engine/core/output/linear/2026-07-10/17-36-49_601481 | linear | seed=1337 | alpha=0.001 | epochs=10 | arch=[32] | limit=1000 | pos_ratio=None | acc=38.8% | tfevents=True
+[OK] engine/core/output/linear/2026-07-10/17-39-38_000047 | linear | seed=1337 | alpha=0.001 | epochs=100 | arch=[32] | limit=1000 | pos_ratio=None | acc=40.3% | tfevents=True
+[OK] engine/core/output/linear/2026-07-10/17-40-57_240443 | linear | seed=1337 | alpha=0.01 | epochs=50 | arch=[32] | limit=2000 | pos_ratio=None | acc=42.3% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/20-40-30_864336 | linear | seed=2024 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=0.5 | acc=41.0% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/20-51-33_554804 | linear | seed=1234 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=0.3333333333333333 | acc=40.5% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/20-53-36_317761 | linear | seed=5678 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=0.3333333333333333 | acc=38.7% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/21-09-02_349430 | linear | seed=2024 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=1000 | pos_ratio=0.3333333333333333 | acc=41.6% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/23-37-32_627775 | linear | seed=5678 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=3000 | pos_ratio=0.3333333333333333 | acc=42.0% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/23-50-52_074575 | linear | seed=1337 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=6000 | pos_ratio=0.3333333333333333 | acc=44.1% | tfevents=True
+[OK] engine/core/output/linear/2026-07-11/23-55-15_225847 | linear | seed=1234 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=6000 | pos_ratio=0.5 | acc=41.3% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/00-32-28_562976 | linear | seed=2024 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=6000 | pos_ratio=0.25 | acc=45.0% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/00-40-06_032186 | linear | seed=1234 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=6000 | pos_ratio=0.2 | acc=42.6% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/00-46-32_444538 | linear | seed=1337 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=3000 | pos_ratio=0.25 | acc=42.8% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/00-49-13_513949 | linear | seed=5678 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=30 | pos_ratio=-1 | acc=36.8% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/00-50-30_358394 | linear | seed=1337 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=30 | pos_ratio=0.3333333333333333 | acc=36.7% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/03-05-29_191835 | linear | seed=2024 | alpha=0.001 | epochs=10 | arch=[128, 128] | limit=6 | pos_ratio=0.25 | acc=37.0% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/13-57-43_156170 | linear | seed=2024 | alpha=0.01 | epochs=100 | arch=[16, 16] | limit={'impressionism': 56, 'realism': 12, 'romanticism': 32} | pos_ratio=0.25 | acc=38.4% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/14-01-07_244955 | linear | seed=1234 | alpha=0.01 | epochs=50 | arch=[16, 16] | limit={'impressionism': 56, 'realism': 12, 'romanticism': 32} | pos_ratio=0.25 | acc=34.1% | tfevents=True
+[OK] engine/core/output/linear/2026-07-12/14-04-04_881138 | linear | seed=5678 | alpha=0.01 | epochs=50 | arch=[16, 16] | limit={'impressionism': 56, 'realism': 12, 'romanticism': 32} | pos_ratio=0.25 | acc=36.4% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-01-36_803290 | linear | seed=1337 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.25 | acc=46.5% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-06-08_575222 | linear | seed=2024 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.25 | acc=42.1% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-12-03_526758 | linear | seed=1234 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.25 | acc=42.4% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-17-59_507743 | linear | seed=1337 | alpha=0.01 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.25 | acc=46.3% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-24-08_060188 | linear | seed=2024 | alpha=0.01 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.25 | acc=42.5% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-26-42_812462 | linear | seed=1234 | alpha=0.01 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.25 | acc=42.7% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-32-07_799606 | linear | seed=1337 | alpha=0.01 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.3333333333333333 | acc=42.3% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-34-31_374596 | linear | seed=2024 | alpha=0.01 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.3333333333333333 | acc=44.2% | tfevents=True
+[OK] engine/core/output/linear/2026-07-14/20-47-40_181637 | linear | seed=1234 | alpha=0.01 | epochs=100 | arch=[128, 128] | limit=-1 | pos_ratio=0.3333333333333333 | acc=43.7% | tfevents=True
+[SKIP] engine/core/output/linear/Train_08/07-10_55: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-10_59: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-11_37: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-11_44: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-12_10: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-12_15: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-12_46: no config.json
+[SKIP] engine/core/output/linear/Train_08/07-12_54: no config.json
+
+================================================================================
+[
+  {
+    "folder": "engine/core/output/linear/2026-07-09/20-08-04_286040",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      32
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4044909258689634,
+    "recall": {
+      "impressionism": 0.40953241472780666,
+      "realism": 0.36903939184519696,
+      "romanticism": 0.43555240793201133
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.554538855142847,
+      "realism": 0.5305314701347652,
+      "romanticism": 0.5752693609003122
+    },
+    "train_accuracy": {
+      "impressionism": 0.9466666579246521,
+      "realism": 0.9150000214576721,
+      "romanticism": 0.9236666560173035
+    },
+    "train_total": 3000,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-09/20-24-29_322064",
+    "model_type": "linear",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 50,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3965702860658259,
+    "recall": {
+      "impressionism": 0.36525864016263837,
+      "realism": 0.39115411195577054,
+      "romanticism": 0.4348441926345609
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.550123782014396,
+      "realism": 0.5377795262537712,
+      "romanticism": 0.555469541572755
+    },
+    "train_accuracy": {
+      "impressionism": 0.9359999895095825,
+      "realism": 0.9206666946411133,
+      "romanticism": 0.8966666460037231
+    },
+    "train_total": 1500,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-10/16-01-51_195321",
+    "model_type": "linear",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.41418025223008303,
+    "recall": {
+      "impressionism": 0.3316015360289135,
+      "realism": 0.41626353374798436,
+      "romanticism": 0.4983474976392823
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5708374941424735,
+      "realism": 0.5357319053941353,
+      "romanticism": 0.5779830553889842
+    },
+    "train_accuracy": {
+      "impressionism": 0.9453333616256714,
+      "realism": 0.9129999876022339,
+      "romanticism": 0.9190000295639038
+    },
+    "train_total": 3000,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-10/17-36-49_601481",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 10,
+    "npl": null,
+    "mlp_hidden_layers": [
+      32
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3881882497693018,
+    "recall": {
+      "impressionism": 0.4700700248475265,
+      "realism": 0.3356369500115181,
+      "romanticism": 0.35646836638338053
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5559514167609441,
+      "realism": 0.5257776115635335,
+      "romanticism": 0.5400612817318362
+    },
+    "train_accuracy": {
+      "impressionism": 0.7366666793823242,
+      "realism": 0.6866666674613953,
+      "romanticism": 0.703000009059906
+    },
+    "train_total": 3000,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-10/17-39-38_000047",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      32
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4032605352199323,
+    "recall": {
+      "impressionism": 0.42082674497402306,
+      "realism": 0.4105044920525225,
+      "romanticism": 0.37747875354107646
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5662487461607902,
+      "realism": 0.5446265967130903,
+      "romanticism": 0.5459474059676185
+    },
+    "train_accuracy": {
+      "impressionism": 0.9426666498184204,
+      "realism": 0.8989999890327454,
+      "romanticism": 0.9263333082199097
+    },
+    "train_total": 3000,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-10/17-40-57_240443",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.01,
+    "epochs": 50,
+    "npl": null,
+    "mlp_hidden_layers": [
+      32
+    ],
+    "limit_per_category": 2000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4225622885266072,
+    "recall": {
+      "impressionism": 0.4061441156539417,
+      "realism": 0.33241188666205945,
+      "romanticism": 0.5321057601510859
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5876470840599195,
+      "realism": 0.5289555681723087,
+      "romanticism": 0.586365380075543
+    },
+    "train_accuracy": {
+      "impressionism": 0.8221666812896729,
+      "realism": 0.7875000238418579,
+      "romanticism": 0.800000011920929
+    },
+    "train_total": 6000,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/20-40-30_864336",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": 0.5,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4102583820362965,
+    "recall": {
+      "impressionism": 0.4115653941721256,
+      "realism": 0.37065192351992626,
+      "romanticism": 0.449480642115203
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5618512525250274,
+      "realism": 0.5341081388348794,
+      "romanticism": 0.5776144086488424
+    },
+    "train_accuracy": {
+      "impressionism": 0.9850000143051147,
+      "realism": 0.9829999804496765,
+      "romanticism": 0.9760000109672546
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/20-51-33_554804",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.40456782528452784,
+    "recall": {
+      "impressionism": 0.32911678337474587,
+      "realism": 0.3780234968901175,
+      "romanticism": 0.5106232294617564
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5637655736857407,
+      "realism": 0.525384829363909,
+      "romanticism": 0.574027399402411
+    },
+    "train_accuracy": {
+      "impressionism": 0.9746666550636292,
+      "realism": 0.9706666469573975,
+      "romanticism": 0.9606666564941406
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/20-53-36_317761",
+    "model_type": "linear",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.38711165795139957,
+    "recall": {
+      "impressionism": 0.352608990286876,
+      "realism": 0.35890347846118403,
+      "romanticism": 0.4520774315391879
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5443819114894797,
+      "realism": 0.520442158254025,
+      "romanticism": 0.5576992997111998
+    },
+    "train_accuracy": {
+      "impressionism": 0.9713333249092102,
+      "realism": 0.9626666903495789,
+      "romanticism": 0.9473333358764648
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/21-09-02_349430",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4161027376191941,
+    "recall": {
+      "impressionism": 0.36548452676756266,
+      "realism": 0.35844275512554713,
+      "romanticism": 0.5280925401322002
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5679002440296949,
+      "realism": 0.5337752272684182,
+      "romanticism": 0.5870959963434723
+    },
+    "train_accuracy": {
+      "impressionism": 0.9480000138282776,
+      "realism": 0.9300000071525574,
+      "romanticism": 0.918666660785675
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/23-37-32_627775",
+    "model_type": "linear",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 3000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4201784066441095,
+    "recall": {
+      "impressionism": 0.4400271063925909,
+      "realism": 0.414651002073255,
+      "romanticism": 0.40509915014164305
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5890236966030811,
+      "realism": 0.5463535513656128,
+      "romanticism": 0.5597576042679018
+    },
+    "train_accuracy": {
+      "impressionism": 0.8083333373069763,
+      "realism": 0.7685555815696716,
+      "romanticism": 0.7907778024673462
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/23-50-52_074575",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4410181482620732,
+    "recall": {
+      "impressionism": 0.41540546645583915,
+      "realism": 0.4293941488136374,
+      "romanticism": 0.4796978281397545
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5897710554851191,
+      "realism": 0.5590927802823814,
+      "romanticism": 0.5944337680844758
+    },
+    "train_accuracy": {
+      "impressionism": 0.7275555729866028,
+      "realism": 0.695111095905304,
+      "romanticism": 0.7191110849380493
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-11/23-55-15_225847",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.5,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4134112580744386,
+    "recall": {
+      "impressionism": 0.3318274226338378,
+      "realism": 0.5008062658373647,
+      "romanticism": 0.4091123701605288
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5813270259957111,
+      "realism": 0.5548011474632973,
+      "romanticism": 0.5455689588028921
+    },
+    "train_accuracy": {
+      "impressionism": 0.73458331823349,
+      "realism": 0.7064999938011169,
+      "romanticism": 0.721916675567627
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/00-32-28_562976",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.449861581051984,
+    "recall": {
+      "impressionism": 0.45719448836683985,
+      "realism": 0.3655839668279198,
+      "romanticism": 0.5285646836638338
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5995311371529897,
+      "realism": 0.5570272367903883,
+      "romanticism": 0.6068348053355666
+    },
+    "train_accuracy": {
+      "impressionism": 0.7848749756813049,
+      "realism": 0.7604374885559082,
+      "romanticism": 0.773562490940094
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/00-40-06_032186",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.2,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4260227622270071,
+    "recall": {
+      "impressionism": 0.3245990512762593,
+      "realism": 0.3906933886201336,
+      "romanticism": 0.5682247403210576
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5616815939603869,
+      "realism": 0.5458026564478944,
+      "romanticism": 0.6046529723503098
+    },
+    "train_accuracy": {
+      "impressionism": 0.8273333311080933,
+      "realism": 0.7943333387374878,
+      "romanticism": 0.8070666790008545
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/00-46-32_444538",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 3000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.42802214703168256,
+    "recall": {
+      "impressionism": 0.4014004969505308,
+      "realism": 0.4155724487445289,
+      "romanticism": 0.4686024551463645
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5763560721898509,
+      "realism": 0.5548946163842695,
+      "romanticism": 0.5828413735585837
+    },
+    "train_accuracy": {
+      "impressionism": 0.8662499785423279,
+      "realism": 0.824999988079071,
+      "romanticism": 0.8388749957084656
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/00-49-13_513949",
+    "model_type": "linear",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 30,
+    "train_positive_ratio": -1,
+    "normalization": "per_column",
+    "top1_accuracy": 0.36804060289141804,
+    "recall": {
+      "impressionism": 0.31782245312852947,
+      "realism": 0.3969131536512324,
+      "romanticism": 0.3909348441926346
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.532526709833473,
+      "realism": 0.5176877900312032,
+      "romanticism": 0.5290668746510618
+    },
+    "train_accuracy": {
+      "impressionism": 1.0,
+      "realism": 1.0,
+      "romanticism": 1.0
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/00-50-30_358394",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 30,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3670409104890803,
+    "recall": {
+      "impressionism": 0.24327987350350125,
+      "realism": 0.33794056668970285,
+      "romanticism": 0.5262039660056658
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5172328013897359,
+      "realism": 0.5224852319769651,
+      "romanticism": 0.540588296871446
+    },
+    "train_accuracy": {
+      "impressionism": 1.0,
+      "realism": 1.0,
+      "romanticism": 1.0
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/03-05-29_191835",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 10,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 6,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3699630882805291,
+    "recall": {
+      "impressionism": 0.34244409306528123,
+      "realism": 0.3713430085233817,
+      "romanticism": 0.3973087818696884
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5499092331946436,
+      "realism": 0.49630292524749253,
+      "romanticism": 0.537215066117326
+    },
+    "train_accuracy": {
+      "impressionism": 0.9375,
+      "realism": 0.8125,
+      "romanticism": 0.875
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/13-57-43_156170",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": {
+      "impressionism": 56,
+      "realism": 12,
+      "romanticism": 32
+    },
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.383881882497693,
+    "recall": {
+      "impressionism": 0.41111362096227694,
+      "realism": 0.33264224832987793,
+      "romanticism": 0.40793201133144474
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5547465038471172,
+      "realism": 0.5224910422071876,
+      "romanticism": 0.5367100750087881
+    },
+    "train_accuracy": {
+      "impressionism": 1.0,
+      "realism": 1.0,
+      "romanticism": 1.0
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/14-01-07_244955",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.01,
+    "epochs": 50,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": {
+      "impressionism": 56,
+      "realism": 12,
+      "romanticism": 32
+    },
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3408951091971701,
+    "recall": {
+      "impressionism": 0.3157894736842105,
+      "realism": 0.27804653305689936,
+      "romanticism": 0.43153918791312557
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5272546528966697,
+      "realism": 0.5089297654318319,
+      "romanticism": 0.48333346256970144
+    },
+    "train_accuracy": {
+      "impressionism": 1.0,
+      "realism": 1.0,
+      "romanticism": 1.0
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-12/14-04-04_881138",
+    "model_type": "linear",
+    "seed": 5678,
+    "alpha": 0.01,
+    "epochs": 50,
+    "npl": null,
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": {
+      "impressionism": 56,
+      "realism": 12,
+      "romanticism": 32
+    },
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3638111350353737,
+    "recall": {
+      "impressionism": 0.37000225886604926,
+      "realism": 0.2980879981571067,
+      "romanticism": 0.42469310670443816
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5355316179488226,
+      "realism": 0.4885914999443043,
+      "romanticism": 0.5453187248850657
+    },
+    "train_accuracy": {
+      "impressionism": 1.0,
+      "realism": 1.0,
+      "romanticism": 1.0
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-01-36_803290",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.46485696708705015,
+    "recall": {
+      "impressionism": 0.44070476620736393,
+      "realism": 0.42179221377562776,
+      "romanticism": 0.5342304060434372
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6060933181625604,
+      "realism": 0.5720873801187962,
+      "romanticism": 0.619190932948726
+    },
+    "train_accuracy": {
+      "impressionism": 0.7462244629859924,
+      "realism": 0.7215152382850647,
+      "romanticism": 0.735163688659668
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-06-08_575222",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.42140879729314057,
+    "recall": {
+      "impressionism": 0.351931330472103,
+      "realism": 0.5033402441833679,
+      "romanticism": 0.41005665722379603
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5608321686754825,
+      "realism": 0.55179709888956,
+      "romanticism": 0.5860730366410951
+    },
+    "train_accuracy": {
+      "impressionism": 0.7462619543075562,
+      "realism": 0.7240752577781677,
+      "romanticism": 0.7353836297988892
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-12-03_526758",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.42394647800676716,
+    "recall": {
+      "impressionism": 0.33770047436187034,
+      "realism": 0.47131997235659984,
+      "romanticism": 0.465533522190746
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5886940053982606,
+      "realism": 0.5322085259451244,
+      "romanticism": 0.585013567664716
+    },
+    "train_accuracy": {
+      "impressionism": 0.7500843405723572,
+      "realism": 0.7201424837112427,
+      "romanticism": 0.7385726571083069
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-17-59_507743",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4633189787757613,
+    "recall": {
+      "impressionism": 0.4890444996611701,
+      "realism": 0.4176457037548952,
+      "romanticism": 0.4832389046270066
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6123081889701443,
+      "realism": 0.5716879101713412,
+      "romanticism": 0.6084647990288318
+    },
+    "train_accuracy": {
+      "impressionism": 0.7493723034858704,
+      "realism": 0.719029426574707,
+      "romanticism": 0.7368865013122559
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-24-08_060188",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4249461704091049,
+    "recall": {
+      "impressionism": 0.3736164445448385,
+      "realism": 0.43814789219073946,
+      "romanticism": 0.46506137865911235
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.557625524359396,
+      "realism": 0.5582174298769697,
+      "romanticism": 0.5913924594025488
+    },
+    "train_accuracy": {
+      "impressionism": 0.7478358745574951,
+      "realism": 0.7251883149147034,
+      "romanticism": 0.7331476211547852
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-26-42_812462",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.42671485696708705,
+    "recall": {
+      "impressionism": 0.37587531059408175,
+      "realism": 0.42202257544344624,
+      "romanticism": 0.48465533522190746
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5919833589230173,
+      "realism": 0.5295499002116226,
+      "romanticism": 0.5903545836693479
+    },
+    "train_accuracy": {
+      "impressionism": 0.7504215836524963,
+      "realism": 0.7220717668533325,
+      "romanticism": 0.7423847913742065
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-32-07_799606",
+    "model_type": "linear",
+    "seed": 1337,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.42263918794217165,
+    "recall": {
+      "impressionism": 0.4599051276259318,
+      "realism": 0.43999078553328724,
+      "romanticism": 0.3659112370160529
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5839807788065534,
+      "realism": 0.5579845420220979,
+      "romanticism": 0.5576704907708001
+    },
+    "train_accuracy": {
+      "impressionism": 0.6966456770896912,
+      "realism": 0.6619945764541626,
+      "romanticism": 0.6893295645713806
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-34-31_374596",
+    "model_type": "linear",
+    "seed": 2024,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.44240233774223314,
+    "recall": {
+      "impressionism": 0.451773209848656,
+      "realism": 0.46970744068187054,
+      "romanticism": 0.40462700661000944
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.601367542315024,
+      "realism": 0.5651665449975207,
+      "romanticism": 0.578282937611574
+    },
+    "train_accuracy": {
+      "impressionism": 0.6934146285057068,
+      "realism": 0.66324782371521,
+      "romanticism": 0.6903075575828552
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/2026-07-14/20-47-40_181637",
+    "model_type": "linear",
+    "seed": 1234,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4365579821593356,
+    "recall": {
+      "impressionism": 0.4908515925005647,
+      "realism": 0.49251324579589956,
+      "romanticism": 0.32247403210576014
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5965392391790453,
+      "realism": 0.5738567614180929,
+      "romanticism": 0.5593893883156538
+    },
+    "train_accuracy": {
+      "impressionism": 0.6924152970314026,
+      "realism": 0.6638084650039673,
+      "romanticism": 0.6929043531417847
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-10_55",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-10_59",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-11_37",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-11_44",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-12_10",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-12_15",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-12_46",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/linear/Train_08/07-12_54",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  }
+]

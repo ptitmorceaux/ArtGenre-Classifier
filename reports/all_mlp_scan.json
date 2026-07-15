@@ -1,0 +1,1265 @@
+[OK] engine/core/output/mlp/2026-07-09/09-29-26_152245 | mlp | seed=42 | alpha=0.001 | epochs=50 | arch=[256, 128] | limit=2000 | pos_ratio=None | acc=? | tfevents=False
+[OK] engine/core/output/mlp/2026-07-09/11-23-00_500405 | mlp | seed=42 | alpha=0.001 | epochs=100 | arch=[256, 128] | limit=2000 | pos_ratio=None | acc=? | tfevents=False
+[OK] engine/core/output/mlp/2026-07-09/16-02-49_720914 | mlp | seed=42 | alpha=0.001 | epochs=50 | arch=[256, 128] | limit=1000 | pos_ratio=None | acc=? | tfevents=False
+[OK] engine/core/output/mlp/2026-07-09/20-15-20_053794 | mlp | seed=1234 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=None | acc=38.2% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-09/20-27-16_613983 | mlp | seed=42 | alpha=0.001 | epochs=50 | arch=[6, 6] | limit=500 | pos_ratio=None | acc=37.7% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-10/17-56-47_468659 | mlp | seed=1337 | alpha=0.001 | epochs=50 | arch=[256, 128] | limit=1000 | pos_ratio=None | acc=41.6% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-10/18-14-16_499052 | mlp | seed=1234 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=None | acc=39.4% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/20-08-33_181855 | mlp | seed=2024 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=0.5 | acc=39.6% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/20-25-36_439699 | mlp | seed=42 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=500 | pos_ratio=0.5 | acc=38.4% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/21-14-54_836787 | mlp | seed=2024 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=1000 | pos_ratio=0.3333333333333333 | acc=40.4% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/21-30-14_564265 | mlp | seed=5678 | alpha=0.001 | epochs=100 | arch=[16, 16] | limit=1000 | pos_ratio=0.5 | acc=39.6% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/21-34-26_983380 | mlp | seed=42 | alpha=0.001 | epochs=100 | arch=[16, 16, 16] | limit=1500 | pos_ratio=0.3333333333333333 | acc=41.4% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/22-03-39_195707 | mlp | seed=42 | alpha=0.001 | epochs=100 | arch=[8, 8, 8] | limit=3000 | pos_ratio=0.3333333333333333 | acc=41.1% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/22-11-15_800568 | mlp | seed=2024 | alpha=0.001 | epochs=100 | arch=[64, 64] | limit=3000 | pos_ratio=0.3333333333333333 | acc=43.9% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-11/22-41-36_963888 | mlp | seed=42 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=3000 | pos_ratio=0.3333333333333333 | acc=45.4% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/01-04-05_375385 | mlp | seed=2024 | alpha=0.001 | epochs=100 | arch=[128, 128] | limit=6000 | pos_ratio=0.25 | acc=47.1% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/03-06-02_267716 | mlp | seed=1234 | alpha=0.001 | epochs=10 | arch=[10, 10] | limit=6 | pos_ratio=0.25 | acc=37.1% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/13-54-29_862006 | mlp | seed=5678 | alpha=0.01 | epochs=100 | arch=[16, 16] | limit={'impressionism': 12, 'realism': 22, 'romanticism': 32} | pos_ratio=0.25 | acc=35.2% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/14-02-18_912919 | mlp | seed=1337 | alpha=0.01 | epochs=50 | arch=[16, 16] | limit={'impressionism': 56, 'realism': 12, 'romanticism': 32} | pos_ratio=0.25 | acc=35.7% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/20-50-23_426125 | mlp | seed=5678 | alpha=0.001 | epochs=100 | arch=[64, 64, 64] | limit=6000 | pos_ratio=0.25 | acc=45.3% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/21-18-42_760600 | mlp | seed=2024 | alpha=0.001 | epochs=100 | arch=[256, 256] | limit=6000 | pos_ratio=0.25 | acc=46.7% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-12/22-30-25_776689 | mlp | seed=1234 | alpha=0.001 | epochs=100 | arch=[128, 64, 64] | limit=6000 | pos_ratio=0.25 | acc=45.5% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-13/07-37-56_165400 | mlp | seed=1337 | alpha=0.001 | epochs=100 | arch=[256, 256] | limit=1000 | pos_ratio=0.25 | acc=41.6% | tfevents=True
+[SKIP] engine/core/output/mlp/2026-07-13/09-23-08_553134: no config.json
+[OK] engine/core/output/mlp/2026-07-13/12-27-09_725625 | mlp | seed=1234 | alpha=0.001 | epochs=100 | arch=[128, 128, 128] | limit=6000 | pos_ratio=0.25 | acc=46.5% | tfevents=True
+[SKIP] engine/core/output/mlp/2026-07-13/12-50-35_768636: no config.json
+[SKIP] engine/core/output/mlp/2026-07-13/12-54-47_912950: no config.json
+[OK] engine/core/output/mlp/2026-07-13/16-35-02_443228 | mlp | seed=1337 | alpha=0.001 | epochs=100 | arch=[128, 128, 128] | limit=6000 | pos_ratio=0.25 | acc=46.8% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-13/17-06-45_581095 | mlp | seed=1337 | alpha=0.001 | epochs=100 | arch=[256, 256] | limit=-1 | pos_ratio=0.25 | acc=49.5% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-14/14-37-01_871539 | mlp | seed=5678 | alpha=0.01 | epochs=100 | arch=[32] | limit=1000 | pos_ratio=-1 | acc=41.5% | tfevents=True
+[OK] engine/core/output/mlp/2026-07-14/16-55-39_070407 | mlp | seed=1453555868 | alpha=0.001 | epochs=100 | arch=[128, 64, 32] | limit=6000 | pos_ratio=0.25 | acc=45.7% | tfevents=True
+[SKIP] engine/core/output/mlp/2026-07-14/21-08-30_464186: no config.json
+[SKIP] engine/core/output/mlp/2026-07-14/21-18-33_055015: no config.json
+[SKIP] engine/core/output/mlp/Train_08/07-16_14: no config.json
+[SKIP] engine/core/output/mlp/Train_08/07-16_29: no config.json
+[SKIP] engine/core/output/mlp/Train_08/07-16_51: no config.json
+[SKIP] engine/core/output/mlp/Train_08/07-17_09: no config.json
+[SKIP] engine/core/output/mlp/Train_08/07-17_50: no config.json
+
+================================================================================
+[
+  {
+    "folder": "engine/core/output/mlp/2026-07-09/09-29-26_152245",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 50,
+    "npl": null,
+    "mlp_hidden_layers": [
+      256,
+      128
+    ],
+    "limit_per_category": 2000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": null,
+    "recall": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "balanced_accuracy": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "train_accuracy": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-09/11-23-00_500405",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": null,
+    "mlp_hidden_layers": [
+      256,
+      128
+    ],
+    "limit_per_category": 2000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": null,
+    "recall": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "balanced_accuracy": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "train_accuracy": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-09/16-02-49_720914",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 50,
+    "npl": null,
+    "mlp_hidden_layers": [
+      256,
+      128
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": null,
+    "recall": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "balanced_accuracy": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "train_accuracy": {
+      "impressionism": null,
+      "realism": null,
+      "romanticism": null
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-09/20-15-20_053794",
+    "model_type": "mlp",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.38249769301753306,
+    "recall": {
+      "impressionism": 0.4000451773209849,
+      "realism": 0.345772863395531,
+      "romanticism": 0.40179414542020775
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5564992121885326,
+      "realism": 0.5189559226362395,
+      "romanticism": 0.5354659595714177
+    },
+    "train_accuracy": {
+      "impressionism": 0.7820000052452087,
+      "realism": 0.7826666831970215,
+      "romanticism": 0.7946666479110718
+    },
+    "train_total": 1500,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-09/20-27-16_613983",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 50,
+    "npl": [
+      12288,
+      6,
+      6,
+      1
+    ],
+    "mlp_hidden_layers": [
+      6,
+      6
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.37657643801907104,
+    "recall": {
+      "impressionism": 0.3864919810255252,
+      "realism": 0.4185671504261691,
+      "romanticism": 0.32318224740321055
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5645296561301113,
+      "realism": 0.505658964800987,
+      "romanticism": 0.5263835507089045
+    },
+    "train_accuracy": {
+      "impressionism": 0.6946666836738586,
+      "realism": 0.6639999747276306,
+      "romanticism": 0.6666666865348816
+    },
+    "train_total": 1500,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-10/17-56-47_468659",
+    "model_type": "mlp",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 50,
+    "npl": [
+      12288,
+      256,
+      128,
+      1
+    ],
+    "mlp_hidden_layers": [
+      256,
+      128
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.415564441710243,
+    "recall": {
+      "impressionism": 0.4601310142308561,
+      "realism": 0.39368809030177376,
+      "romanticism": 0.3914069877242682
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5880578121171769,
+      "realism": 0.5430866862682827,
+      "romanticism": 0.5531396252489954
+    },
+    "train_accuracy": {
+      "impressionism": 0.8529999852180481,
+      "realism": 0.8233333230018616,
+      "romanticism": 0.8023333549499512
+    },
+    "train_total": 3000,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-10/18-14-16_499052",
+    "model_type": "mlp",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": null,
+    "normalization": "per_column",
+    "top1_accuracy": 0.39364810827437713,
+    "recall": {
+      "impressionism": 0.407047662073639,
+      "realism": 0.3879290486063119,
+      "romanticism": 0.385505193578848
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5601753408887491,
+      "realism": 0.5369173120210365,
+      "romanticism": 0.5384984909500079
+    },
+    "train_accuracy": {
+      "impressionism": 0.8253333568572998,
+      "realism": 0.8226666450500488,
+      "romanticism": 0.7826666831970215
+    },
+    "train_total": 1500,
+    "test_total": 13004,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/20-08-33_181855",
+    "model_type": "mlp",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": 0.5,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3958781913257459,
+    "recall": {
+      "impressionism": 0.4287327761463745,
+      "realism": 0.3660446901635568,
+      "romanticism": 0.3921152030217186
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5615157409937889,
+      "realism": 0.5352675257351318,
+      "romanticism": 0.5435712876422462
+    },
+    "train_accuracy": {
+      "impressionism": 0.8199999928474426,
+      "realism": 0.8090000152587891,
+      "romanticism": 0.7929999828338623
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/20-25-36_439699",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 500,
+    "train_positive_ratio": 0.5,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3840356813288219,
+    "recall": {
+      "impressionism": 0.3740682177546871,
+      "realism": 0.37456807187284036,
+      "romanticism": 0.40415486307837584
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5584926608185817,
+      "realism": 0.515634491898558,
+      "romanticism": 0.5406381067216697
+    },
+    "train_accuracy": {
+      "impressionism": 0.7720000147819519,
+      "realism": 0.7649999856948853,
+      "romanticism": 0.7710000276565552
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/21-14-54_836787",
+    "model_type": "mlp",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.40433712703783453,
+    "recall": {
+      "impressionism": 0.43121752880054215,
+      "realism": 0.3372494816862474,
+      "romanticism": 0.4449952785646837
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5729598195477585,
+      "realism": 0.5269878944850491,
+      "romanticism": 0.56025995680059
+    },
+    "train_accuracy": {
+      "impressionism": 0.7910000085830688,
+      "realism": 0.7826666831970215,
+      "romanticism": 0.7926666736602783
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/21-30-14_564265",
+    "model_type": "mlp",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": 0.5,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3958012919101815,
+    "recall": {
+      "impressionism": 0.42466681725773664,
+      "realism": 0.3676572218382861,
+      "romanticism": 0.3944759206798867
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5627473062620734,
+      "realism": 0.5287437673314713,
+      "romanticism": 0.5487434347924981
+    },
+    "train_accuracy": {
+      "impressionism": 0.8314999938011169,
+      "realism": 0.7689999938011169,
+      "romanticism": 0.7705000042915344
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/21-34-26_983380",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16,
+      16
+    ],
+    "limit_per_category": 1500,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4138726545678253,
+    "recall": {
+      "impressionism": 0.4673593855884346,
+      "realism": 0.42639944713199723,
+      "romanticism": 0.34513692162417375
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5888738166137346,
+      "realism": 0.5513043062740675,
+      "romanticism": 0.5395278586223058
+    },
+    "train_accuracy": {
+      "impressionism": 0.8288888931274414,
+      "realism": 0.7564444541931152,
+      "romanticism": 0.7877777814865112
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/22-03-39_195707",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      8,
+      8,
+      8,
+      1
+    ],
+    "mlp_hidden_layers": [
+      8,
+      8,
+      8
+    ],
+    "limit_per_category": 3000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4107966779452476,
+    "recall": {
+      "impressionism": 0.47323243731646714,
+      "realism": 0.3946095369730477,
+      "romanticism": 0.362134088762984
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5921601151255298,
+      "realism": 0.5347744672052125,
+      "romanticism": 0.546030548031127
+    },
+    "train_accuracy": {
+      "impressionism": 0.7094444632530212,
+      "realism": 0.6932222247123718,
+      "romanticism": 0.7024444341659546
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/22-11-15_800568",
+    "model_type": "mlp",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      64,
+      64,
+      1
+    ],
+    "mlp_hidden_layers": [
+      64,
+      64
+    ],
+    "limit_per_category": 3000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4394801599507844,
+    "recall": {
+      "impressionism": 0.43867178676304497,
+      "realism": 0.4001382170006911,
+      "romanticism": 0.4806421152030217
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5968571712175956,
+      "realism": 0.5544498080270683,
+      "romanticism": 0.588347973659905
+    },
+    "train_accuracy": {
+      "impressionism": 0.9377777576446533,
+      "realism": 0.9020000100135803,
+      "romanticism": 0.914222240447998
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-11/22-41-36_963888",
+    "model_type": "mlp",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      128,
+      128,
+      1
+    ],
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 3000,
+    "train_positive_ratio": 0.3333333333333333,
+    "normalization": "per_column",
+    "top1_accuracy": 0.45386035066133495,
+    "recall": {
+      "impressionism": 0.43325050824486105,
+      "realism": 0.44943561391384473,
+      "romanticism": 0.4799338999055713
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6079042561044755,
+      "realism": 0.5709604480743182,
+      "romanticism": 0.5932402163761433
+    },
+    "train_accuracy": {
+      "impressionism": 0.9415555596351624,
+      "realism": 0.9141111373901367,
+      "romanticism": 0.9144444465637207
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/01-04-05_375385",
+    "model_type": "mlp",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      128,
+      128,
+      1
+    ],
+    "mlp_hidden_layers": [
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4712396185788988,
+    "recall": {
+      "impressionism": 0.44160831262706124,
+      "realism": 0.44920525224602625,
+      "romanticism": 0.5247875354107648
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.616280430068923,
+      "realism": 0.583254363396475,
+      "romanticism": 0.6121884757345795
+    },
+    "train_accuracy": {
+      "impressionism": 0.9298750162124634,
+      "realism": 0.906000018119812,
+      "romanticism": 0.9126250147819519
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/03-06-02_267716",
+    "model_type": "mlp",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 10,
+    "npl": [
+      12288,
+      10,
+      10,
+      1
+    ],
+    "mlp_hidden_layers": [
+      10,
+      10
+    ],
+    "limit_per_category": 6,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3709627806828668,
+    "recall": {
+      "impressionism": 0.322340185227016,
+      "realism": 0.41395991706979957,
+      "romanticism": 0.3777148253068933
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5508751176805478,
+      "realism": 0.4982762762077614,
+      "romanticism": 0.5364851498797241
+    },
+    "train_accuracy": {
+      "impressionism": 0.6875,
+      "realism": 0.625,
+      "romanticism": 0.6875
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/13-54-29_862006",
+    "model_type": "mlp",
+    "seed": 5678,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": {
+      "impressionism": 12,
+      "realism": 22,
+      "romanticism": 32
+    },
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3516610273761919,
+    "recall": {
+      "impressionism": 0.2380844815902417,
+      "realism": 0.4019811103432389,
+      "romanticism": 0.4187913125590179
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5089804476273466,
+      "realism": 0.519529167661519,
+      "romanticism": 0.5155658205130855
+    },
+    "train_accuracy": {
+      "impressionism": 1.0,
+      "realism": 1.0,
+      "romanticism": 0.9777777791023254
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/14-02-18_912919",
+    "model_type": "mlp",
+    "seed": 1337,
+    "alpha": 0.01,
+    "epochs": 50,
+    "npl": [
+      12288,
+      16,
+      16,
+      1
+    ],
+    "mlp_hidden_layers": [
+      16,
+      16
+    ],
+    "limit_per_category": {
+      "impressionism": 56,
+      "realism": 12,
+      "romanticism": 32
+    },
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.3571208858812673,
+    "recall": {
+      "impressionism": 0.27400045177320986,
+      "realism": 0.41695461875143974,
+      "romanticism": 0.38267233238904624
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5173779803462062,
+      "realism": 0.5071613680159138,
+      "romanticism": 0.5305241223989027
+    },
+    "train_accuracy": {
+      "impressionism": 0.9661017060279846,
+      "realism": 0.875,
+      "romanticism": 0.9340659379959106
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/20-50-23_426125",
+    "model_type": "mlp",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      64,
+      64,
+      64,
+      1
+    ],
+    "mlp_hidden_layers": [
+      64,
+      64,
+      64
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.45286065825899724,
+    "recall": {
+      "impressionism": 0.47165123108199686,
+      "realism": 0.4402211472011057,
+      "romanticism": 0.4461756373937677
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6116563255794735,
+      "realism": 0.5712591364540678,
+      "romanticism": 0.5858843515435992
+    },
+    "train_accuracy": {
+      "impressionism": 0.8939375281333923,
+      "realism": 0.8307499885559082,
+      "romanticism": 0.8575000166893005
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/21-18-42_760600",
+    "model_type": "mlp",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      256,
+      256,
+      1
+    ],
+    "mlp_hidden_layers": [
+      256,
+      256
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4671639495539834,
+    "recall": {
+      "impressionism": 0.46939236503275356,
+      "realism": 0.4109652153881594,
+      "romanticism": 0.5224268177525968
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6232352987574867,
+      "realism": 0.5719838197453322,
+      "romanticism": 0.6070163285843275
+    },
+    "train_accuracy": {
+      "impressionism": 0.8496875166893005,
+      "realism": 0.8091250061988831,
+      "romanticism": 0.8399999737739563
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-12/22-30-25_776689",
+    "model_type": "mlp",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      128,
+      64,
+      64,
+      1
+    ],
+    "mlp_hidden_layers": [
+      128,
+      64,
+      64
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.45493694247923716,
+    "recall": {
+      "impressionism": 0.44499661170092614,
+      "realism": 0.44551946556093064,
+      "romanticism": 0.4749763928234183
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6056742414922959,
+      "realism": 0.5766209817704226,
+      "romanticism": 0.5919589993314172
+    },
+    "train_accuracy": {
+      "impressionism": 0.8841875195503235,
+      "realism": 0.8370000123977661,
+      "romanticism": 0.8498749732971191
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/07-37-56_165400",
+    "model_type": "mlp",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      256,
+      256,
+      1
+    ],
+    "mlp_hidden_layers": [
+      256,
+      256
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4161027376191941,
+    "recall": {
+      "impressionism": 0.436638807318726,
+      "realism": 0.4164938954158028,
+      "romanticism": 0.3942398489140699
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5852309111794749,
+      "realism": 0.5475058649421158,
+      "romanticism": 0.5531304171577649
+    },
+    "train_accuracy": {
+      "impressionism": 0.9058867692947388,
+      "realism": 0.8560180068016052,
+      "romanticism": 0.8560180068016052
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/09-23-08_553134",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/12-27-09_725625",
+    "model_type": "mlp",
+    "seed": 1234,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      128,
+      128,
+      128,
+      1
+    ],
+    "mlp_hidden_layers": [
+      128,
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4654721624115657,
+    "recall": {
+      "impressionism": 0.45719448836683985,
+      "realism": 0.44390693388620134,
+      "romanticism": 0.4962228517469311
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6241901088214052,
+      "realism": 0.5646753877557522,
+      "romanticism": 0.6092542178442685
+    },
+    "train_accuracy": {
+      "impressionism": 0.8784375190734863,
+      "realism": 0.827875018119812,
+      "romanticism": 0.8268125057220459
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/12-50-35_768636",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/12-54-47_912950",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/16-35-02_443228",
+    "model_type": "mlp",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      128,
+      128,
+      128,
+      1
+    ],
+    "mlp_hidden_layers": [
+      128,
+      128,
+      128
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.46816364195632115,
+    "recall": {
+      "impressionism": 0.4890444996611701,
+      "realism": 0.4227136604469016,
+      "romanticism": 0.49291784702549574
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6269403447355635,
+      "realism": 0.5724326700018185,
+      "romanticism": 0.6043512592791712
+    },
+    "train_accuracy": {
+      "impressionism": 0.8691250085830688,
+      "realism": 0.8318750262260437,
+      "romanticism": 0.8254374861717224
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-13/17-06-45_581095",
+    "model_type": "mlp",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      256,
+      256,
+      1
+    ],
+    "mlp_hidden_layers": [
+      256,
+      256
+    ],
+    "limit_per_category": -1,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.49530913565056905,
+    "recall": {
+      "impressionism": 0.5030494691664784,
+      "realism": 0.5240727942870307,
+      "romanticism": 0.45774315391879133
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6405302143547211,
+      "realism": 0.6030845328932557,
+      "romanticism": 0.620237909076184
+    },
+    "train_accuracy": {
+      "impressionism": 0.886827826499939,
+      "realism": 0.8662857413291931,
+      "romanticism": 0.8597925305366516
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-14/14-37-01_871539",
+    "model_type": "mlp",
+    "seed": 5678,
+    "alpha": 0.01,
+    "epochs": 100,
+    "npl": [
+      12288,
+      32,
+      1
+    ],
+    "mlp_hidden_layers": [
+      32
+    ],
+    "limit_per_category": 1000,
+    "train_positive_ratio": -1,
+    "normalization": "per_column",
+    "top1_accuracy": 0.4151799446324208,
+    "recall": {
+      "impressionism": 0.350576010842557,
+      "realism": 0.49366505413499195,
+      "romanticism": 0.40226628895184136
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.5892439340676584,
+      "realism": 0.5623121530631094,
+      "romanticism": 0.5339342393664317
+    },
+    "train_accuracy": {
+      "impressionism": 0.7799999713897705,
+      "realism": 0.7369999885559082,
+      "romanticism": 0.749666690826416
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": true
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-14/16-55-39_070407",
+    "model_type": "mlp",
+    "seed": 1453555868,
+    "alpha": 0.001,
+    "epochs": 100,
+    "npl": [
+      12288,
+      128,
+      64,
+      32,
+      1
+    ],
+    "mlp_hidden_layers": [
+      128,
+      64,
+      32
+    ],
+    "limit_per_category": 6000,
+    "train_positive_ratio": 0.25,
+    "normalization": "per_column",
+    "top1_accuracy": 0.45716702553060595,
+    "recall": {
+      "impressionism": 0.44906257058956406,
+      "realism": 0.45219995392766643,
+      "romanticism": 0.4707271010387158
+    },
+    "balanced_accuracy": {
+      "impressionism": 0.6172093778679428,
+      "realism": 0.5687641810501775,
+      "romanticism": 0.5932558862857813
+    },
+    "train_accuracy": {
+      "impressionism": 0.8863750100135803,
+      "realism": 0.8221874833106995,
+      "romanticism": 0.8379374742507935
+    },
+    "train_total": null,
+    "test_total": null,
+    "has_report_md": true,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-14/21-08-30_464186",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/2026-07-14/21-18-33_055015",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": true,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/Train_08/07-16_14",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/Train_08/07-16_29",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/Train_08/07-16_51",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/Train_08/07-17_09",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  },
+  {
+    "folder": "engine/core/output/mlp/Train_08/07-17_50",
+    "error": "no config.json",
+    "has_report_md": false,
+    "has_tfevents": false,
+    "has_confusion_matrix": false
+  }
+]
