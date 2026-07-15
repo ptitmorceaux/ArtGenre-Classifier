@@ -7,7 +7,6 @@ Affiche un resume compact (une ligne par run) + JSON structure complete.
 import sys
 import os
 import json
-import re
 
 CATS = ["impressionism", "realism", "romanticism"]
 

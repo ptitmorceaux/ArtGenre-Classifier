@@ -4,11 +4,13 @@ Sortie: reports/presentation_charts/*.png
 """
 import json
 import os
-
 import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+from sklearn.metrics import ConfusionMatrixDisplay
+
+matplotlib.use("Agg")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "presentation_charts")
@@ -247,7 +249,6 @@ plt.close(fig)
 # ============================================================
 # 6. Matrice de confusion du meilleur modele (run 36)
 # ============================================================
-from sklearn.metrics import ConfusionMatrixDisplay
 r36 = runs[36]
 if "confusion_matrix" in r36:
     matrix = np.array(r36["confusion_matrix"])

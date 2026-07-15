@@ -82,7 +82,7 @@ def main():
     for tag, val in sorted(final_values.items()):
         print(f"  {tag}: {val:.4f}")
 
-    print(f"\n--- Config utilisee ---")
+    print("\n--- Config utilisee ---")
     print(json.dumps(config.get("model", {}), indent=2, ensure_ascii=False))
     print(json.dumps(config.get("dataset", {}), indent=2, ensure_ascii=False, default=str)[:1000])
 
