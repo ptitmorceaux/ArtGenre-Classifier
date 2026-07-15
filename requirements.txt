@@ -12,3 +12,4 @@ tensorflow
 tensorboard
 ruff
 pytest
+matplotlib

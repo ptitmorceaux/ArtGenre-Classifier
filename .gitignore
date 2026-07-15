@@ -13,9 +13,9 @@ drawio/
 
 !libc/build/.gitkeep
 
-*.bin
+# *.bin
 *.tmp
-*.png
+#*.png
 
 engine/core/output/*
 
