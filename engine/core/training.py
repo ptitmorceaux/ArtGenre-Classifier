@@ -4,6 +4,7 @@ import engine.core.config as cf
 from engine.core.dataset import build_one_vs_all_train_arrays
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
+from engine.interop.rbf import RBF
 import engine.core.tb_logger as tb
 
 
@@ -59,8 +60,31 @@ def train_mlp_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> di
 
     return models_per_category
 
+def train_rbf_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> dict[str, RBF]:
+    """Entraîne un RBF par catégorie (One-vs-All)."""
+    models_per_category = dict()
 
-def train_models(summary_writer: tf.summary.SummaryWriter, data: dict) -> dict[str, LinearModel | MLP]:
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        print(f"\n> Training RBF ({cf.CONFIG['model']['rbf_num_centers']} centres) for category: {category}")
+        X, Y = build_one_vs_all_train_arrays(data, category)
+
+        models_per_category[category] = RBF(
+            input_dim=cf.CONFIG["dataset"]["W_length"],
+            num_centers=cf.CONFIG["model"]["rbf_num_centers"]
+        )
+        models_per_category[category].train(
+            dataset_inputs=X,
+            dataset_expected_outputs=Y,
+            data_size=len(Y),
+            alpha=cf.CONFIG["model"]["alpha"],
+            epochs=cf.CONFIG["model"]["epochs"]
+        )
+        print(f"    Model for '{category}' trained (pas d'historique loss/accuracy pour le RBF, cf. point 2).")
+
+    return models_per_category
+
+
+def train_models(summary_writer: tf.summary.SummaryWriter, data: dict) -> dict[str, LinearModel | MLP | RBF]:
     """Dispatch vers LinearModel ou MLP selon cf.CONFIG['model']['type']."""
     model_type = cf.CONFIG["model"]["type"]
 
@@ -74,6 +98,8 @@ def train_models(summary_writer: tf.summary.SummaryWriter, data: dict) -> dict[s
             models = train_linear_models(data, summary_writer)
         elif model_type == "mlp":
             models = train_mlp_models(data, summary_writer)
+        elif model_type == "rbf":
+            models = train_rbf_models(data, summary_writer)
         else:
             raise ValueError(f"train_models(): unknown model type '{model_type}'.")
 
