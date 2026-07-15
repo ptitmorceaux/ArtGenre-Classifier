@@ -7,6 +7,7 @@
 typedef enum {
     ModelType_LINEAR,
     ModelType_MLP,
+    ModelType_RBF,
 } ModelType;
 
 DLLEXPORT const char* get_model_type_string(unsigned char code);

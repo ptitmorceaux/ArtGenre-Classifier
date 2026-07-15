@@ -160,7 +160,7 @@ def get_config_documentation() -> dict:
             "type": {
                 "docs": "Type de modèle à utiliser.",
                 "type": (str,),
-                "options": ["linear", "mlp"],
+                "options": ["linear", "mlp", "rbf"],
             },
             "alpha": {
                 "docs": "Paramètre de régularisation pour le modèle linéaire.",
@@ -172,7 +172,13 @@ def get_config_documentation() -> dict:
             },
             "mlp_hidden_layers": {
                 "docs": "Nombre de neurones dans les couches **cachées** du MLP. Utiliser seulement si le type de modèle est 'mlp'.",
-                "type": (list,),
+                "type": (list, type(None)),
+                "default": None,
+            },
+            "rbf_num_centers": {
+                "docs": "Nombre de centres (neurones cachés) du RBF. Utiliser seulement si le type de modèle est 'rbf'.",
+                "type": (int, type(None)),
+                "default": None,
             },
         },
         "global": {

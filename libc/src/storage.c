@@ -198,6 +198,29 @@ unsigned char save_mlp_model(FILE* file, MLP* model) {
     return RES_EXIT_SUCCESS;
 }
 
+/*
+typedef struct {
+    uint32_t input_dim;         // dimension de chaque vecteur d'entrée
+    uint32_t num_centers;       // nombre de centres
+    float gamma;                // variance de la gaussienne
+    float* centers;             // tableau des centres [num_centers * input_dim]
+    LinearModel* output_layer;  // modèle linéaire pour la sortie (sauvegardé/chargé via save_linear_model/load_linear_model)
+} RBF;
+*/
+unsigned char save_rbf_model(FILE* file, RBF* model) {
+    if (!file || !model || !model->centers || !model->output_layer) return ERR_INVALID_PTR;
+
+    fwrite(&(model->input_dim), sizeof(uint32_t), 1, file);
+    // num_centers (uint32_t)
+    fwrite(&(model->num_centers), sizeof(uint32_t), 1, file);
+    // weights (float32 array)
+    fwrite(&(model->gamma), sizeof(float), 1, file);
+    // centers (float32 array)
+    fwrite(model->centers, sizeof(float), model->num_centers * model->input_dim, file);
+
+    return save_linear_model(file, model->output_layer);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /*  SAVE - GLOBAL  */
 
@@ -236,6 +259,10 @@ unsigned char save_model_data(FILE* file, ModelType model_type, void* model) {
 
         case ModelType_MLP:
             status = save_mlp_model(file, (MLP*) model);
+            break;
+
+        case ModelType_RBF:
+            status = save_rbf_model(file, (RBF*) model);
             break;
         
         default:
@@ -503,6 +530,46 @@ unsigned char load_mlp_model(FILE* file, MLP** res_model) {
     *res_model = model;
     return RES_EXIT_SUCCESS;
 }
+
+/*
+typedef struct {
+    uint32_t input_dim;         // dimension de chaque vecteur d'entrée
+    uint32_t num_centers;       // nombre de centres
+    float gamma;                // variance de la gaussienne
+    float* centers;             // tableau des centres [num_centers * input_dim]
+    LinearModel* output_layer;  // modèle linéaire pour la sortie (sauvegardé/chargé via save_linear_model/load_linear_model)
+} RBF;
+*/
+unsigned char load_rbf_model(FILE* file, RBF** res_model) {
+    if (!file || !res_model || *res_model != NULL) return ERR_INVALID_PTR;
+
+    RBF* model = (RBF*) malloc(sizeof(RBF));
+    if (!model) return ERR_MEMORY_ALLOCATION;
+
+    if (fread(&(model->input_dim), sizeof(uint32_t), 1, file) != 1) { free(model); return ERR_FILE_READ; }
+    if (fread(&(model->num_centers), sizeof(uint32_t), 1, file) != 1) { free(model); return ERR_FILE_READ; }
+    if (fread(&(model->gamma), sizeof(float), 1, file) != 1) { free(model); return ERR_FILE_READ; }
+
+    model->centers = (float*) malloc(model->num_centers * model->input_dim * sizeof(float));
+    if (!model->centers) { free(model); return ERR_MEMORY_ALLOCATION; }
+
+    if (fread(model->centers, sizeof(float), model->num_centers * model->input_dim, file) != model->num_centers * model->input_dim) {
+        free(model->centers);
+        free(model);
+        return ERR_FILE_READ;
+    }
+
+    model->output_layer = NULL;
+    unsigned char status = load_linear_model(file, &(model->output_layer));
+    if (status != RES_EXIT_SUCCESS) {
+        free(model->centers);
+        free(model);
+        return status;
+    }
+
+    *res_model = model;
+    return RES_EXIT_SUCCESS;
+}
     
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,6 +610,10 @@ unsigned char load_model_data(FILE* file, ModelType model_type, void** model) {
 
         case ModelType_MLP:
             status = load_mlp_model(file, (MLP**) model);
+            break;
+
+        case ModelType_RBF:
+            status = load_rbf_model(file, (RBF**) model);
             break;
         
         default:
