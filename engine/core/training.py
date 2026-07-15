@@ -72,14 +72,19 @@ def train_rbf_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> di
             input_dim=cf.CONFIG["dataset"]["W_length"],
             num_centers=cf.CONFIG["model"]["rbf_num_centers"]
         )
-        models_per_category[category].train(
+        loss_history, acc_history = models_per_category[category].train(
             dataset_inputs=X,
             dataset_expected_outputs=Y,
             data_size=len(Y),
             alpha=cf.CONFIG["model"]["alpha"],
             epochs=cf.CONFIG["model"]["epochs"]
         )
-        print(f"    Model for '{category}' trained (pas d'historique loss/accuracy pour le RBF, cf. point 2).")
+        tb.write_training_logs(summary_writer, category, loss_history, acc_history)
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%")
+
+        if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
+        cf.CONFIG["model"]["train_last_accuracy_per_category"][category] = acc_history[-1]
 
     return models_per_category
 

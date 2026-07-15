@@ -101,11 +101,12 @@ class RBF:
             alpha: float,
             epochs: int,
             is_classification: bool = True
-            ) -> None:
+            ) -> tuple[list[float], list[float]] | None:
         """
         Entraîne le RBF (Phase 1: K-Means / Phase 2: calcul de Gamma).
-        Si is_classification = True : Phase 3 = règle de Rosenblatt (classification -1/1).
-        Si is_classification = False : Phase 3 = descente de gradient (régression).
+        Si is_classification = True : Phase 3 = règle de Rosenblatt (classification -1/1),
+        renvoie (loss_history, accuracy_history).
+        Si is_classification = False : Phase 3 = descente de gradient (régression), renvoie None.
         """
         
         # Vérifications des primitives (Sécurité Ctypes)
@@ -117,13 +118,32 @@ class RBF:
         c_dataset_inputs = (ctypes.c_float * len(dataset_inputs))(*dataset_inputs)
         c_expected_outputs = (ctypes.c_float * len(dataset_expected_outputs))(*dataset_expected_outputs)
 
-        Loader.call(
-            "train_rbf" if is_classification else "train_rbf_regression",
-            self.ptr,
-            c_dataset_inputs,
-            c_expected_outputs,
-            ctypes.c_uint32(data_size),
-            ctypes.c_float(alpha),
-            ctypes.c_uint32(epochs),
-            prefix_errmsg="RBF.train()"
+        if is_classification:
+            loss_history = (ctypes.c_float * epochs)()
+            accuracy_history = (ctypes.c_float * epochs)()
+
+            Loader.call(
+                "train_rbf" if is_classification else "train_rbf_regression",
+                self.ptr,
+                c_dataset_inputs,
+                c_expected_outputs,
+                ctypes.c_uint32(data_size),
+                ctypes.c_float(alpha),
+                ctypes.c_uint32(epochs),
+                loss_history,
+                accuracy_history,
+                prefix_errmsg="RBF.train()"
+            )
+            return (loss_history[:epochs], accuracy_history[:epochs]) 
+        else:
+            Loader.call(
+                "train_rbf_regression",
+                self.ptr,
+                c_dataset_inputs,
+                c_expected_outputs,
+                ctypes.c_uint32(data_size),
+                ctypes.c_float(alpha),
+                ctypes.c_uint32(epochs),
+                prefix_errmsg="RBF.train()"
         )
+    

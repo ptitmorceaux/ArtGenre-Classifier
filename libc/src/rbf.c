@@ -311,7 +311,7 @@ unsigned char predict_rbf_regression(RBF* model, float* input, float* output) {
           Les données transformées sont envoyées à l'algorithme de Rosenblatt du modèle linéaire.
 */
 unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expected_outputs,
-        uint32_t dataset_size, float alpha, uint32_t epochs) {
+        uint32_t dataset_size, float alpha, uint32_t epochs, float* loss_history, float* accuracy_history) {
     
     if (!model || !dataset_inputs || !dataset_expected_outputs) return ERR_INVALID_PTR;
 
@@ -368,8 +368,8 @@ unsigned char train_rbf(RBF* model, float* dataset_inputs, float* dataset_expect
         dataset_size,
         alpha,
         epochs,
-        NULL, // loss_history : pas de suivi de l'historique pour l'instant
-        NULL // accuracy_history : idem
+        loss_history,
+        accuracy_history
     );
 
     free(transformed_inputs);
