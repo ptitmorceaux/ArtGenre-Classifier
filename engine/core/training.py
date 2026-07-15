@@ -4,6 +4,7 @@ import engine.core.config as cf
 from engine.core.dataset import build_one_vs_all_train_arrays
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
+from engine.interop.rbf import RBF
 import engine.core.tb_logger as tb
 
 
@@ -59,8 +60,36 @@ def train_mlp_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> di
 
     return models_per_category
 
+def train_rbf_models(data: dict, summary_writer: tf.summary.SummaryWriter) -> dict[str, RBF]:
+    """Entraîne un RBF par catégorie (One-vs-All)."""
+    models_per_category = dict()
 
-def train_models(summary_writer: tf.summary.SummaryWriter, data: dict) -> dict[str, LinearModel | MLP]:
+    for category in cf.CONFIG["dataset"]["categories"]["train"].keys():
+        print(f"\n> Training RBF ({cf.CONFIG['model']['rbf_num_centers']} centres) for category: {category}")
+        X, Y = build_one_vs_all_train_arrays(data, category)
+
+        models_per_category[category] = RBF(
+            input_dim=cf.CONFIG["dataset"]["W_length"],
+            num_centers=cf.CONFIG["model"]["rbf_num_centers"]
+        )
+        loss_history, acc_history = models_per_category[category].train(
+            dataset_inputs=X,
+            dataset_expected_outputs=Y,
+            data_size=len(Y),
+            alpha=cf.CONFIG["model"]["alpha"],
+            epochs=cf.CONFIG["model"]["epochs"]
+        )
+        tb.write_training_logs(summary_writer, category, loss_history, acc_history)
+        print(f"    Model for '{category}' trained successfully. Final Acc: {acc_history[-1]*100:.2f}%")
+
+        if "train_last_accuracy_per_category" not in cf.CONFIG["model"].keys():
+            cf.CONFIG["model"]["train_last_accuracy_per_category"] = dict()
+        cf.CONFIG["model"]["train_last_accuracy_per_category"][category] = acc_history[-1]
+
+    return models_per_category
+
+
+def train_models(summary_writer: tf.summary.SummaryWriter, data: dict) -> dict[str, LinearModel | MLP | RBF]:
     """Dispatch vers LinearModel ou MLP selon cf.CONFIG['model']['type']."""
     model_type = cf.CONFIG["model"]["type"]
 
@@ -74,6 +103,8 @@ def train_models(summary_writer: tf.summary.SummaryWriter, data: dict) -> dict[s
             models = train_linear_models(data, summary_writer)
         elif model_type == "mlp":
             models = train_mlp_models(data, summary_writer)
+        elif model_type == "rbf":
+            models = train_rbf_models(data, summary_writer)
         else:
             raise ValueError(f"train_models(): unknown model type '{model_type}'.")
 
