@@ -2,6 +2,15 @@ import ctypes
 from engine.interop.loader import Loader
 
 
+class _CRBF(ctypes.Structure):
+        _fields_ = [
+            ("input_dim", ctypes.c_uint32),
+            ("num_centers", ctypes.c_uint32),
+            ("gamma", ctypes.c_float),
+            ("centers", ctypes.POINTER(ctypes.c_float)),
+            ("output_layer", ctypes.c_void_p),
+    ]
+
 class RBF:
     """
     Wrapper Python pour le modèle RBF en C.
@@ -10,14 +19,16 @@ class RBF:
 
     #====== Constructeurs ======#
 
-    def __init__(self, input_dim: int, num_centers: int, gamma: float = 1.0) -> None:
-        """
-        Initialise un réseau RBF.
-        """
+    def __init__(self, input_dim: int, num_centers: int, gamma: float = 1.0, 
+    init_without_create: bool = False) -> None:
         self.input_dim = input_dim
         self.num_centers = num_centers
         self.gamma = gamma
         self.ptr = ctypes.c_void_p()
+
+        if init_without_create:
+            self.ptr = None
+            return
 
         Loader.call(
             "create_rbf",
@@ -27,6 +38,19 @@ class RBF:
             ctypes.byref(self.ptr),
             prefix_errmsg="RBF.__init__()"
         )
+        
+    @classmethod
+    def _init_from_model_ptr(cls, model_ptr) -> "RBF":
+        """Initialise un RBF à partir d'un pointeur vers un modèle C existant."""
+        if model_ptr is None or model_ptr.value is None:
+            raise ValueError("RBF._init_from_model_ptr(): model_ptr is NULL.")
+
+        model_struct = ctypes.cast(model_ptr, ctypes.POINTER(_CRBF)).contents
+
+        instance = cls(model_struct.input_dim, model_struct.num_centers, model_struct.gamma, init_without_create=True)
+        instance.ptr = model_ptr
+
+        return instance
 
     def close(self) -> None:
         """Libère la mémoire allouée pour le RBF côté C."""
