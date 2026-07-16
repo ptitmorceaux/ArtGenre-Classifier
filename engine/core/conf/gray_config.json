@@ -1,0 +1,51 @@
+{
+    "lib": {
+        "compile": false,
+        "seeds_choice": [42, 1337, 2024, 1234, 5678],
+        "seed": 1337
+    },
+    "model": {
+        "type": "mlp_multiclass",
+        "alpha": 0.01,
+        "epochs": 100,
+        "mlp_hidden_layers": [128, 64]
+    },
+    "dataset": {
+        "limit_per_category": -1,
+        "normalization_method": "standard",
+        "data_folder_path": {
+            "train": "dataset/images/32x32_gray/",
+            "test": "dataset/images/32x32_gray/"
+        },
+        "categories": {
+            "test": {
+                "impressionism": {
+                  "data_folder_path": "dataset/images/32x32_gray/test/impressionism",
+                  "csv_path": "dataset/test/test.impressionism_clean.csv"
+                },
+                "realism": {
+                  "data_folder_path": "dataset/images/32x32_gray/test/realism",
+                  "csv_path": "dataset/test/test.realism_clean.csv"
+                },
+                "romanticism": {
+                  "data_folder_path": "dataset/images/32x32_gray/test/romanticism",
+                  "csv_path": "dataset/test/test.romanticism_clean.csv"
+                }
+            },
+            "train": {
+                "impressionism": {
+                  "data_folder_path": "dataset/images/32x32_gray/train/impressionism",
+                  "csv_path": "dataset/train/train.impressionism_clean.csv"
+                },
+                "realism": {
+                  "data_folder_path": "dataset/images/32x32_gray/train/realism",
+                  "csv_path": "dataset/train/train.realism_clean.csv"
+                },
+                "romanticism": {
+                  "data_folder_path": "dataset/images/32x32_gray/train/romanticism",
+                  "csv_path": "dataset/train/train.romanticism_clean.csv"
+                }
+            }
+        }
+    }
+}
