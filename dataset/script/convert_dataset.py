@@ -10,8 +10,8 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 # DATASET_DIR pointe vers le dossier parent "dataset"
 DATASET_DIR = SCRIPT_DIR.parent 
 
-INPUT_DIR = DATASET_DIR / "images" / "64x64"
-OUTPUT_DIR = DATASET_DIR / "images" / "32x32_gray"
+INPUT_DIR = os.path.join(DATASET_DIR, "images", "64x64")
+OUTPUT_DIR = os.path.join(DATASET_DIR, "images", "32x32_gray")
 
 GENRES = ["impressionism", "realism", "romanticism"]
 TARGET_SIZE = (32, 32)
@@ -34,22 +34,22 @@ def main():
 
     # Création de l'arborescence de sortie si elle n'existe pas
     for genre in GENRES:
-        (OUTPUT_DIR / genre).mkdir(parents=True, exist_ok=True)
+        os.makedirs(os.path.join(OUTPUT_DIR, genre), exist_ok=True)
 
     tasks = []
     # Parallélisation pour traiter les ~43 000 images très rapidement
     with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         for genre in GENRES:
-            genre_dir = INPUT_DIR / genre
-            if not genre_dir.exists():
+            genre_dir = os.path.join(INPUT_DIR, genre)
+            if not os.path.exists(genre_dir):
                 print(f"[!] Dossier introuvable : {genre_dir}")
                 continue
 
-            image_files = list(genre_dir.glob("*.*"))
+            image_files = list(Path(genre_dir).glob("*.*"))
             print(f"[*] Lancement de la conversion pour '{genre}' ({len(image_files)} images)...")
 
             for img_path in image_files:
-                out_path = OUTPUT_DIR / genre / img_path.name
+                out_path = os.path.join(OUTPUT_DIR, genre, img_path.name)
                 tasks.append(executor.submit(process_single_image, img_path, out_path))
 
         # Suivi de la progression
