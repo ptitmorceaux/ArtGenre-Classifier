@@ -3084,6 +3084,43 @@
         ],
         "conclusion": "Bilan du scan complet RBF (8/16/32/64/256 centres + dataset complet + train_positive_ratio) : (1) moins de centres donne une accuracy globale plus haute, mais en sacrifiant progressivement Realism jusqu'à l'abandon quasi total à 8 centres — ce n'est pas un vrai gain, juste un transfert. (2) Plus de données aide (45,7% sur dataset complet, meilleur score absolu), mais accentue aussi le déséquilibre entre classes. (3) train_positive_ratio=0.25 est le SEUL levier testé qui améliore Realism sans la sacrifier (44,2%, meilleur score Realism de toute la série) tout en gardant une bonne accuracy globale (44,5%) — c'est la piste la plus prometteuse pour la suite, notamment combinée au dataset complet (16 centres + ratio=0.25 + dataset complet, jamais testé ensemble)."
       }
+    },
+    {
+      "id": 82,
+      "title": "RBF (16 centres) — combo dataset complet + train_positive_ratio=0.25",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 36.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 19.3,
+          "realism": 5.1,
+          "romanticism": 87.6
+        },
+        "train_accuracy": {
+          "impressionism": 66.1,
+          "realism": 63.4,
+          "romanticism": 64.2
+        },
+        "train_loss": {
+          "impressionism": 1.356,
+          "realism": 1.464,
+          "romanticism": 1.433
+        },
+        "observations": [
+          "Test de la combinaison des deux meilleurs leviers identifiés séparément : dataset complet (run 80, 45,7%) + train_positive_ratio=0.25 (run 81, 44,5%). Hypothèse : cumuler les deux devrait dépasser 45,7% tout en gardant un bon Realism.",
+          "Résultat : ÉCHEC net. 36,8% — plus bas que les deux leviers pris séparément, et même plus bas que la config de base (16 centres, 1000 img/classe, ratio naturel, 43,0%).",
+          "Le recall révèle un collapse sévère : Impressionism 19,3%, Realism 5,1% (pire que TOUS les autres runs 16 centres, y compris celui sans ratio), Romanticism 87,6%. Le modèle prédit quasiment toujours 'romanticism'.",
+          "Pourtant l'accuracy train est la meilleure de toute la série RBF (66,1/63,4/64,2%, loss 1,36-1,46) — comme pour le collapse à 256 centres, le problème n'est pas un défaut d'apprentissage, c'est une instabilité qui apparaît uniquement à la décision finale (argmax one-vs-rest)."
+        ],
+        "conclusion": "Les leviers ne s'additionnent pas : combiner dataset complet et train_positive_ratio=0.25 recrée le même type de collapse qu'on avait observé à 256 centres, alors qu'aucun des deux leviers pris seul ne posait ce problème à 16 centres. Hypothèse : avec ratio=0.25 appliqué APRÈS un dataset complet (au lieu de 1000 img/classe), le sous-échantillonnage des négatifs change radicalement la distribution vue par le K-Means à seulement 16 centres — les centres trouvés ne représentent plus correctement la frontière de décision, et gamma (calculé automatiquement) devient mal calibré. Conclusion pratique : sur ce projet, train_positive_ratio et limit_per_category ne sont PAS indépendants pour le RBF à ce nombre de centres — il faudrait re-scanner num_centers spécifiquement dans la configuration 'dataset complet + ratio=0.25' plutôt que de réutiliser la valeur optimale trouvée à 1000 images/classe."
+      }
     }
   ]
 }
