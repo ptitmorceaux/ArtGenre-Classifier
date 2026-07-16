@@ -2855,7 +2855,8 @@
         "observations": [
           "Premier point du scan rbf_num_centers (16/64/256), seed=42, alpha=0.001, epochs=100, 1000 images/classe — mêmes conditions que le tout premier scan d'architecture MLP.",
           "43,0% — le meilleur des 3 tailles testées, et déjà comparable aux meilleurs runs Linear/MLP à volume de données équivalent (~1000 img/classe).",
-          "Recall équilibré entre les 3 classes (34,0% / 38,9% / 56,8%), pas de collapse vers une seule catégorie."
+          "Recall équilibré entre les 3 classes (34,0% / 38,9% / 56,8%), pas de collapse vers une seule catégorie.",
+          "Run rejoué intégralement (dossier source perdu suite à un problème git) : accuracy, recall, train_accuracy et train_loss identiques au run original à la décimale près — confirme la reproductibilité totale avec seed fixe."
         ],
         "conclusion": "",
         "train_loss": {
@@ -2867,72 +2868,74 @@
     },
     {
       "id": 76,
-      "title": "RBF (64 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "title": "RBF (64 centres) — seed 1337, limit=1000, pos_ratio=-1 (batch import)",
       "model": "rbf",
       "architecture": "RBF, 64 centres (gamma auto)",
-      "seed": 42,
+      "seed": 1337,
       "alpha": 0.001,
       "epochs": 100,
       "normalization": "per_column",
       "train": null,
       "test": null,
-      "accuracy": 39.1,
+      "accuracy": 39.6,
       "analysis": {
         "recall": {
-          "impressionism": 37.7,
-          "realism": 42.8,
-          "romanticism": 36.6
+          "impressionism": 53.1,
+          "realism": 26.4,
+          "romanticism": 38.9
         },
         "train_accuracy": {
-          "impressionism": 60.3,
-          "realism": 56.3,
-          "romanticism": 58.7
+          "impressionism": 59.5,
+          "realism": 56.8,
+          "romanticism": 59.5
         },
         "observations": [
           "Deuxième point du scan : 4x plus de centres (16→64), même config sinon.",
-          "Accuracy en recul (43,0% → 39,1%, -3,9 pts) — tendance INVERSE de ce qu'on observait sur le MLP (plus de neurones aidait). Ici plus de centres RBF dégrade le résultat.",
-          "Hypothèse : avec seulement ~700 images d'entraînement par classe, 64 centres (trouvés par K-Means) commencent à sur-ajuster le nuage de points local, et gamma (calculé automatiquement à partir de l'espacement des centres) devient moins adapté."
+          "Accuracy en recul (43,0% → 39,6%, -3,4 pts) — tendance INVERSE de ce qu'on observait sur le MLP (plus de neurones aidait). Ici plus de centres RBF dégrade le résultat.",
+          "Hypothèse : avec seulement ~700 images d'entraînement par classe, 64 centres (trouvés par K-Means) commencent à sur-ajuster le nuage de points local, et gamma (calculé automatiquement à partir de l'espacement des centres) devient moins adapté.",
+          "Run rejoué après perte du dossier source original : le fichier de config avait entre-temps été modifié avec seed=null (sélection aléatoire), donc ce run utilise seed=1337 au lieu du seed=42 d'origine — comparaison avec le run 75 non parfaitement isolée sur ce point. Accuracy quasi identique au run perdu (39,1% → 39,6%), mais répartition du recall différente (avant 37,7/42,8/36,6, plutôt équilibrée ; maintenant 53,1/26,4/38,9, dominée par Impressionism)."
         ],
         "conclusion": "",
         "train_loss": {
-          "impressionism": 1.589,
-          "realism": 1.747,
-          "romanticism": 1.651
+          "impressionism": 1.621,
+          "realism": 1.728,
+          "romanticism": 1.621
         }
       }
     },
     {
       "id": 77,
-      "title": "RBF (256 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "title": "RBF (256 centres) — seed 5678, limit=1000, pos_ratio=-1 (batch import)",
       "model": "rbf",
       "architecture": "RBF, 256 centres (gamma auto)",
-      "seed": 42,
+      "seed": 5678,
       "alpha": 0.001,
       "epochs": 100,
       "normalization": "per_column",
       "train": null,
       "test": null,
-      "accuracy": 32.4,
+      "accuracy": 33.0,
       "analysis": {
         "recall": {
-          "impressionism": 1.9,
-          "realism": 4.0,
-          "romanticism": 93.3
+          "impressionism": 8.2,
+          "realism": 87.5,
+          "romanticism": 3.0
         },
         "train_accuracy": {
-          "impressionism": 57.1,
-          "realism": 56.7,
+          "impressionism": 57.5,
+          "realism": 56.8,
           "romanticism": 57.2
         },
         "observations": [
-          "Troisième point du scan : 256 centres. Accuracy globale = 32,4%, EN DESSOUS du hasard (33,3%).",
-          "Le détail du recall révèle un vrai effondrement, pas juste une baisse : Impressionism 1,9%, Realism 4,0%, Romanticism 93,3% — le modèle prédit quasiment toujours 'romanticism', quelle que soit l'image.",
-          "L'accuracy train reste normale (~57% par classe, comparable aux runs 16/64 centres) — le problème n'est donc pas un défaut d'apprentissage sur le train, mais une instabilité qui n'apparaît qu'au moment de la décision argmax en test : un des 3 classifieurs one-vs-rest domine numériquement les deux autres."
+          "Troisième point du scan : 256 centres. Accuracy globale = 33,0%, quasiment pile au niveau du hasard (33,3%).",
+          "Le détail du recall révèle un effondrement, toujours pas juste une baisse : Impressionism 8,2%, Realism 87,5%, Romanticism 3,0% — le modèle prédit quasiment toujours 'realism' cette fois.",
+          "L'accuracy train reste normale (~57% par classe, comparable aux runs 16/64 centres) — cohérent avec le run original : le problème n'est pas un défaut d'apprentissage sur le train, mais une instabilité au moment de la décision argmax en test.",
+          "Run rejoué après perte du dossier source original avec une seed différente (5678 au lieu de 42, changement de config non intentionnel). Résultat clé : L'EFFONDREMENT SE REPRODUIT avec une seed complètement différente — seule la classe vers laquelle le modèle collapse change (Romanticism à 93,3% avant, Realism à 87,5% maintenant). Ça renforce la conclusion : l'instabilité à 256 centres n'est pas un hasard d'initialisation, c'est structurel à cette taille sur ce volume de données."
         ],
-        "conclusion": "Scan rbf_num_centers (16→64→256) : tendance opposée au MLP — plus de centres dégrade puis fait carrément s'effondrer le modèle (256 centres < hasard). Avec seulement 1000 images/classe, K-Means sur 256 centres est probablement instable (centres trop proches, gamma auto mal calibré). Meilleur réglage à ce stade : 16 centres (43,0%). Prochain test recommandé : affiner autour de 8-32 centres plutôt que de continuer à augmenter, et vérifier si le comportement se stabilise avec plus de données.",
+        "conclusion": "Scan rbf_num_centers (16→64→256) : tendance opposée au MLP — plus de centres dégrade puis fait carrément s'effondrer le modèle (256 centres ≈ hasard). Avec seulement 1000 images/classe, K-Means sur 256 centres est probablement instable (centres trop proches, gamma auto mal calibré) — confirmé par la reproduction du collapse sur une seed totalement différente (seule la classe cible du collapse change). Meilleur réglage à ce stade : 16 centres (43,0%, seed=42, reproduit à l'identique). Prochain test recommandé : affiner autour de 8-32 centres plutôt que de continuer à augmenter, et vérifier si le comportement se stabilise avec plus de données.",
         "train_loss": {
-          "impressionism": 1.715,
-          "realism": 1.731,
+          "impressionism": 1.699,
+          "realism": 1.728,
           "romanticism": 1.712
         }
       }

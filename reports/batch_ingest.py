@@ -16,7 +16,7 @@ import json
 import shutil
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from extract_tensorboard import load_scalars, plot_metrics
+from extract_tensorboard import load_scalars, plot_metrics, get_final_values
 from batch_parse_reports import parse_run
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -40,10 +40,12 @@ def build_entry(run_id: int, folder: str) -> dict:
     if os.path.isfile(cm_src):
         shutil.copy(cm_src, os.path.join(IMAGES_DIR, f"run_{run_id_str}.png"))
 
+    tb_final = {}
     if r.get("has_tfevents"):
         try:
             series = load_scalars(folder)
             plot_metrics(series, os.path.join(TENSORBOARD_DIR, f"run_{run_id_str}.png"))
+            tb_final = get_final_values(series)
         except Exception as e:
             print(f"[WARN] tfevents non exploitable pour {folder}: {e}", file=sys.stderr)
 
@@ -59,6 +61,9 @@ def build_entry(run_id: int, folder: str) -> dict:
             "analysis": {"recall": {}, "observations": [f"Dossier source: {folder}. Pas de config.json disponible."], "conclusion": ""},
             "_folder": folder,
         }
+
+    train_loss = {c: round(tb_final[f"Loss/{c}"], 3) for c in CATS if f"Loss/{c}" in tb_final}
+    train_acc_tb = {c: round(tb_final[f"Accuracy/{c}"] * 100, 1) for c in CATS if f"Accuracy/{c}" in tb_final}
 
     arch = r.get("mlp_hidden_layers")
     model = r.get("model_type")
@@ -87,7 +92,8 @@ def build_entry(run_id: int, folder: str) -> dict:
         "accuracy": pct(r.get("top1_accuracy")),
         "analysis": {
             "recall": {c: pct(r["recall"].get(c)) for c in CATS} if r.get("recall") else {},
-            "train_accuracy": {c: pct(r["train_accuracy"].get(c)) for c in CATS} if r.get("train_accuracy") else {},
+            "train_accuracy": ({c: pct(r["train_accuracy"].get(c)) for c in CATS} if r.get("train_accuracy") else None) or train_acc_tb or {},
+            "train_loss": train_loss,
             "observations": [
                 f"Run importe en lot depuis {folder}.",
                 f"train_positive_ratio={r.get('train_positive_ratio')}{limit_note}."
