@@ -65,11 +65,19 @@ def build_entry(run_id: int, folder: str) -> dict:
     limit = r.get("limit_per_category")
     limit_note = f" | limit_per_category={limit}" if not isinstance(limit, (int, float)) or limit != 6000 else ""
 
+    if model == "mlp":
+        title_model, arch_str = "MLP " + str(arch), str(arch)
+    elif model == "rbf":
+        num_centers = r.get("rbf_num_centers")
+        title_model, arch_str = f"RBF ({num_centers} centres)", f"RBF, {num_centers} centres (gamma auto)"
+    else:
+        title_model, arch_str = "Linear", "perceptron (Rosenblatt), one-vs-rest"
+
     entry = {
         "id": run_id,
-        "title": f"{'MLP ' + str(arch) if model == 'mlp' else 'Linear'} — seed {r.get('seed')}, limit={limit}, pos_ratio={r.get('train_positive_ratio')} (batch import)",
+        "title": f"{title_model} — seed {r.get('seed')}, limit={limit}, pos_ratio={r.get('train_positive_ratio')} (batch import)",
         "model": model,
-        "architecture": str(arch) if model == "mlp" else "perceptron (Rosenblatt), one-vs-rest",
+        "architecture": arch_str,
         "seed": r.get("seed"),
         "alpha": r.get("alpha"),
         "epochs": r.get("epochs"),

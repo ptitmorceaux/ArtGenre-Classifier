@@ -60,6 +60,16 @@ def plot_metrics(series: dict, out_path: str, title: str = "") -> None:
                 ax.plot(steps, values, linewidth=1.5)
                 final_val = values[-1]
                 ax.set_title(f"{metric}/{cat}\nfinal={final_val:.4f}", fontsize=10)
+
+                # Zoom auto sur la zone "stabilisee" (comme TensorBoard) : on ignore le
+                # transitoire des tout premiers epochs pour calibrer l'axe Y, sinon le pic
+                # de depart ecrase l'echelle et cache les variations fines une fois converge.
+                skip = max(2, round(len(values) * 0.05))
+                if len(values) > skip:
+                    stable = values[skip:]
+                    lo, hi = min(stable), max(stable)
+                    pad = (hi - lo) * 0.15 if hi > lo else abs(hi) * 0.01 or 0.01
+                    ax.set_ylim(lo - pad, hi + pad)
             else:
                 ax.set_title(f"{metric}/{cat}\n(absent)", fontsize=10)
             ax.grid(True, alpha=0.3)

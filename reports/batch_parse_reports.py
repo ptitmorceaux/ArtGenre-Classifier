@@ -24,6 +24,7 @@ def parse_run(folder: str) -> dict:
         result["epochs"] = config.get("model", {}).get("epochs")
         result["npl"] = config.get("model", {}).get("npl")
         result["mlp_hidden_layers"] = config.get("model", {}).get("mlp_hidden_layers")
+        result["rbf_num_centers"] = config.get("model", {}).get("rbf_num_centers")
         result["limit_per_category"] = config.get("dataset", {}).get("limit_per_category")
         result["train_positive_ratio"] = config.get("dataset", {}).get("train_positive_ratio")
         result["normalization"] = config.get("dataset", {}).get("normalization_method")
