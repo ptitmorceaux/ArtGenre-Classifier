@@ -2939,6 +2939,151 @@
           "romanticism": 1.712
         }
       }
+    },
+    {
+      "id": 78,
+      "title": "RBF (8 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 8 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 3000,
+      "test": 13004,
+      "accuracy": 43.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 49.3,
+          "realism": 3.9,
+          "romanticism": 78.2
+        },
+        "train_accuracy": {
+          "impressionism": 61.9,
+          "realism": 58.1,
+          "romanticism": 58.1
+        },
+        "train_loss": {
+          "impressionism": 1.525,
+          "realism": 1.675,
+          "romanticism": 1.677
+        },
+        "observations": [
+          "Prolonge le scan rbf_num_centers vers le bas (16→8), même config sinon (seed=42, 1000 img/classe).",
+          "Accuracy 43,6% — LÉGÈREMENT MEILLEURE que 16 centres (43,0%). La tendance 'moins de centres = mieux' se confirme numériquement.",
+          "Mais le recall révèle le vrai prix payé : Impressionism 49,3%, Romanticism 78,2%, et Realism quasi abandonné à 3,9%. Le modèle a en fait sacrifié une classe entière pour gagner quelques points d'accuracy globale sur les deux autres."
+        ],
+        "conclusion": ""
+      }
+    },
+    {
+      "id": 79,
+      "title": "RBF (32 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 32 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 3000,
+      "test": 13004,
+      "accuracy": 41.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 59.5,
+          "realism": 32.2,
+          "romanticism": 33.2
+        },
+        "train_accuracy": {
+          "impressionism": 62.4,
+          "realism": 58.3,
+          "romanticism": 60.7
+        },
+        "train_loss": {
+          "impressionism": 1.504,
+          "realism": 1.667,
+          "romanticism": 1.571
+        },
+        "observations": [
+          "Comble l'écart entre 16 et 64 centres, même config sinon.",
+          "Accuracy 41,8% — se place bien entre 16 (43,0%) et 64 (39,6%), confirmant une décroissance régulière avec le nombre de centres sur ce volume de données (1000 img/classe).",
+          "Recall 59,5/32,2/33,2 : toujours le même schéma qu'aux autres tailles — Impressionism favorisé, Realism et Romanticism à la peine."
+        ],
+        "conclusion": ""
+      }
+    },
+    {
+      "id": 80,
+      "title": "RBF (16 centres) — seed 42, limit=-1, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.7,
+      "analysis": {
+        "recall": {
+          "impressionism": 76.6,
+          "realism": 22.7,
+          "romanticism": 37.1
+        },
+        "train_accuracy": {
+          "impressionism": 61.4,
+          "realism": 57.2,
+          "romanticism": 59.2
+        },
+        "train_loss": {
+          "impressionism": 1.544,
+          "realism": 1.712,
+          "romanticism": 1.63
+        },
+        "observations": [
+          "16 centres, mais sur le DATASET COMPLET (limit=-1, 30345 images train contre 3000 pour les runs précédents à 1000/classe) au lieu de rester sur un volume réduit — même logique que ce qu'on avait fait pour MLP et Linear (Phase 4-5).",
+          "Meilleure accuracy de toute la série RBF : 45,7% (vs 43,0% avec la même architecture sur seulement 1000 img/classe, +2,7 pts). Confirme que le RBF profite lui aussi de plus de données, comme le MLP et le Linear.",
+          "Mais le recall se déséquilibre fortement avec l'échelle : Impressionism 76,6%, Romanticism 37,1%, Realism 22,7% — le gain d'accuracy vient presque entièrement d'un très fort score sur Impressionism, pas d'un vrai progrès généralisé sur les 3 classes."
+        ],
+        "conclusion": ""
+      }
+    },
+    {
+      "id": 81,
+      "title": "RBF (16 centres) — seed 42, limit=1000, pos_ratio=0.25 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 3000,
+      "test": 13004,
+      "accuracy": 44.5,
+      "analysis": {
+        "recall": {
+          "impressionism": 54.8,
+          "realism": 44.2,
+          "romanticism": 33.9
+        },
+        "train_accuracy": {
+          "impressionism": 67.4,
+          "realism": 63.0,
+          "romanticism": 64.8
+        },
+        "train_loss": {
+          "impressionism": 1.305,
+          "realism": 1.482,
+          "romanticism": 1.407
+        },
+        "observations": [
+          "16 centres, 1000 img/classe, mais avec train_positive_ratio=0.25 au lieu du ratio naturel — levier jamais testé sur RBF jusqu'ici, par analogie avec ce qu'on avait fait sur MLP/Linear.",
+          "Accuracy 44,5%, deuxième meilleur résultat de toute la série RBF (juste derrière le dataset complet à 45,7%), avec seulement 1000 images/classe.",
+          "Recall nettement plus équilibré que les autres runs 16 centres : 54,8/44,2/33,9 — Realism à 44,2% est de LOIN le meilleur score Realism obtenu sur RBF (les autres runs oscillent entre 3,9% et 38,9%).",
+          "Accuracy train aussi la plus haute de la série (67,4/63,0/64,8%) et loss la plus basse (1,3-1,48) — cohérent : réduire les négatifs par sous-échantillonnage rend le problème plus facile à apprendre pour le modèle."
+        ],
+        "conclusion": "Bilan du scan complet RBF (8/16/32/64/256 centres + dataset complet + train_positive_ratio) : (1) moins de centres donne une accuracy globale plus haute, mais en sacrifiant progressivement Realism jusqu'à l'abandon quasi total à 8 centres — ce n'est pas un vrai gain, juste un transfert. (2) Plus de données aide (45,7% sur dataset complet, meilleur score absolu), mais accentue aussi le déséquilibre entre classes. (3) train_positive_ratio=0.25 est le SEUL levier testé qui améliore Realism sans la sacrifier (44,2%, meilleur score Realism de toute la série) tout en gardant une bonne accuracy globale (44,5%) — c'est la piste la plus prometteuse pour la suite, notamment combinée au dataset complet (16 centres + ratio=0.25 + dataset complet, jamais testé ensemble)."
+      }
     }
   ]
 }

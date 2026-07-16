@@ -39,7 +39,10 @@ def parse_run(folder: str) -> dict:
         result["train_accuracy"] = {c: train_acc.get(c) for c in CATS}
 
         count = config.get("dataset", {}).get("count_total_dataset", {})
-        if count:
+        if "loaded" in count:  # nouveau schema (feat/dataset-repartition-mem)
+            result["train_total"] = count["loaded"].get("train", {}).get("total")
+            result["test_total"] = count["loaded"].get("test", {}).get("total")
+        elif count:  # ancien schema (plat)
             result["train_total"] = count.get("train", {}).get("total")
             result["test_total"] = count.get("test", {}).get("total")
     else:

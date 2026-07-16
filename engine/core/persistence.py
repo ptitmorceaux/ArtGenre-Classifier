@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 
 import engine.core.config as cf
+from engine.interop.rbf import RBF
 from engine.interop.storage import Storage
 from engine.interop.linearModel import LinearModel
 from engine.interop.mlp import MLP
@@ -10,7 +11,7 @@ from engine.interop.normalization import StandardScaler, StandardPerColumnScaler
 
 
 def save_trained_models(
-        models_per_category: dict[str, LinearModel | MLP],
+        models_per_category: dict[str, LinearModel | MLP | RBF],
         scaler: StandardScaler | StandardPerColumnScaler,
         output_folder: str,
         model_type: str
