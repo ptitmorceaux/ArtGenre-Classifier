@@ -202,12 +202,12 @@ def collect_runs(
     model_filter: str | None = None,
     resolution_filter: str | None = None,
 ) -> list[dict]:
-    runs = list()
+    all_runs = list()
     filepaths = sorted(Path(p) for p in glob.glob(pattern))
 
     if not filepaths:
         print(f"[!] No file found for pattern '{pattern}'.", file=sys.stderr)
-        return runs
+        return all_runs
 
     normalized_filter = model_filter.lower().strip() if model_filter is not None else None
     normalized_resolution_filter = (
@@ -233,7 +233,17 @@ def collect_runs(
         }
         run.update(extract_run_info(config))
         run["info"] = extract_extra_info(config)
+        run["run_dt"] = parse_run_datetime(run["path"])
+        run["elapsed"] = format_time_ago(run["run_dt"])
 
+        all_runs.append(run)
+
+    # Le rank doit refléter la position de chaque run parmi TOUS les runs trouvés
+    # (avant filtrage par modèle/résolution), pas seulement parmi le sous-ensemble affiché.
+    assign_accuracy_ranks(all_runs)
+
+    runs = list()
+    for run in all_runs:
         if normalized_filter is not None and str(run["model_type"]).lower().strip() != normalized_filter:
             continue
 
@@ -246,8 +256,6 @@ def collect_runs(
             elif run_resolution != normalized_resolution_filter:
                 continue
 
-        run["run_dt"] = parse_run_datetime(run["path"])
-        run["elapsed"] = format_time_ago(run["run_dt"])
         runs.append(run)
 
     return runs
@@ -265,8 +273,6 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
         print("Y en a pas.")
         sys.exit(1)
 
-    assign_accuracy_ranks(runs)
-
     if sort_by_ago:
         oldest_possible = datetime.min.replace(tzinfo=RUN_TIMEZONE)
         display_runs = sorted(runs, key=lambda r: r["run_dt"] or oldest_possible, reverse=True)
@@ -276,7 +282,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
     if n > 0:
         display_runs = display_runs[:n]
 
-    headers = ["#", "Rank"]
+    headers = ["#", "Global Rank"]
     headers += ["Top-1 Acc", "Train Acc", "Model", "Resolution", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
