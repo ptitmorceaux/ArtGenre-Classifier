@@ -68,8 +68,7 @@ def parse_args() -> argparse.Namespace:
         "-a", "--ago",
         dest="ago",
         action="store_true",
-        help="Sort by most recent first instead of by Top-1 Accuracy. Adds a 'Rank' "
-             "column showing each run's Top-1 Accuracy rank among all matching runs.",
+        help="Sort by most recent first instead of by Top-1 Accuracy.",
     )
     return parser.parse_args()
 
@@ -277,16 +276,12 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
     if n > 0:
         display_runs = display_runs[:n]
 
-    headers = ["#"]
-    if sort_by_ago:
-        headers.append("Rank")
+    headers = ["#", "Rank"]
     headers += ["Top-1 Acc", "Train Acc", "Model", "Resolution", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
     for i, run in enumerate(display_runs):
-        row = [str(i + 1)]
-        if sort_by_ago:
-            row.append(str(run.get("rank", UNKNOWN)))
+        row = [str(i + 1), str(run.get("rank", UNKNOWN))]
 
         # Formatage conditionnel pour repérer les WIP et les float vs str
         top1_str = f"{run['top1_accuracy'] * 100:.2f}%" if run['top1_accuracy'] != -1.0 else "WIP/Err"
