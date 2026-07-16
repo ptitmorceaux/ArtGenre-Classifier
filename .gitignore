@@ -4,6 +4,7 @@ ArtGenre-Classifier.wiki/
 
 dataset/*
 !dataset/README.md
+!dataset/script/
 
 libc/specs/*.json
 
