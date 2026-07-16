@@ -7,6 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import engine.core.config as cf
 from engine.core.dataset import build_multiclass_test_arrays
+from engine.core.training import MULTICLASS_KEY
 
 
 def _predict_scalar(model, x, is_classification: bool) -> float:
@@ -82,6 +83,73 @@ def _print_stats(stats: dict, count_line: str | None = None) -> None:
 
 
 def evaluate_models(models_per_category: dict, data: dict) -> tuple[list, list]:
+    """Dispatch vers l'évaluation One-vs-All ou multiclasse selon cf.CONFIG['model']['type']."""
+    if cf.CONFIG["model"]["type"] == "mlp_multiclass":
+        return _evaluate_multiclass_model(models_per_category[MULTICLASS_KEY], data)
+    return _evaluate_one_vs_all_models(models_per_category, data)
+
+
+def _evaluate_multiclass_model(model, data: dict) -> tuple[list, list]:
+    """
+    Évalue le MLP multiclasse partagé (une seule sortie par catégorie, décision par
+    argmax en un seul forward pass) et renvoie EXACTEMENT la même forme de résultat
+    que _evaluate_one_vs_all_models() (test_multiclass_accuracy, df_predictions_*),
+    pour que plot_confusion_matrix() et le reporting TensorBoard n'aient rien à
+    changer.
+
+    Pas de section "test_individual_accuracy" ici : contrairement au One-vs-All, il
+    n'y a pas plusieurs modèles séparés à évaluer individuellement, juste un seul
+    modèle dont les sorties sont, par construction, déjà comparables entre elles.
+    """
+    X_test, expected_categories = build_multiclass_test_arrays(data)
+    categories_order = cf.CONFIG["model"]["categories_order"]
+
+    print("\n========>>> TEST: Evaluating multiclass model <<<========")
+
+    unknown_is_valid = cf.CONFIG["global"]["unknown_category"] is not None and cf.CONFIG["global"]["unknown_category"] != ""
+
+    df_predictions_test = list()
+    for x in X_test:
+        outputs = model.predict(x, is_classification=True)
+        best_idx = max(range(len(outputs)), key=lambda i: outputs[i])
+
+        # "unknown" si même la catégorie gagnante n'est pas du côté positif de tanh
+        # (équivalent, pour un modèle partagé, du test `prediction[i]` du One-vs-All).
+        if unknown_is_valid and outputs[best_idx] < 0:
+            df_predictions_test.append(cf.CONFIG["global"]["unknown_category"])
+        else:
+            df_predictions_test.append(categories_order[best_idx])
+
+    df_predictions_expected = expected_categories
+
+    print("\n========>>> TEST: Evaluating final multiclass predictions <<<========")
+    cf.CONFIG["model"]["test_multiclass_accuracy"] = {
+        "categories": dict(),
+        "global": dict()
+    }
+
+    for category in categories_order:
+        stats = compute_binary_stats(df_predictions_expected, df_predictions_test, positive_value=category)
+        cf.CONFIG["model"]["test_multiclass_accuracy"]["categories"][category] = stats
+
+        correct = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if (e == category) == (p == category))
+        print(f"\n  > Category: {category}")
+        _print_stats(stats, f"{correct}/{len(df_predictions_expected)}")
+
+    correct_predictions = sum(1 for e, p in zip(df_predictions_expected, df_predictions_test) if e == p)
+    total_predictions = len(df_predictions_expected)
+    top1_accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+    cf.CONFIG["model"]["test_multiclass_accuracy"]["global"]["top1_accuracy"] = top1_accuracy
+
+    print("\n========>>> TEST: Evaluation Results <<<========")
+    print("\n> Global Multiclass Stats:")
+    print(f"    Top-1 Accuracy: {top1_accuracy * 100:.2f}% ({correct_predictions}/{total_predictions})")
+    print("\n========>>> TEST: Evaluation Complete <<<========\n")
+
+    return df_predictions_expected, df_predictions_test
+
+
+def _evaluate_one_vs_all_models(models_per_category: dict, data: dict) -> tuple[list, list]:
     """Évalue les modèles et génère les prédictions finales par rapport aux attentes."""
     X_test, expected_categories = build_multiclass_test_arrays(data)
     predictions = dict()
@@ -184,10 +252,15 @@ def plot_confusion_matrix(df_predictions_expected: list, df_predictions_test: li
     # on le reconstruit via la diagonale (used_during_train["model_<cat>"]["categories"][cat]
     # = nb d'images chargées pour cette catégorie, jamais affecté par le ratio car
     # seuls les négatifs sont sous-échantillonnés).
+    # Cas particulier "mlp_multiclass" : un seul dataset partagé (clé "model_multiclass"),
+    # déjà le total exact (chaque image n'est utilisée qu'une fois, pas de sous-échantillonnage).
     train_counts = cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"]
     categories = list(cf.CONFIG["dataset"]["categories"]["train"].keys())
 
-    length_X_train = sum(train_counts[f"model_{cat}"]["categories"][cat] for cat in categories)
+    if cf.CONFIG["model"]["type"] == "mlp_multiclass":
+        length_X_train = train_counts["model_multiclass"]["total"]
+    else:
+        length_X_train = sum(train_counts[f"model_{cat}"]["categories"][cat] for cat in categories)
 
     plt.title("Confusion Matrix")
 

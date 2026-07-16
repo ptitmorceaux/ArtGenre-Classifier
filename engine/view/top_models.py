@@ -90,7 +90,7 @@ def extract_extra_info(config: dict) -> str:
     model = config.get("model", {})
     model_type = str(model.get("type", "")).lower().strip()
 
-    if model_type == "mlp":
+    if model_type in ("mlp", "mlp_multiclass"):
         return f"npl={model.get('npl', UNKNOWN)}"
 
     return ""
