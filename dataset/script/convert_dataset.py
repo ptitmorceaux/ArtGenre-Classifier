@@ -20,8 +20,6 @@ def process_single_image(input_path, output_path):
     """Ouvre une image, la convertit en niveaux de gris (L), la redimensionne et la sauvegarde."""
     try:
         with Image.open(input_path) as img:
-            # 1. 'L' pour Luminance (1 seul canal)
-            # 2. resize avec LANCZOS pour éviter la perte de qualité lors de la réduction
             processed_img = img.convert('L').resize(TARGET_SIZE, getattr(Image, "Resampling", Image).LANCZOS)
             processed_img.save(output_path)
         return True

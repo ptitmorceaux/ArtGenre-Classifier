@@ -7,12 +7,12 @@
     "dataset": {
         "train_positive_ratio": 0.5,
         "limit_per_category": 9884,
-        "normalization_method": "per_column"
+        "normalization_method": "standard"
     },
     "model": {
         "type": "mlp",
         "alpha": 0.0005,
         "epochs": 150,
-        "mlp_hidden_layers": [256, 128]
+        "mlp_hidden_layers": [1024, 1024]
     }
 }
