@@ -266,7 +266,8 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_fi
             str(run["epochs"]),
             str(run["seed"]),
             str(run["limit_per_category"]),
-            f"{run['ratio'] * 100:.2f}%" if isinstance(run["ratio"], float) else str(run["ratio"]),
+            "unused" if str(run["model_type"]).lower().strip() == "mlp_multiclass"
+                else f"{run['ratio'] * 100:.2f}%" if isinstance(run["ratio"], float) else str(run["ratio"]),
             str(run["elapsed"]),
             str(run["info"]),
             str(run["path"]),
