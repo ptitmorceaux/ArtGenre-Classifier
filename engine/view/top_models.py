@@ -16,6 +16,7 @@ Usage:
 import argparse
 import glob
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -55,11 +56,19 @@ def parse_args() -> argparse.Namespace:
         help="Filter runs by model type (e.g. 'mlp', 'linear', 'rbf'). Case-insensitive.",
     )
     parser.add_argument(
+        "-r", "--resolution",
+        dest="resolution",
+        type=str,
+        default=None,
+        help="Filter runs by resolution (e.g. '64x64', '32x32_gray'). "
+             "Pass an empty string (-r \"\") to show runs where no resolution could be detected. "
+             "Case-insensitive.",
+    )
+    parser.add_argument(
         "-a", "--ago",
         dest="ago",
         action="store_true",
-        help="Sort by most recent first instead of by Top-1 Accuracy. Adds a 'Rank' "
-             "column showing each run's Top-1 Accuracy rank among all matching runs.",
+        help="Sort by most recent first instead of by Top-1 Accuracy.",
     )
     return parser.parse_args()
 
@@ -96,6 +105,42 @@ def extract_extra_info(config: dict) -> str:
     return ""
 
 
+RESOLUTION_PATTERN = re.compile(r"(\d+x\d+(?:_[A-Za-z0-9]+)?)")
+
+
+def extract_resolution(config: dict) -> str:
+    """
+    Extracts the image resolution (e.g. '64x64', '32x32_gray') from the dataset's
+    folder paths. Looks in dataset.data_folder_path.{train,test} first, then falls
+    back to each category's data_folder_path. Returns UNKNOWN if nothing matches.
+    """
+    dataset = config.get("dataset", {})
+    candidates = []
+
+    data_folder_path = dataset.get("data_folder_path", {})
+    if isinstance(data_folder_path, dict):
+        candidates.append(data_folder_path.get("train"))
+        candidates.append(data_folder_path.get("test"))
+
+    categories = dataset.get("categories", {})
+    if isinstance(categories, dict):
+        for split in ("train", "test"):
+            split_categories = categories.get(split, {})
+            if isinstance(split_categories, dict):
+                for cat_info in split_categories.values():
+                    if isinstance(cat_info, dict):
+                        candidates.append(cat_info.get("data_folder_path"))
+
+    for candidate in candidates:
+        if not candidate:
+            continue
+        match = RESOLUTION_PATTERN.search(str(candidate))
+        if match:
+            return match.group(1)
+
+    return UNKNOWN
+
+
 def extract_run_info(config: dict) -> dict:
     """Extracts a few useful fields to identify/compare runs in the display."""
     model = config.get("model", {})
@@ -111,6 +156,7 @@ def extract_run_info(config: dict) -> dict:
         "seed": lib.get("seed", UNKNOWN),
         "limit_per_category": dataset.get("limit_per_category", UNKNOWN),
         "ratio": dataset.get("train_positive_ratio", UNKNOWN),
+        "resolution": extract_resolution(config),
         "path": output.get("logs", UNKNOWN)
     }
 
@@ -151,15 +197,22 @@ def format_time_ago(run_dt: datetime | None) -> str:
     return f"{int(elapsed_days)}d"
 
 
-def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
-    runs = list()
+def collect_runs(
+    pattern: str,
+    model_filter: str | None = None,
+    resolution_filter: str | None = None,
+) -> list[dict]:
+    all_runs = list()
     filepaths = sorted(Path(p) for p in glob.glob(pattern))
 
     if not filepaths:
         print(f"[!] No file found for pattern '{pattern}'.", file=sys.stderr)
-        return runs
+        return all_runs
 
     normalized_filter = model_filter.lower().strip() if model_filter is not None else None
+    normalized_resolution_filter = (
+        resolution_filter.lower().strip() if resolution_filter is not None else None
+    )
 
     for filepath in filepaths:
         try:
@@ -180,12 +233,29 @@ def collect_runs(pattern: str, model_filter: str | None = None) -> list[dict]:
         }
         run.update(extract_run_info(config))
         run["info"] = extract_extra_info(config)
+        run["run_dt"] = parse_run_datetime(run["path"])
+        run["elapsed"] = format_time_ago(run["run_dt"])
 
+        all_runs.append(run)
+
+    # Le rank doit refléter la position de chaque run parmi TOUS les runs trouvés
+    # (avant filtrage par modèle/résolution), pas seulement parmi le sous-ensemble affiché.
+    assign_accuracy_ranks(all_runs)
+
+    runs = list()
+    for run in all_runs:
         if normalized_filter is not None and str(run["model_type"]).lower().strip() != normalized_filter:
             continue
 
-        run["run_dt"] = parse_run_datetime(run["path"])
-        run["elapsed"] = format_time_ago(run["run_dt"])
+        if normalized_resolution_filter is not None:
+            run_resolution = str(run["resolution"]).lower().strip()
+            if normalized_resolution_filter == "":
+                # -r "" means: only keep runs with no detected resolution
+                if run_resolution != UNKNOWN.lower():
+                    continue
+            elif run_resolution != normalized_resolution_filter:
+                continue
+
         runs.append(run)
 
     return runs
@@ -200,10 +270,8 @@ def assign_accuracy_ranks(runs: list[dict]) -> None:
 
 def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
     if not runs:
-        print("No valid run to display.")
-        return
-
-    assign_accuracy_ranks(runs)
+        print("Y en a pas.")
+        sys.exit(1)
 
     if sort_by_ago:
         oldest_possible = datetime.min.replace(tzinfo=RUN_TIMEZONE)
@@ -214,16 +282,12 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
     if n > 0:
         display_runs = display_runs[:n]
 
-    headers = ["#"]
-    if sort_by_ago:
-        headers.append("Rank")
-    headers += ["Top-1 Acc", "Train Acc", "Model", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
+    headers = ["#", "Global Rank"]
+    headers += ["Top-1 Acc", "Train Acc", "Model", "Resolution", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
     for i, run in enumerate(display_runs):
-        row = [str(i + 1)]
-        if sort_by_ago:
-            row.append(str(run.get("rank", UNKNOWN)))
+        row = [str(i + 1), str(run.get("rank", UNKNOWN))]
 
         # Formatage conditionnel pour repérer les WIP et les float vs str
         top1_str = f"{run['top1_accuracy'] * 100:.2f}%" if run['top1_accuracy'] != -1.0 else "WIP/Err"
@@ -233,6 +297,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
             top1_str,
             train_str,
             str(run["model_type"]),
+            str(run["resolution"]),
             str(run["norm"]),
             str(run["alpha"]),
             str(run["epochs"]),
@@ -263,7 +328,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False) -> None:
 
 def main() -> None:
     args = parse_args()
-    runs = collect_runs(args.pattern, args.model)
+    runs = collect_runs(args.pattern, args.model, args.resolution)
     print_top_runs(runs, args.n, sort_by_ago=args.ago)
 
 
