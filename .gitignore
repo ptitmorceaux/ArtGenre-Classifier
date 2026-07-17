@@ -18,7 +18,7 @@ drawio/
 *.tmp
 #*.png
 
-engine/core/output/*
+# engine/core/output/*
 
 ########################
 # Node / Frontend (Vue.js, Vite)
