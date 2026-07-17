@@ -1,0 +1,16 @@
+{
+    "lib": {
+        "seeds_choice": [42, 1337, 2024, 1234, 5678],
+        "seed": 42
+    },
+    "dataset": {
+        "limit_per_category": -1,
+        "normalization_method": "per_column"
+    },
+    "model": {
+        "type": "rbf",
+        "alpha": 0.001,
+        "epochs": 100,
+        "rbf_num_centers": 64
+    }
+}

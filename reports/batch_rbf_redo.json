@@ -1,0 +1,110 @@
+[
+  {
+    "id": 75,
+    "title": "RBF (16 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+    "model": "rbf",
+    "architecture": "RBF, 16 centres (gamma auto)",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 43.0,
+    "analysis": {
+      "recall": {
+        "impressionism": 34.0,
+        "realism": 38.9,
+        "romanticism": 56.8
+      },
+      "train_accuracy": {
+        "impressionism": 61.4,
+        "realism": 59.3,
+        "romanticism": 60.0
+      },
+      "train_loss": {
+        "impressionism": 1.544,
+        "realism": 1.627,
+        "romanticism": 1.6
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/rbf/2026-07-16/09-23-22_352290.",
+        "train_positive_ratio=-1 | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/rbf/2026-07-16/09-23-22_352290"
+  },
+  {
+    "id": 76,
+    "title": "RBF (64 centres) — seed 1337, limit=1000, pos_ratio=-1 (batch import)",
+    "model": "rbf",
+    "architecture": "RBF, 64 centres (gamma auto)",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 39.6,
+    "analysis": {
+      "recall": {
+        "impressionism": 53.1,
+        "realism": 26.4,
+        "romanticism": 38.9
+      },
+      "train_accuracy": {
+        "impressionism": 59.5,
+        "realism": 56.8,
+        "romanticism": 59.5
+      },
+      "train_loss": {
+        "impressionism": 1.621,
+        "realism": 1.728,
+        "romanticism": 1.621
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/rbf/2026-07-16/09-26-39_758618.",
+        "train_positive_ratio=-1 | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/rbf/2026-07-16/09-26-39_758618"
+  },
+  {
+    "id": 77,
+    "title": "RBF (256 centres) — seed 5678, limit=1000, pos_ratio=-1 (batch import)",
+    "model": "rbf",
+    "architecture": "RBF, 256 centres (gamma auto)",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 33.0,
+    "analysis": {
+      "recall": {
+        "impressionism": 8.2,
+        "realism": 87.5,
+        "romanticism": 3.0
+      },
+      "train_accuracy": {
+        "impressionism": 57.5,
+        "realism": 56.8,
+        "romanticism": 57.2
+      },
+      "train_loss": {
+        "impressionism": 1.699,
+        "realism": 1.728,
+        "romanticism": 1.712
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/rbf/2026-07-16/09-32-45_394612.",
+        "train_positive_ratio=-1 | limit_per_category=1000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/rbf/2026-07-16/09-32-45_394612"
+  }
+]
