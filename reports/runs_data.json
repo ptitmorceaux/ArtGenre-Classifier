@@ -1072,7 +1072,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-14-54_836787.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.607,
+          "realism": 0.628,
+          "romanticism": 0.595
+        }
       }
     },
     {
@@ -1102,7 +1107,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-30-14_564265.",
           "train_positive_ratio=0.5 | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.516,
+          "realism": 0.659,
+          "romanticism": 0.675
+        }
       }
     },
     {
@@ -1132,7 +1142,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-34-26_983380.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=1500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.528,
+          "realism": 0.664,
+          "romanticism": 0.608
+        }
       }
     },
     {
@@ -1162,7 +1177,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-03-39_195707.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.759,
+          "realism": 0.8,
+          "romanticism": 0.783
+        }
       }
     },
     {
@@ -1192,7 +1212,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-11-15_800568.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.23,
+          "realism": 0.325,
+          "romanticism": 0.297
+        }
       }
     },
     {
@@ -1222,7 +1247,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-41-36_963888.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.233,
+          "realism": 0.297,
+          "romanticism": 0.279
+        }
       }
     },
     {
@@ -1252,7 +1282,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-12/01-04-05_375385.",
           "train_positive_ratio=0.25."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.262,
+          "realism": 0.324,
+          "romanticism": 0.298
+        }
       }
     },
     {
@@ -1282,7 +1317,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-12/03-06-02_267716.",
           "train_positive_ratio=0.25 | limit_per_category=6."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.683,
+          "realism": 1.206,
+          "romanticism": 1.276
+        }
       }
     },
     {
@@ -1312,7 +1352,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-12/13-54-29_862006.",
           "train_positive_ratio=0.25 | limit_per_category={'impressionism': 12, 'realism': 22, 'romanticism': 32}."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.007,
+          "realism": 0.012,
+          "romanticism": 0.092
+        }
       }
     },
     {
@@ -1342,7 +1387,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-12/14-02-18_912919.",
           "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.165,
+          "realism": 0.405,
+          "romanticism": 0.293
+        }
       }
     },
     {
@@ -1372,7 +1422,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-12/20-50-23_426125.",
           "train_positive_ratio=0.25."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.348,
+          "realism": 0.515,
+          "romanticism": 0.437
+        }
       }
     },
     {
@@ -1402,7 +1457,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-12/22-30-25_776689.",
           "train_positive_ratio=0.25."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.376,
+          "realism": 0.483,
+          "romanticism": 0.447
+        }
       }
     },
     {
@@ -1432,7 +1492,11 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-13/17-06-45_581095.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.41,
+          "realism": 0.435
+        }
       }
     },
     {
@@ -1462,7 +1526,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-14/14-37-01_871539.",
           "train_positive_ratio=-1 | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.668,
+          "realism": 0.747,
+          "romanticism": 0.706
+        }
       }
     },
     {
@@ -1492,7 +1561,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-53-36_317761.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.115,
+          "realism": 0.149,
+          "romanticism": 0.211
+        }
       }
     },
     {
@@ -1522,7 +1596,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/21-09-02_349430.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.208,
+          "realism": 0.28,
+          "romanticism": 0.325
+        }
       }
     },
     {
@@ -1552,7 +1631,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/23-37-32_627775.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.767,
+          "realism": 0.926,
+          "romanticism": 0.837
+        }
       }
     },
     {
@@ -1582,7 +1666,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/23-50-52_074575.",
           "train_positive_ratio=0.3333333333333333."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.09,
+          "realism": 1.22,
+          "romanticism": 1.124
+        }
       }
     },
     {
@@ -1612,7 +1701,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/23-55-15_225847.",
           "train_positive_ratio=0.5."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.062,
+          "realism": 1.174,
+          "romanticism": 1.112
+        }
       }
     },
     {
@@ -1642,7 +1736,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-32-28_562976.",
           "train_positive_ratio=0.25."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.86,
+          "realism": 0.958,
+          "romanticism": 0.906
+        }
       }
     },
     {
@@ -1672,7 +1771,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-40-06_032186.",
           "train_positive_ratio=0.2."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.691,
+          "realism": 0.823,
+          "romanticism": 0.772
+        }
       }
     },
     {
@@ -1702,7 +1806,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-46-32_444538.",
           "train_positive_ratio=0.25 | limit_per_category=3000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.535,
+          "realism": 0.7,
+          "romanticism": 0.645
+        }
       }
     },
     {
@@ -1732,7 +1841,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-49-13_513949.",
           "train_positive_ratio=-1 | limit_per_category=30."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.0,
+          "realism": 0.0,
+          "romanticism": 0.0
+        }
       }
     },
     {
@@ -1762,7 +1876,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-50-30_358394.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=30."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.0,
+          "realism": 0.0,
+          "romanticism": 0.0
+        }
       }
     },
     {
@@ -1792,7 +1911,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/03-05-29_191835.",
           "train_positive_ratio=0.25 | limit_per_category=6."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.25,
+          "realism": 0.75,
+          "romanticism": 0.5
+        }
       }
     },
     {
@@ -1822,7 +1946,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/13-57-43_156170.",
           "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.0,
+          "realism": 0.0,
+          "romanticism": 0.0
+        }
       }
     },
     {
@@ -1852,7 +1981,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/14-01-07_244955.",
           "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.0,
+          "realism": 0.0,
+          "romanticism": 0.0
+        }
       }
     },
     {
@@ -1882,7 +2016,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-12/14-04-04_881138.",
           "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.0,
+          "realism": 0.0,
+          "romanticism": 0.0
+        }
       }
     },
     {
@@ -1912,7 +2051,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-14/16-55-39_070407.",
           "train_positive_ratio=0.25."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.368,
+          "realism": 0.521,
+          "romanticism": 0.476
+        }
       }
     },
     {
@@ -1942,7 +2086,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-09/20-15-20_053794.",
           "train_positive_ratio=None | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.637,
+          "realism": 0.618,
+          "romanticism": 0.605
+        }
       }
     },
     {
@@ -1972,7 +2121,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-09/20-27-16_613983.",
           "train_positive_ratio=None | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.804,
+          "realism": 0.862,
+          "romanticism": 0.85
+        }
       }
     },
     {
@@ -2002,7 +2156,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-10/17-56-47_468659.",
           "train_positive_ratio=None | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.531,
+          "realism": 0.636,
+          "romanticism": 0.716
+        }
       }
     },
     {
@@ -2032,7 +2191,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-10/18-14-16_499052.",
           "train_positive_ratio=None | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.567,
+          "realism": 0.522,
+          "romanticism": 0.604
+        }
       }
     },
     {
@@ -2062,7 +2226,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/20-08-33_181855.",
           "train_positive_ratio=0.5 | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.547,
+          "realism": 0.591,
+          "romanticism": 0.588
+        }
       }
     },
     {
@@ -2092,7 +2261,12 @@
           "Run importe en lot depuis engine/core/output/mlp/2026-07-11/20-25-36_439699.",
           "train_positive_ratio=0.5 | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.657,
+          "realism": 0.648,
+          "romanticism": 0.679
+        }
       }
     },
     {
@@ -2122,7 +2296,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-09/20-08-04_286040.",
           "train_positive_ratio=None | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.213,
+          "realism": 0.34,
+          "romanticism": 0.305
+        }
       }
     },
     {
@@ -2152,7 +2331,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-09/20-24-29_322064.",
           "train_positive_ratio=None | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.256,
+          "realism": 0.317,
+          "romanticism": 0.413
+        }
       }
     },
     {
@@ -2182,7 +2366,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-10/16-01-51_195321.",
           "train_positive_ratio=None | limit_per_category=1000."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.219,
+          "realism": 0.348,
+          "romanticism": 0.324
+        }
       }
     },
     {
@@ -2212,7 +2401,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-40-30_864336.",
           "train_positive_ratio=0.5 | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.06,
+          "realism": 0.068,
+          "romanticism": 0.096
+        }
       }
     },
     {
@@ -2242,7 +2436,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-51-33_554804.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=500."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.101,
+          "realism": 0.117,
+          "romanticism": 0.157
+        }
       }
     },
     {
@@ -2272,7 +2471,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-01-36_803290.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.015,
+          "realism": 1.114,
+          "romanticism": 1.059
+        }
       }
     },
     {
@@ -2302,7 +2506,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-06-08_575222.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.015,
+          "realism": 1.104,
+          "romanticism": 1.058
+        }
       }
     },
     {
@@ -2332,7 +2541,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-12-03_526758.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.0,
+          "realism": 1.119,
+          "romanticism": 1.046
+        }
       }
     },
     {
@@ -2362,7 +2576,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-17-59_507743.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.003,
+          "realism": 1.124,
+          "romanticism": 1.052
+        }
       }
     },
     {
@@ -2392,7 +2611,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-24-08_060188.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.009,
+          "realism": 1.099,
+          "romanticism": 1.067
+        }
       }
     },
     {
@@ -2422,7 +2646,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-26-42_812462.",
           "train_positive_ratio=0.25 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.998,
+          "realism": 1.112,
+          "romanticism": 1.03
+        }
       }
     },
     {
@@ -2452,7 +2681,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-32-07_799606.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.213,
+          "realism": 1.352,
+          "romanticism": 1.243
+        }
       }
     },
     {
@@ -2482,7 +2716,12 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-34-31_374596.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=-1."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.226,
+          "realism": 1.347,
+          "romanticism": 1.239
+        }
       }
     },
     {
@@ -2512,7 +2751,375 @@
           "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-47-40_181637.",
           "train_positive_ratio=0.3333333333333333 | limit_per_category=-1."
         ],
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.23,
+          "realism": 1.345,
+          "romanticism": 1.228
+        }
+      }
+    },
+    {
+      "id": 73,
+      "title": "MLP [128, 128, 128] — seed 2024, limit=2000, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[128, 128, 128]",
+      "seed": 2024,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": null,
+      "test": null,
+      "accuracy": 43.1,
+      "analysis": {
+        "recall": {
+          "impressionism": 42.6,
+          "realism": 38.1,
+          "romanticism": 48.8
+        },
+        "train_accuracy": {
+          "impressionism": 85.0,
+          "realism": 80.3,
+          "romanticism": 81.4
+        },
+        "observations": [
+          "Run importe en lot depuis engine/core/output/mlp/2026-07-13/18-03-59_211388.",
+          "train_positive_ratio=0.25 | limit_per_category=2000."
+        ],
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 0.541,
+          "realism": 0.698,
+          "romanticism": 0.638
+        }
+      }
+    },
+    {
+      "id": 74,
+      "title": "RBF (16 centres) — seed 42, limit=50, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.01,
+      "epochs": 10,
+      "normalization": "per_column",
+      "train": null,
+      "test": null,
+      "accuracy": 34.0,
+      "analysis": {
+        "recall": {
+          "impressionism": 18.8,
+          "realism": 61.2,
+          "romanticism": 22.0
+        },
+        "train_accuracy": {
+          "impressionism": 60.0,
+          "realism": 53.3,
+          "romanticism": 54.0
+        },
+        "observations": [
+          "Run de calibration rapide (50 images/classe, 10 epochs, alpha=0.01) — objectif : vérifier que le pipeline RBF (K-Means + calcul de gamma + Rosenblatt) fonctionne de bout en bout avant de lancer les vrais tests.",
+          "34,0% obtenu, à peine au-dessus du hasard (33,3%) — attendu vu le volume de données minuscule, pas comparable aux runs suivants."
+        ],
+        "conclusion": "Pipeline RBF validé, on peut passer au scan de rbf_num_centers.",
+        "train_loss": {
+          "impressionism": 1.6,
+          "realism": 1.867,
+          "romanticism": 1.84
+        }
+      }
+    },
+    {
+      "id": 75,
+      "title": "RBF (16 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": null,
+      "test": null,
+      "accuracy": 43.0,
+      "analysis": {
+        "recall": {
+          "impressionism": 34.0,
+          "realism": 38.9,
+          "romanticism": 56.8
+        },
+        "train_accuracy": {
+          "impressionism": 61.4,
+          "realism": 59.3,
+          "romanticism": 60.0
+        },
+        "observations": [
+          "Premier point du scan rbf_num_centers (16/64/256), seed=42, alpha=0.001, epochs=100, 1000 images/classe — mêmes conditions que le tout premier scan d'architecture MLP.",
+          "43,0% — le meilleur des 3 tailles testées, et déjà comparable aux meilleurs runs Linear/MLP à volume de données équivalent (~1000 img/classe).",
+          "Recall équilibré entre les 3 classes (34,0% / 38,9% / 56,8%), pas de collapse vers une seule catégorie.",
+          "Run rejoué intégralement (dossier source perdu suite à un problème git) : accuracy, recall, train_accuracy et train_loss identiques au run original à la décimale près — confirme la reproductibilité totale avec seed fixe."
+        ],
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.544,
+          "realism": 1.627,
+          "romanticism": 1.6
+        }
+      }
+    },
+    {
+      "id": 76,
+      "title": "RBF (64 centres) — seed 1337, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 64 centres (gamma auto)",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": null,
+      "test": null,
+      "accuracy": 39.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 53.1,
+          "realism": 26.4,
+          "romanticism": 38.9
+        },
+        "train_accuracy": {
+          "impressionism": 59.5,
+          "realism": 56.8,
+          "romanticism": 59.5
+        },
+        "observations": [
+          "Deuxième point du scan : 4x plus de centres (16→64), même config sinon.",
+          "Accuracy en recul (43,0% → 39,6%, -3,4 pts) — tendance INVERSE de ce qu'on observait sur le MLP (plus de neurones aidait). Ici plus de centres RBF dégrade le résultat.",
+          "Hypothèse : avec seulement ~700 images d'entraînement par classe, 64 centres (trouvés par K-Means) commencent à sur-ajuster le nuage de points local, et gamma (calculé automatiquement à partir de l'espacement des centres) devient moins adapté.",
+          "Run rejoué après perte du dossier source original : le fichier de config avait entre-temps été modifié avec seed=null (sélection aléatoire), donc ce run utilise seed=1337 au lieu du seed=42 d'origine — comparaison avec le run 75 non parfaitement isolée sur ce point. Accuracy quasi identique au run perdu (39,1% → 39,6%), mais répartition du recall différente (avant 37,7/42,8/36,6, plutôt équilibrée ; maintenant 53,1/26,4/38,9, dominée par Impressionism)."
+        ],
+        "conclusion": "",
+        "train_loss": {
+          "impressionism": 1.621,
+          "realism": 1.728,
+          "romanticism": 1.621
+        }
+      }
+    },
+    {
+      "id": 77,
+      "title": "RBF (256 centres) — seed 5678, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 256 centres (gamma auto)",
+      "seed": 5678,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": null,
+      "test": null,
+      "accuracy": 33.0,
+      "analysis": {
+        "recall": {
+          "impressionism": 8.2,
+          "realism": 87.5,
+          "romanticism": 3.0
+        },
+        "train_accuracy": {
+          "impressionism": 57.5,
+          "realism": 56.8,
+          "romanticism": 57.2
+        },
+        "observations": [
+          "Troisième point du scan : 256 centres. Accuracy globale = 33,0%, quasiment pile au niveau du hasard (33,3%).",
+          "Le détail du recall révèle un effondrement, toujours pas juste une baisse : Impressionism 8,2%, Realism 87,5%, Romanticism 3,0% — le modèle prédit quasiment toujours 'realism' cette fois.",
+          "L'accuracy train reste normale (~57% par classe, comparable aux runs 16/64 centres) — cohérent avec le run original : le problème n'est pas un défaut d'apprentissage sur le train, mais une instabilité au moment de la décision argmax en test.",
+          "Run rejoué après perte du dossier source original avec une seed différente (5678 au lieu de 42, changement de config non intentionnel). Résultat clé : L'EFFONDREMENT SE REPRODUIT avec une seed complètement différente — seule la classe vers laquelle le modèle collapse change (Romanticism à 93,3% avant, Realism à 87,5% maintenant). Ça renforce la conclusion : l'instabilité à 256 centres n'est pas un hasard d'initialisation, c'est structurel à cette taille sur ce volume de données."
+        ],
+        "conclusion": "Scan rbf_num_centers (16→64→256) : tendance opposée au MLP — plus de centres dégrade puis fait carrément s'effondrer le modèle (256 centres ≈ hasard). Avec seulement 1000 images/classe, K-Means sur 256 centres est probablement instable (centres trop proches, gamma auto mal calibré) — confirmé par la reproduction du collapse sur une seed totalement différente (seule la classe cible du collapse change). Meilleur réglage à ce stade : 16 centres (43,0%, seed=42, reproduit à l'identique). Prochain test recommandé : affiner autour de 8-32 centres plutôt que de continuer à augmenter, et vérifier si le comportement se stabilise avec plus de données.",
+        "train_loss": {
+          "impressionism": 1.699,
+          "realism": 1.728,
+          "romanticism": 1.712
+        }
+      }
+    },
+    {
+      "id": 78,
+      "title": "RBF (8 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 8 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 3000,
+      "test": 13004,
+      "accuracy": 43.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 49.3,
+          "realism": 3.9,
+          "romanticism": 78.2
+        },
+        "train_accuracy": {
+          "impressionism": 61.9,
+          "realism": 58.1,
+          "romanticism": 58.1
+        },
+        "train_loss": {
+          "impressionism": 1.525,
+          "realism": 1.675,
+          "romanticism": 1.677
+        },
+        "observations": [
+          "Prolonge le scan rbf_num_centers vers le bas (16→8), même config sinon (seed=42, 1000 img/classe).",
+          "Accuracy 43,6% — LÉGÈREMENT MEILLEURE que 16 centres (43,0%). La tendance 'moins de centres = mieux' se confirme numériquement.",
+          "Mais le recall révèle le vrai prix payé : Impressionism 49,3%, Romanticism 78,2%, et Realism quasi abandonné à 3,9%. Le modèle a en fait sacrifié une classe entière pour gagner quelques points d'accuracy globale sur les deux autres."
+        ],
         "conclusion": ""
+      }
+    },
+    {
+      "id": 79,
+      "title": "RBF (32 centres) — seed 42, limit=1000, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 32 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 3000,
+      "test": 13004,
+      "accuracy": 41.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 59.5,
+          "realism": 32.2,
+          "romanticism": 33.2
+        },
+        "train_accuracy": {
+          "impressionism": 62.4,
+          "realism": 58.3,
+          "romanticism": 60.7
+        },
+        "train_loss": {
+          "impressionism": 1.504,
+          "realism": 1.667,
+          "romanticism": 1.571
+        },
+        "observations": [
+          "Comble l'écart entre 16 et 64 centres, même config sinon.",
+          "Accuracy 41,8% — se place bien entre 16 (43,0%) et 64 (39,6%), confirmant une décroissance régulière avec le nombre de centres sur ce volume de données (1000 img/classe).",
+          "Recall 59,5/32,2/33,2 : toujours le même schéma qu'aux autres tailles — Impressionism favorisé, Realism et Romanticism à la peine."
+        ],
+        "conclusion": ""
+      }
+    },
+    {
+      "id": 80,
+      "title": "RBF (16 centres) — seed 42, limit=-1, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.7,
+      "analysis": {
+        "recall": {
+          "impressionism": 76.6,
+          "realism": 22.7,
+          "romanticism": 37.1
+        },
+        "train_accuracy": {
+          "impressionism": 61.4,
+          "realism": 57.2,
+          "romanticism": 59.2
+        },
+        "train_loss": {
+          "impressionism": 1.544,
+          "realism": 1.712,
+          "romanticism": 1.63
+        },
+        "observations": [
+          "16 centres, mais sur le DATASET COMPLET (limit=-1, 30345 images train contre 3000 pour les runs précédents à 1000/classe) au lieu de rester sur un volume réduit — même logique que ce qu'on avait fait pour MLP et Linear (Phase 4-5).",
+          "Meilleure accuracy de toute la série RBF : 45,7% (vs 43,0% avec la même architecture sur seulement 1000 img/classe, +2,7 pts). Confirme que le RBF profite lui aussi de plus de données, comme le MLP et le Linear.",
+          "Mais le recall se déséquilibre fortement avec l'échelle : Impressionism 76,6%, Romanticism 37,1%, Realism 22,7% — le gain d'accuracy vient presque entièrement d'un très fort score sur Impressionism, pas d'un vrai progrès généralisé sur les 3 classes."
+        ],
+        "conclusion": ""
+      }
+    },
+    {
+      "id": 81,
+      "title": "RBF (16 centres) — seed 42, limit=1000, pos_ratio=0.25 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 3000,
+      "test": 13004,
+      "accuracy": 44.5,
+      "analysis": {
+        "recall": {
+          "impressionism": 54.8,
+          "realism": 44.2,
+          "romanticism": 33.9
+        },
+        "train_accuracy": {
+          "impressionism": 67.4,
+          "realism": 63.0,
+          "romanticism": 64.8
+        },
+        "train_loss": {
+          "impressionism": 1.305,
+          "realism": 1.482,
+          "romanticism": 1.407
+        },
+        "observations": [
+          "16 centres, 1000 img/classe, mais avec train_positive_ratio=0.25 au lieu du ratio naturel — levier jamais testé sur RBF jusqu'ici, par analogie avec ce qu'on avait fait sur MLP/Linear.",
+          "Accuracy 44,5%, deuxième meilleur résultat de toute la série RBF (juste derrière le dataset complet à 45,7%), avec seulement 1000 images/classe.",
+          "Recall nettement plus équilibré que les autres runs 16 centres : 54,8/44,2/33,9 — Realism à 44,2% est de LOIN le meilleur score Realism obtenu sur RBF (les autres runs oscillent entre 3,9% et 38,9%).",
+          "Accuracy train aussi la plus haute de la série (67,4/63,0/64,8%) et loss la plus basse (1,3-1,48) — cohérent : réduire les négatifs par sous-échantillonnage rend le problème plus facile à apprendre pour le modèle."
+        ],
+        "conclusion": "Bilan du scan complet RBF (8/16/32/64/256 centres + dataset complet + train_positive_ratio) : (1) moins de centres donne une accuracy globale plus haute, mais en sacrifiant progressivement Realism jusqu'à l'abandon quasi total à 8 centres — ce n'est pas un vrai gain, juste un transfert. (2) Plus de données aide (45,7% sur dataset complet, meilleur score absolu), mais accentue aussi le déséquilibre entre classes. (3) train_positive_ratio=0.25 est le SEUL levier testé qui améliore Realism sans la sacrifier (44,2%, meilleur score Realism de toute la série) tout en gardant une bonne accuracy globale (44,5%) — c'est la piste la plus prometteuse pour la suite, notamment combinée au dataset complet (16 centres + ratio=0.25 + dataset complet, jamais testé ensemble)."
+      }
+    },
+    {
+      "id": 82,
+      "title": "RBF (16 centres) — combo dataset complet + train_positive_ratio=0.25",
+      "model": "rbf",
+      "architecture": "RBF, 16 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 36.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 19.3,
+          "realism": 5.1,
+          "romanticism": 87.6
+        },
+        "train_accuracy": {
+          "impressionism": 66.1,
+          "realism": 63.4,
+          "romanticism": 64.2
+        },
+        "train_loss": {
+          "impressionism": 1.356,
+          "realism": 1.464,
+          "romanticism": 1.433
+        },
+        "observations": [
+          "Test de la combinaison des deux meilleurs leviers identifiés séparément : dataset complet (run 80, 45,7%) + train_positive_ratio=0.25 (run 81, 44,5%). Hypothèse : cumuler les deux devrait dépasser 45,7% tout en gardant un bon Realism.",
+          "Résultat : ÉCHEC net. 36,8% — plus bas que les deux leviers pris séparément, et même plus bas que la config de base (16 centres, 1000 img/classe, ratio naturel, 43,0%).",
+          "Le recall révèle un collapse sévère : Impressionism 19,3%, Realism 5,1% (pire que TOUS les autres runs 16 centres, y compris celui sans ratio), Romanticism 87,6%. Le modèle prédit quasiment toujours 'romanticism'.",
+          "Pourtant l'accuracy train est la meilleure de toute la série RBF (66,1/63,4/64,2%, loss 1,36-1,46) — comme pour le collapse à 256 centres, le problème n'est pas un défaut d'apprentissage, c'est une instabilité qui apparaît uniquement à la décision finale (argmax one-vs-rest)."
+        ],
+        "conclusion": "Les leviers ne s'additionnent pas : combiner dataset complet et train_positive_ratio=0.25 recrée le même type de collapse qu'on avait observé à 256 centres, alors qu'aucun des deux leviers pris seul ne posait ce problème à 16 centres. Hypothèse : avec ratio=0.25 appliqué APRÈS un dataset complet (au lieu de 1000 img/classe), le sous-échantillonnage des négatifs change radicalement la distribution vue par le K-Means à seulement 16 centres — les centres trouvés ne représentent plus correctement la frontière de décision, et gamma (calculé automatiquement) devient mal calibré. Conclusion pratique : sur ce projet, train_positive_ratio et limit_per_category ne sont PAS indépendants pour le RBF à ce nombre de centres — il faudrait re-scanner num_centers spécifiquement dans la configuration 'dataset complet + ratio=0.25' plutôt que de réutiliser la valeur optimale trouvée à 1000 images/classe."
       }
     }
   ]

@@ -136,7 +136,7 @@ function buildRunSection(run) {
   }));
 
   const paramRows = [
-    ["Modèle", run.model === "mlp" ? `MLP ${run.architecture}` : run.architecture],
+    ["Modèle", run.model === "mlp" ? `MLP ${run.architecture}` : run.model === "rbf" ? `RBF (${run.architecture})` : run.architecture],
     ["Seed", run.seed],
     ["Alpha (learning rate)", run.alpha],
     ["Epochs", run.epochs],
@@ -227,7 +227,7 @@ function summaryTable(runs) {
     const cellsData = [
       String(run.id),
       run.title,
-      run.model === "mlp" ? `MLP ${run.architecture}` : "Linear",
+      run.model === "mlp" ? `MLP ${run.architecture}` : run.model === "rbf" ? "RBF" : "Linear",
       String(run.epochs),
       `${run.accuracy}%`,
     ];
@@ -247,6 +247,7 @@ function summaryTable(runs) {
 
 const mlpRuns = data.runs.filter(r => r.model === "mlp");
 const linearRuns = data.runs.filter(r => r.model === "linear");
+const rbfRuns = data.runs.filter(r => r.model === "rbf");
 
 const now = new Date();
 const dateStr = now.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
@@ -320,6 +321,12 @@ const doc = new Document({
       new Paragraph({ children: [new PageBreak()] }),
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Résultats — Linear (Perceptron)")] }),
       ...linearRuns.flatMap(buildRunSection),
+
+      ...(rbfRuns.length > 0 ? [
+        new Paragraph({ children: [new PageBreak()] }),
+        new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Résultats — RBF")] }),
+        ...rbfRuns.flatMap(buildRunSection),
+      ] : []),
     ],
   }],
 });

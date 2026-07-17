@@ -96,6 +96,9 @@ def extract_extra_info(config: dict) -> str:
 
     if model_type in ("mlp", "mlp_multiclass"):
         return f"npl={model.get('npl', UNKNOWN)}"
+    
+    if model_type == "rbf":
+        return f"centers={model.get('rbf_num_centers', UNKNOWN)}"
 
     return ""
 

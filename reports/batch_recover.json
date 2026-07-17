@@ -1,0 +1,64 @@
+[
+  {
+    "id": 73,
+    "title": "MLP [128, 128, 128] — seed 2024, limit=2000, pos_ratio=0.25 (batch import)",
+    "model": "mlp",
+    "architecture": "[128, 128, 128]",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 43.1,
+    "analysis": {
+      "recall": {
+        "impressionism": 42.6,
+        "realism": 38.1,
+        "romanticism": 48.8
+      },
+      "train_accuracy": {
+        "impressionism": 85.0,
+        "realism": 80.3,
+        "romanticism": 81.4
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp/2026-07-13/18-03-59_211388.",
+        "train_positive_ratio=0.25 | limit_per_category=2000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp/2026-07-13/18-03-59_211388"
+  },
+  {
+    "id": 74,
+    "title": "RBF (16 centres) — seed 42, limit=50, pos_ratio=-1 (batch import)",
+    "model": "rbf",
+    "architecture": "RBF, 16 centres (gamma auto)",
+    "seed": 42,
+    "alpha": 0.01,
+    "epochs": 10,
+    "normalization": "per_column",
+    "train": null,
+    "test": null,
+    "accuracy": 34.0,
+    "analysis": {
+      "recall": {
+        "impressionism": 18.8,
+        "realism": 61.2,
+        "romanticism": 22.0
+      },
+      "train_accuracy": {
+        "impressionism": 60.0,
+        "realism": 53.3,
+        "romanticism": 54.0
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/rbf/2026-07-15/20-02-41_896535.",
+        "train_positive_ratio=-1 | limit_per_category=50."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/rbf/2026-07-15/20-02-41_896535"
+  }
+]
