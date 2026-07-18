@@ -8,6 +8,9 @@ dégénérés (limit_per_category minuscule ou déséquilibre entre classes).
 """
 import json
 import io
+import sys
+import glob
+from batch_parse_reports import parse_run
 
 RUNS_DATA = "runs_data.json"
 CATS = ["impressionism", "realism", "romanticism"]
@@ -85,9 +88,7 @@ for rid in groupA:
     set_analysis(rid, obs)
 
 # Recompute limit_per_category display + comparisons using parse
-import sys, glob
 sys.path.insert(0, ".")
-from batch_parse_reports import parse_run
 
 id_to_folder = {}
 for fn in glob.glob("batch_*.json"):
@@ -233,7 +234,7 @@ a01_accs = [r["accuracy"] for r in alpha01]
 r033_accs = [r["accuracy"] for r in ratio033]
 
 set_analysis(64, [
-    f"Linear sur le dataset COMPLET (limit=-1, ~30000 images train), pos_ratio=0.25, alpha=0.001 — 3 seeds testées ici (64/65/66) pour mesurer la variance à grande échelle.",
+    "Linear sur le dataset COMPLET (limit=-1, ~30000 images train), pos_ratio=0.25, alpha=0.001 — 3 seeds testées ici (64/65/66) pour mesurer la variance à grande échelle.",
     f"Accuracy {r64['accuracy']}% (seed {r64['seed']}) — c'est le meilleur score Linear de tout ce rapport à ce jour sur cette combinaison de réglages.",
 ])
 set_analysis(65, [
@@ -274,7 +275,7 @@ set_analysis(37, [
 r73 = runs[73]
 set_analysis(73, [
     f"Architecture [128,128,128] (mêmes couches que les runs 22/23 de la série de référence, mais limit=2000 au lieu de 12000 train et pos_ratio=0.25 au lieu du ratio naturel) : accuracy {r73['accuracy']}%.",
-    f"Nettement en dessous des runs 22/23 (46,6-46,8% avec ~12000 images train) : confirme, sur cette architecture aussi, que le volume de données pèse plus que le réglage fin du ratio positif/négatif à lui seul.",
+    "Nettement en dessous des runs 22/23 (46,6-46,8% avec ~12000 images train) : confirme, sur cette architecture aussi, que le volume de données pèse plus que le réglage fin du ratio positif/négatif à lui seul.",
 ])
 
 # ---------------------------------------------------------------------------
