@@ -72,6 +72,8 @@ def build_entry(run_id: int, folder: str) -> dict:
 
     if model == "mlp":
         title_model, arch_str = "MLP " + str(arch), str(arch)
+    elif model == "mlp_multiclass":
+        title_model, arch_str = "MLP multiclasse " + str(arch), f"{arch} (multiclasse, 1 modele partage, argmax)"
     elif model == "rbf":
         num_centers = r.get("rbf_num_centers")
         title_model, arch_str = f"RBF ({num_centers} centres)", f"RBF, {num_centers} centres (gamma auto)"
@@ -92,6 +94,10 @@ def build_entry(run_id: int, folder: str) -> dict:
         "accuracy": pct(r.get("top1_accuracy")),
         "analysis": {
             "recall": {c: pct(r["recall"].get(c)) for c in CATS} if r.get("recall") else {},
+            "tnr": {c: pct(r["tnr"].get(c)) for c in CATS} if r.get("tnr") else {},
+            "fpr": {c: pct(r["fpr"].get(c)) for c in CATS} if r.get("fpr") else {},
+            "fnr": {c: pct(r["fnr"].get(c)) for c in CATS} if r.get("fnr") else {},
+            "balanced_accuracy": {c: pct(r["balanced_accuracy"].get(c)) for c in CATS} if r.get("balanced_accuracy") else {},
             "train_accuracy": ({c: pct(r["train_accuracy"].get(c)) for c in CATS} if r.get("train_accuracy") else None) or train_acc_tb or {},
             "train_loss": train_loss,
             "observations": [

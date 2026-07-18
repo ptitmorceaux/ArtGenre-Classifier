@@ -1,0 +1,230 @@
+[
+  {
+    "id": 101,
+    "title": "MLP multiclasse [64, 32] — seed 5678, limit=6000, pos_ratio=0.25 (batch import)",
+    "model": "mlp_multiclass",
+    "architecture": "[64, 32] (multiclasse, 1 modele partage, argmax)",
+    "seed": 5678,
+    "alpha": 0.001,
+    "epochs": 30,
+    "normalization": "per_column",
+    "train": 18000,
+    "test": 13004,
+    "accuracy": 44.5,
+    "analysis": {
+      "recall": {
+        "impressionism": 48.1,
+        "realism": 39.9,
+        "romanticism": 45.4
+      },
+      "train_accuracy": {
+        "impressionism": null,
+        "realism": null,
+        "romanticism": null
+      },
+      "train_loss": {},
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp_multiclass/2026-07-16/15-45-51_971534.",
+        "train_positive_ratio=0.25."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp_multiclass/2026-07-16/15-45-51_971534"
+  },
+  {
+    "id": 102,
+    "title": "MLP multiclasse [16, 8] — seed 2024, limit=3000, pos_ratio=0.25 (batch import)",
+    "model": "mlp_multiclass",
+    "architecture": "[16, 8] (multiclasse, 1 modele partage, argmax)",
+    "seed": 2024,
+    "alpha": 0.001,
+    "epochs": 30,
+    "normalization": "per_column",
+    "train": 9000,
+    "test": 13004,
+    "accuracy": 43.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 57.2,
+        "realism": 34.0,
+        "romanticism": 38.7
+      },
+      "train_accuracy": {
+        "impressionism": null,
+        "realism": null,
+        "romanticism": null
+      },
+      "train_loss": {},
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp_multiclass/2026-07-16/15-50-58_270067.",
+        "train_positive_ratio=0.25 | limit_per_category=3000."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp_multiclass/2026-07-16/15-50-58_270067"
+  },
+  {
+    "id": 103,
+    "title": "MLP multiclasse [256, 256] — seed 42, limit=9884, pos_ratio=0.25 (batch import)",
+    "model": "mlp_multiclass",
+    "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 29652,
+    "test": 13004,
+    "accuracy": 47.7,
+    "analysis": {
+      "recall": {
+        "impressionism": 46.3,
+        "realism": 49.5,
+        "romanticism": 47.3
+      },
+      "train_accuracy": {
+        "impressionism": null,
+        "realism": null,
+        "romanticism": null
+      },
+      "train_loss": {},
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp_multiclass/2026-07-17/20-04-44_926831.",
+        "train_positive_ratio=0.25 | limit_per_category=9884."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp_multiclass/2026-07-17/20-04-44_926831"
+  },
+  {
+    "id": 104,
+    "title": "MLP multiclasse [256, 256] — seed 1337, limit=9884, pos_ratio=0.25 (batch import)",
+    "model": "mlp_multiclass",
+    "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 29652,
+    "test": 13004,
+    "accuracy": 50.0,
+    "analysis": {
+      "recall": {
+        "impressionism": 51.9,
+        "realism": 44.0,
+        "romanticism": 54.1
+      },
+      "train_accuracy": {
+        "impressionism": null,
+        "realism": null,
+        "romanticism": null
+      },
+      "train_loss": {},
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp_multiclass/2026-07-17/20-08-47_304612.",
+        "train_positive_ratio=0.25 | limit_per_category=9884."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp_multiclass/2026-07-17/20-08-47_304612"
+  },
+  {
+    "id": 105,
+    "title": "MLP multiclasse [256, 256] — seed 1337, limit=9884, pos_ratio=0.25 (batch import)",
+    "model": "mlp_multiclass",
+    "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+    "seed": 1337,
+    "alpha": 0.001,
+    "epochs": 40,
+    "normalization": "per_column",
+    "train": 29652,
+    "test": 13004,
+    "accuracy": 46.4,
+    "analysis": {
+      "recall": {
+        "impressionism": 42.9,
+        "realism": 32.6,
+        "romanticism": 64.1
+      },
+      "train_accuracy": {
+        "impressionism": null,
+        "realism": null,
+        "romanticism": null
+      },
+      "train_loss": {},
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp_multiclass/2026-07-17/20-13-01_991370.",
+        "train_positive_ratio=0.25 | limit_per_category=9884."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp_multiclass/2026-07-17/20-13-01_991370"
+  },
+  {
+    "id": 106,
+    "title": "MLP multiclasse [256, 256] — seed 42, limit=9884, pos_ratio=0.25 (batch import)",
+    "model": "mlp_multiclass",
+    "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 40,
+    "normalization": "per_column",
+    "train": 29652,
+    "test": 13004,
+    "accuracy": 47.3,
+    "analysis": {
+      "recall": {
+        "impressionism": 47.7,
+        "realism": 46.8,
+        "romanticism": 47.2
+      },
+      "train_accuracy": {
+        "impressionism": null,
+        "realism": null,
+        "romanticism": null
+      },
+      "train_loss": {},
+      "observations": [
+        "Run importe en lot depuis engine/core/output/mlp_multiclass/2026-07-17/20-18-02_256683.",
+        "train_positive_ratio=0.25 | limit_per_category=9884."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/mlp_multiclass/2026-07-17/20-18-02_256683"
+  },
+  {
+    "id": 107,
+    "title": "RBF (64 centres) — seed 42, limit=-1, pos_ratio=-1 (batch import)",
+    "model": "rbf",
+    "architecture": "RBF, 64 centres (gamma auto)",
+    "seed": 42,
+    "alpha": 0.001,
+    "epochs": 100,
+    "normalization": "per_column",
+    "train": 30345,
+    "test": 13004,
+    "accuracy": 39.1,
+    "analysis": {
+      "recall": {
+        "impressionism": 23.3,
+        "realism": 88.5,
+        "romanticism": 5.0
+      },
+      "train_accuracy": {
+        "impressionism": 58.2,
+        "realism": 57.2,
+        "romanticism": 59.6
+      },
+      "train_loss": {
+        "impressionism": 1.672,
+        "realism": 1.713,
+        "romanticism": 1.618
+      },
+      "observations": [
+        "Run importe en lot depuis engine/core/output/rbf/2026-07-16/11-38-03_381284.",
+        "train_positive_ratio=-1 | limit_per_category=-1."
+      ],
+      "conclusion": ""
+    },
+    "_folder": "engine/core/output/rbf/2026-07-16/11-38-03_381284"
+  }
+]

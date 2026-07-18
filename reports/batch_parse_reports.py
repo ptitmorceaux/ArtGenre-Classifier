@@ -33,6 +33,9 @@ def parse_run(folder: str) -> dict:
         result["top1_accuracy"] = test_acc.get("global", {}).get("top1_accuracy")
         cats = test_acc.get("categories", {})
         result["recall"] = {c: cats.get(c, {}).get("TPR") for c in CATS}
+        result["tnr"] = {c: cats.get(c, {}).get("TNR") for c in CATS}
+        result["fpr"] = {c: cats.get(c, {}).get("FPR") for c in CATS}
+        result["fnr"] = {c: cats.get(c, {}).get("FNR") for c in CATS}
         result["balanced_accuracy"] = {c: cats.get(c, {}).get("balanced_accuracy") for c in CATS}
 
         train_acc = config.get("model", {}).get("train_last_accuracy_per_category", {})

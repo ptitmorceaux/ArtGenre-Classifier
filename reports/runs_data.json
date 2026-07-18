@@ -790,7 +790,27 @@
           "Nouveau paramètre `train_positive_ratio=0.25` contrôle le ratio positif/négatif de l'entraînement one-vs-all (4000 positifs / 12000 négatifs par modèle) — remplace le ratio naturel ~1:2 des runs précédents.",
           "Plusieurs variables changent simultanément par rapport au run 16 (données 1000→6000, architecture [256,128]→[256,256], seed 42→2024, positive_ratio ajouté) : ce n'est pas une comparaison isolée propre, mais un bon signal que le fix de sampling ne plafonne pas la performance."
         ],
-        "conclusion": "Avec un tirage aléatoire non biaisé, plus de données semble bien aider comme attendu initialement (46,7% à 6000 img/cl vs 41,8% à 1000 img/cl) — à l'inverse de ce que les runs 14/15 (biaisés par head()) suggéraient. Une comparaison isolée (même seed, même archi, seule la taille du dataset variant) serait nécessaire pour confirmer proprement cet effet."
+        "conclusion": "Avec un tirage aléatoire non biaisé, plus de données semble bien aider comme attendu initialement (46,7% à 6000 img/cl vs 41,8% à 1000 img/cl) — à l'inverse de ce que les runs 14/15 (biaisés par head()) suggéraient. Une comparaison isolée (même seed, même archi, seule la taille du dataset variant) serait nécessaire pour confirmer proprement cet effet.",
+        "tnr": {
+          "impressionism": 77.7,
+          "realism": 73.3,
+          "romanticism": 69.2
+        },
+        "fpr": {
+          "impressionism": 22.3,
+          "realism": 26.7,
+          "romanticism": 30.8
+        },
+        "fnr": {
+          "impressionism": 53.1,
+          "realism": 58.9,
+          "romanticism": 47.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 62.3,
+          "realism": 57.2,
+          "romanticism": 60.7
+        }
       }
     },
     {
@@ -827,7 +847,27 @@
           "Train accuracy plus élevée qu'au run 17 (87,3% de moyenne vs 83,3%) : signature classique d'overfitting accru avec moins de données, cohérent avec l'hypothèse.",
           "La direction du résultat confirme l'intuition malgré le seed différent : moins de données pénalise le test tout en facilitant la mémorisation du train."
         ],
-        "conclusion": "Confirmation directionnelle que plus de données aide (accuracy test en baisse, accuracy train en hausse avec moins de données) une fois le biais de sampling corrigé — cohérent avec le run 17. Pour une preuve rigoureuse (une seule variable isolée), relancer avec seed=2024 exact."
+        "conclusion": "Confirmation directionnelle que plus de données aide (accuracy test en baisse, accuracy train en hausse avec moins de données) une fois le biais de sampling corrigé — cohérent avec le run 17. Pour une preuve rigoureuse (une seule variable isolée), relancer avec seed=2024 exact.",
+        "tnr": {
+          "impressionism": 73.4,
+          "realism": 67.9,
+          "romanticism": 71.2
+        },
+        "fpr": {
+          "impressionism": 26.6,
+          "realism": 32.1,
+          "romanticism": 28.8
+        },
+        "fnr": {
+          "impressionism": 56.3,
+          "realism": 58.4,
+          "romanticism": 60.6
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.5,
+          "realism": 54.8,
+          "romanticism": 55.3
+        }
       }
     },
     {
@@ -1069,14 +1109,34 @@
           "romanticism": 79.3
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-14-54_836787.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=1000."
+          "Architecture [16,16] (petite), limit=1000, pos_ratio=0.33, seed=2024 : accuracy 40.4% — proche du hasard, cohérent avec une architecture étroite (16 neurones/couche) sur peu de données.",
+          "Recall 43.1/33.7/44.5 : Romanticism et Realism — pas de collapse, mais pas d'apprentissage marqué non plus."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.607,
           "realism": 0.628,
           "romanticism": 0.595
+        },
+        "tnr": {
+          "impressionism": 71.5,
+          "realism": 71.7,
+          "romanticism": 67.6
+        },
+        "fpr": {
+          "impressionism": 28.5,
+          "realism": 28.3,
+          "romanticism": 32.4
+        },
+        "fnr": {
+          "impressionism": 56.9,
+          "realism": 66.3,
+          "romanticism": 55.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 57.3,
+          "realism": 52.7,
+          "romanticism": 56.0
         }
       }
     },
@@ -1104,14 +1164,33 @@
           "romanticism": 77.1
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-30-14_564265.",
-          "train_positive_ratio=0.5 | limit_per_category=1000."
+          "Même architecture [16,16], même limit=1000, mais pos_ratio=0.5 (au lieu de 0.33) et seed=5678 : accuracy 39.6%, quasi identique au run 24 (40.4%, -0.8 pt) — à cette taille d'architecture, ni le ratio positif/négatif ni la seed ne changent grand-chose : le plafond de performance semble imposé par la capacité du modèle, pas par ces réglages fins."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.516,
           "realism": 0.659,
           "romanticism": 0.675
+        },
+        "tnr": {
+          "impressionism": 70.1,
+          "realism": 69.0,
+          "romanticism": 70.3
+        },
+        "fpr": {
+          "impressionism": 29.9,
+          "realism": 31.0,
+          "romanticism": 29.7
+        },
+        "fnr": {
+          "impressionism": 57.5,
+          "realism": 63.2,
+          "romanticism": 60.6
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.3,
+          "realism": 52.9,
+          "romanticism": 54.9
         }
       }
     },
@@ -1139,14 +1218,33 @@
           "romanticism": 78.8
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/21-34-26_983380.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=1500."
+          "[16,16,16] (3 couches étroites), limit=1500 : accuracy 41.4%, dans la même plage basse que les runs [16,16] (24/25, ~40%) — ajouter une couche à une architecture déjà étroite n'aide pas plus que sur les architectures plus larges (voir runs 27/34/35/52)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.528,
           "realism": 0.664,
           "romanticism": 0.608
+        },
+        "tnr": {
+          "impressionism": 71.0,
+          "realism": 67.6,
+          "romanticism": 73.4
+        },
+        "fpr": {
+          "impressionism": 29.0,
+          "realism": 32.4,
+          "romanticism": 26.6
+        },
+        "fnr": {
+          "impressionism": 53.3,
+          "realism": 57.4,
+          "romanticism": 65.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.9,
+          "realism": 55.1,
+          "romanticism": 54.0
         }
       }
     },
@@ -1174,14 +1272,34 @@
           "romanticism": 70.2
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-03-39_195707.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+          "Scan d'architecture à limit_per_category=3000 fixe (seed=42, alpha=0.001, 100 epochs) : ce run teste [8,8,8], la plus petite/plus profonde des 3 architectures comparées ici.",
+          "Accuracy 41.1% — la plus basse des 3 (vs 43.9% pour [64,64] et 45.4% pour [128,128])."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.759,
           "realism": 0.8,
           "romanticism": 0.783
+        },
+        "tnr": {
+          "impressionism": 71.1,
+          "realism": 67.5,
+          "romanticism": 73.0
+        },
+        "fpr": {
+          "impressionism": 28.9,
+          "realism": 32.5,
+          "romanticism": 27.0
+        },
+        "fnr": {
+          "impressionism": 52.7,
+          "realism": 60.5,
+          "romanticism": 63.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.2,
+          "realism": 53.5,
+          "romanticism": 54.6
         }
       }
     },
@@ -1209,14 +1327,33 @@
           "romanticism": 91.4
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-11-15_800568.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+          "Même comparaison à limit=3000 : [64,64] fait 43.9%, soit +2.8 pts vs [8,8,8] (run 27) malgré 2 couches au lieu de 3 — la largeur des couches compte plus que leur nombre ici, cohérent avec ce qu'on observe sur la série de référence (runs 6-8)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.23,
           "realism": 0.325,
           "romanticism": 0.297
+        },
+        "tnr": {
+          "impressionism": 75.5,
+          "realism": 70.9,
+          "romanticism": 69.6
+        },
+        "fpr": {
+          "impressionism": 24.5,
+          "realism": 29.1,
+          "romanticism": 30.4
+        },
+        "fnr": {
+          "impressionism": 56.1,
+          "realism": 60.0,
+          "romanticism": 51.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.7,
+          "realism": 55.4,
+          "romanticism": 58.8
         }
       }
     },
@@ -1244,14 +1381,33 @@
           "romanticism": 91.4
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/22-41-36_963888.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+          "Troisième point du même scan à limit=3000 : [128,128] atteint 45.4%, le meilleur des 3 (+1.5 pts vs [64,64], +4.3 pts vs [8,8,8]) — tendance monotone claire : plus de neurones par couche améliore l'accuracy à volume de données égal, sans qu'ajouter une 3e couche ([8,8,8]) n'aide."
         ],
-        "conclusion": "",
+        "conclusion": "Sur ce mini-scan à données fixées (3000/classe), la largeur des couches domine clairement leur profondeur : [128,128] > [64,64] > [8,8,8]. A noter : la seed diffère entre le run 28 (2024) et les runs 27/29 (42), donc la comparaison n'est pas parfaitement isolée — mais l'écart observé (jusqu'à 4,3 pts) reste nettement plus grand que la variance inter-seed habituelle à architecture fixe (souvent <1 pt, cf runs 22/23), donc l'effet architecture reste la lecture la plus probable.",
         "train_loss": {
           "impressionism": 0.233,
           "realism": 0.297,
           "romanticism": 0.279
+        },
+        "tnr": {
+          "impressionism": 78.3,
+          "realism": 69.2,
+          "romanticism": 70.7
+        },
+        "fpr": {
+          "impressionism": 21.7,
+          "realism": 30.8,
+          "romanticism": 29.3
+        },
+        "fnr": {
+          "impressionism": 56.7,
+          "realism": 55.1,
+          "romanticism": 52.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.8,
+          "realism": 57.1,
+          "romanticism": 59.3
         }
       }
     },
@@ -1279,14 +1435,34 @@
           "romanticism": 91.3
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-12/01-04-05_375385.",
-          "train_positive_ratio=0.25."
+          "Même architecture [128,128] que le run 29, mais limit_per_category=6000 au lieu de 3000 (2x plus de données) : accuracy 47,1% vs 45,4% au run 29, soit +1,7 pt — plus de données aide, mais avec des rendements déjà assez modestes à cette échelle.",
+          "C'est le meilleur résultat de tout ce groupe de scan (24-30/34/35/52) : 47.1%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.262,
           "realism": 0.324,
           "romanticism": 0.298
+        },
+        "tnr": {
+          "impressionism": 79.1,
+          "realism": 71.7,
+          "romanticism": 70.0
+        },
+        "fpr": {
+          "impressionism": 20.9,
+          "realism": 28.3,
+          "romanticism": 30.0
+        },
+        "fnr": {
+          "impressionism": 55.8,
+          "realism": 55.1,
+          "romanticism": 47.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.6,
+          "realism": 58.3,
+          "romanticism": 61.2
         }
       }
     },
@@ -1314,14 +1490,35 @@
           "romanticism": 68.8
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-12/03-06-02_267716.",
-          "train_positive_ratio=0.25 | limit_per_category=6."
+          "Run avec un volume de données quasi nul : 6 images/classe (18 images d'entraînement au total), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 37.1% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 32.2/41.4/37.8 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.683,
           "realism": 1.206,
           "romanticism": 1.276
+        },
+        "tnr": {
+          "impressionism": 77.9,
+          "realism": 58.3,
+          "romanticism": 69.5
+        },
+        "fpr": {
+          "impressionism": 22.1,
+          "realism": 41.7,
+          "romanticism": 30.5
+        },
+        "fnr": {
+          "impressionism": 67.8,
+          "realism": 58.6,
+          "romanticism": 62.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.1,
+          "realism": 49.8,
+          "romanticism": 53.6
         }
       }
     },
@@ -1349,14 +1546,35 @@
           "romanticism": 97.8
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-12/13-54-29_862006.",
-          "train_positive_ratio=0.25 | limit_per_category={'impressionism': 12, 'realism': 22, 'romanticism': 32}."
+          "Run avec un volume de données quasi nul : 12/22/32 images par classe seulement (config déjà déséquilibrée entre classes), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 35.2% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 23.8/40.2/41.9 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.007,
           "realism": 0.012,
           "romanticism": 0.092
+        },
+        "tnr": {
+          "impressionism": 78.0,
+          "realism": 63.7,
+          "romanticism": 61.2
+        },
+        "fpr": {
+          "impressionism": 22.0,
+          "realism": 36.3,
+          "romanticism": 38.8
+        },
+        "fnr": {
+          "impressionism": 76.2,
+          "realism": 59.8,
+          "romanticism": 58.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 50.9,
+          "realism": 52.0,
+          "romanticism": 51.6
         }
       }
     },
@@ -1384,14 +1602,35 @@
           "romanticism": 93.4
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-12/14-02-18_912919.",
-          "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
+          "Run avec un volume de données quasi nul : 56/12/32 images par classe (même config déjà déséquilibrée), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 35.7% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 27.4/41.7/38.3 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.165,
           "realism": 0.405,
           "romanticism": 0.293
+        },
+        "tnr": {
+          "impressionism": 76.1,
+          "realism": 59.7,
+          "romanticism": 67.8
+        },
+        "fpr": {
+          "impressionism": 23.9,
+          "realism": 40.3,
+          "romanticism": 32.2
+        },
+        "fnr": {
+          "impressionism": 72.6,
+          "realism": 58.3,
+          "romanticism": 61.7
+        },
+        "balanced_accuracy": {
+          "impressionism": 51.7,
+          "realism": 50.7,
+          "romanticism": 53.1
         }
       }
     },
@@ -1419,14 +1658,33 @@
           "romanticism": 85.8
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-12/20-50-23_426125.",
-          "train_positive_ratio=0.25."
+          "A limit=6000 également, [64,64,64] (3 couches) fait 45.3% — 1.8 pts de moins que [128,128] (run 30, 2 couches) à volume de données identique : confirme que rajouter une couche sans augmenter la largeur ne compense pas, même constat qu'à limit=3000."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.348,
           "realism": 0.515,
           "romanticism": 0.437
+        },
+        "tnr": {
+          "impressionism": 75.2,
+          "realism": 70.2,
+          "romanticism": 72.6
+        },
+        "fpr": {
+          "impressionism": 24.8,
+          "realism": 29.8,
+          "romanticism": 27.4
+        },
+        "fnr": {
+          "impressionism": 52.8,
+          "realism": 56.0,
+          "romanticism": 55.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.2,
+          "realism": 57.1,
+          "romanticism": 58.6
         }
       }
     },
@@ -1454,14 +1712,33 @@
           "romanticism": 85.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-12/22-30-25_776689.",
-          "train_positive_ratio=0.25."
+          "[128,64,64] (3 couches, plus large que le run 34) : 45.5%, très proche de [64,64,64] (45.3%) et toujours en retrait sur [128,128] (run 30, 47.1%) malgré plus de paramètres au total."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.376,
           "realism": 0.483,
           "romanticism": 0.447
+        },
+        "tnr": {
+          "impressionism": 76.6,
+          "realism": 70.8,
+          "romanticism": 70.9
+        },
+        "fpr": {
+          "impressionism": 23.4,
+          "realism": 29.2,
+          "romanticism": 29.1
+        },
+        "fnr": {
+          "impressionism": 55.5,
+          "realism": 55.4,
+          "romanticism": 52.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.6,
+          "realism": 57.7,
+          "romanticism": 59.2
         }
       }
     },
@@ -1489,13 +1766,33 @@
           "romanticism": 86.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-13/17-06-45_581095.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Meilleur run one-vs-rest du projet (49,5%) avant l'arrivée du multiclasse (run 104, 50,0%).",
+          "Contraste avec les collapses RBF (runs 77/82/107) : FPR ici de 22,2/31,8/21,7% seulement — un ordre de grandeur en dessous des FPR de collapse (80-90%). Balanced Accuracy 64,1/60,3/62,0%, nettement au-dessus de 50% sur les 3 classes : ce modèle discrimine réellement les 3 styles, ce n'est pas un artefact d'accuracy comme sur le RBF."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.41,
           "realism": 0.435
+        },
+        "tnr": {
+          "impressionism": 77.8,
+          "realism": 68.2,
+          "romanticism": 78.3
+        },
+        "fpr": {
+          "impressionism": 22.2,
+          "realism": 31.8,
+          "romanticism": 21.7
+        },
+        "fnr": {
+          "impressionism": 49.7,
+          "realism": 47.6,
+          "romanticism": 54.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 64.1,
+          "realism": 60.3,
+          "romanticism": 62.0
         }
       }
     },
@@ -1523,14 +1820,34 @@
           "romanticism": 75.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-14/14-37-01_871539.",
-          "train_positive_ratio=-1 | limit_per_category=1000."
+          "Architecture [32] (une seule couche cachée), limit=1000, pos_ratio naturel (-1) : accuracy 41.5%.",
+          "Recall 35.1/49.4/40.2, TNR 82.8/63.1/66.6 — pas de signe de collapse, résultat dans la plage moyenne du MLP à ce volume de données."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.668,
           "realism": 0.747,
           "romanticism": 0.706
+        },
+        "tnr": {
+          "impressionism": 82.8,
+          "realism": 63.1,
+          "romanticism": 66.6
+        },
+        "fpr": {
+          "impressionism": 17.2,
+          "realism": 36.9,
+          "romanticism": 33.4
+        },
+        "fnr": {
+          "impressionism": 64.9,
+          "realism": 50.6,
+          "romanticism": 59.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.9,
+          "realism": 56.2,
+          "romanticism": 53.4
         }
       }
     },
@@ -1558,14 +1875,33 @@
           "romanticism": 94.7
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-53-36_317761.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=500."
+          "Début d'un sweep Linear à pos_ratio=0.33 fixe, limit_per_category croissant : ce run est le point de départ, limit=500, accuracy 38.7%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.115,
           "realism": 0.149,
           "romanticism": 0.211
+        },
+        "tnr": {
+          "impressionism": 73.6,
+          "realism": 68.2,
+          "romanticism": 66.3
+        },
+        "fpr": {
+          "impressionism": 26.4,
+          "realism": 31.8,
+          "romanticism": 33.7
+        },
+        "fnr": {
+          "impressionism": 64.7,
+          "realism": 64.1,
+          "romanticism": 54.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 54.4,
+          "realism": 52.0,
+          "romanticism": 55.8
         }
       }
     },
@@ -1593,14 +1929,33 @@
           "romanticism": 91.9
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/21-09-02_349430.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=1000."
+          "Même pos_ratio=0.33, limit=1000 (2x plus de données que le run 38) : accuracy 41.6% (+2.9 pt vs run 38)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.208,
           "realism": 0.28,
           "romanticism": 0.325
+        },
+        "tnr": {
+          "impressionism": 77.0,
+          "realism": 70.9,
+          "romanticism": 64.6
+        },
+        "fpr": {
+          "impressionism": 23.0,
+          "realism": 29.1,
+          "romanticism": 35.4
+        },
+        "fnr": {
+          "impressionism": 63.5,
+          "realism": 64.2,
+          "romanticism": 47.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.8,
+          "realism": 53.4,
+          "romanticism": 58.7
         }
       }
     },
@@ -1628,14 +1983,33 @@
           "romanticism": 79.1
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/23-37-32_627775.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=3000."
+          "Même pos_ratio=0.33, limit=3000 : accuracy 42.0% (+0.4 pt vs run 39) — la progression avec le volume de données continue, de façon monotone."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.767,
           "realism": 0.926,
           "romanticism": 0.837
+        },
+        "tnr": {
+          "impressionism": 73.8,
+          "realism": 67.8,
+          "romanticism": 71.4
+        },
+        "fpr": {
+          "impressionism": 26.2,
+          "realism": 32.2,
+          "romanticism": 28.6
+        },
+        "fnr": {
+          "impressionism": 56.0,
+          "realism": 58.5,
+          "romanticism": 59.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.9,
+          "realism": 54.6,
+          "romanticism": 56.0
         }
       }
     },
@@ -1663,14 +2037,33 @@
           "romanticism": 71.9
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/23-50-52_074575.",
-          "train_positive_ratio=0.3333333333333333."
+          "Même pos_ratio=0.33, limit=6000 : accuracy 44.1% (+2.1 pt vs run 40)."
         ],
-        "conclusion": "",
+        "conclusion": "Sweep à pos_ratio=0.33 fixe (runs 38→41, limit 500→6000) : accuracy monte de façon régulière (38.7% → 41.6% → 42.0% → 44.1%), +5.4 pts au total, plutôt cohérent avec 'plus de données aide le Linear' (cf runs 9-13). A noter : la seed change à chaque run de ce sweep (5678/2024/5678/1337) — la comparaison n'isolé donc pas parfaitement le volume de données, mais la progression est trop régulière pour n'être due qu'au bruit inter-seed.",
         "train_loss": {
           "impressionism": 1.09,
           "realism": 1.22,
           "romanticism": 1.124
+        },
+        "tnr": {
+          "impressionism": 76.4,
+          "realism": 68.9,
+          "romanticism": 70.9
+        },
+        "fpr": {
+          "impressionism": 23.6,
+          "realism": 31.1,
+          "romanticism": 29.1
+        },
+        "fnr": {
+          "impressionism": 58.5,
+          "realism": 57.1,
+          "romanticism": 52.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.0,
+          "realism": 55.9,
+          "romanticism": 59.4
         }
       }
     },
@@ -1698,14 +2091,33 @@
           "romanticism": 72.2
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/23-55-15_225847.",
-          "train_positive_ratio=0.5."
+          "A limit=6000 fixe (comme le run 41), ce run testé pos_ratio=0.5 au lieu de 0.33 : accuracy 41.3%, moins bon que le run 41 (44.1%, -2.8 pt)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.062,
           "realism": 1.174,
           "romanticism": 1.112
+        },
+        "tnr": {
+          "impressionism": 83.1,
+          "realism": 60.9,
+          "romanticism": 68.2
+        },
+        "fpr": {
+          "impressionism": 16.9,
+          "realism": 39.1,
+          "romanticism": 31.8
+        },
+        "fnr": {
+          "impressionism": 66.8,
+          "realism": 49.9,
+          "romanticism": 59.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.1,
+          "realism": 55.5,
+          "romanticism": 54.6
         }
       }
     },
@@ -1733,14 +2145,33 @@
           "romanticism": 77.4
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-32-28_562976.",
-          "train_positive_ratio=0.25."
+          "Toujours à limit=6000, pos_ratio=0.25 cette fois : accuracy 45.0% — le meilleur des 4 ratios testés à ce volume de données (0.33: 44.1%, 0.5: 41.3%, 0.25: 45.0%, 0.2 voir run 44)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.86,
           "realism": 0.958,
           "romanticism": 0.906
+        },
+        "tnr": {
+          "impressionism": 74.2,
+          "realism": 74.8,
+          "romanticism": 68.5
+        },
+        "fpr": {
+          "impressionism": 25.8,
+          "realism": 25.2,
+          "romanticism": 31.5
+        },
+        "fnr": {
+          "impressionism": 54.3,
+          "realism": 63.4,
+          "romanticism": 47.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.0,
+          "realism": 55.7,
+          "romanticism": 60.7
         }
       }
     },
@@ -1768,14 +2199,33 @@
           "romanticism": 80.7
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-40-06_032186.",
-          "train_positive_ratio=0.2."
+          "pos_ratio=0.2 (encore plus bas), limit=6000 : accuracy 42.6% — moins bon que ratio=0.25 (run 43, 45.0%) : le ratio optimal semble se situer autour de 0.25, pas plus bas."
         ],
-        "conclusion": "",
+        "conclusion": "Sweep de pos_ratio à limit=6000 fixe (runs 41-44) : 0.33→44.1%, 0.5→41.3%, 0.25→45.0%, 0.2→42.6%. Le maximum est atteint à ratio=0.25, ni plus haut ni plus bas — ce même ratio de 0.25 revient comme le meilleur réglage sur MLP (run 17 et suivants) et sur RBF (run 81), un signal cohérent à travers les 3 familles de modèles de ce projet. A nuancer : la seed diffère aussi entre ces 4 runs (1337/1234/2024/1234, seuls 42 et 44 la partagent), donc ce n'est pas un test isolé à 100% — mais la convergence avec les résultats MLP/RBF (obtenus avec d'autres seeds) rend l'effet ratio=0.25 plausible au-delà du simple bruit.",
         "train_loss": {
           "impressionism": 0.691,
           "realism": 0.823,
           "romanticism": 0.772
+        },
+        "tnr": {
+          "impressionism": 79.9,
+          "realism": 70.1,
+          "romanticism": 64.1
+        },
+        "fpr": {
+          "impressionism": 20.1,
+          "realism": 29.9,
+          "romanticism": 35.9
+        },
+        "fnr": {
+          "impressionism": 67.5,
+          "realism": 60.9,
+          "romanticism": 43.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.2,
+          "realism": 54.6,
+          "romanticism": 60.5
         }
       }
     },
@@ -1803,14 +2253,33 @@
           "romanticism": 83.9
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-46-32_444538.",
-          "train_positive_ratio=0.25 | limit_per_category=3000."
+          "pos_ratio=0.25 mais avec limit=3000 (au lieu de 6000) : accuracy 42.8%, en retrait sur le run 43 (même ratio, limit=6000, 45.0%, soit -2.2 pt) — confirme que le volume de données et le ratio sont deux leviers indépendants qui s'additionnent plutôt qu'ils ne se substituent."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.535,
           "realism": 0.7,
           "romanticism": 0.645
+        },
+        "tnr": {
+          "impressionism": 75.1,
+          "realism": 69.4,
+          "romanticism": 69.7
+        },
+        "fpr": {
+          "impressionism": 24.9,
+          "realism": 30.6,
+          "romanticism": 30.3
+        },
+        "fnr": {
+          "impressionism": 59.9,
+          "realism": 58.4,
+          "romanticism": 53.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 57.6,
+          "realism": 55.5,
+          "romanticism": 58.3
         }
       }
     },
@@ -1838,14 +2307,35 @@
           "romanticism": 100.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-49-13_513949.",
-          "train_positive_ratio=-1 | limit_per_category=30."
+          "Run avec un volume de données quasi nul : 30 images/classe (90 au total), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 36.8% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 31.8/39.7/39.1 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.0,
           "realism": 0.0,
           "romanticism": 0.0
+        },
+        "tnr": {
+          "impressionism": 74.7,
+          "realism": 63.8,
+          "romanticism": 66.7
+        },
+        "fpr": {
+          "impressionism": 25.3,
+          "realism": 36.2,
+          "romanticism": 33.3
+        },
+        "fnr": {
+          "impressionism": 68.2,
+          "realism": 60.3,
+          "romanticism": 60.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 53.3,
+          "realism": 51.8,
+          "romanticism": 52.9
         }
       }
     },
@@ -1873,14 +2363,35 @@
           "romanticism": 100.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/00-50-30_358394.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=30."
+          "Run avec un volume de données quasi nul : 30 images/classe (90 au total), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 36.7% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 24.3/33.8/52.6 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.0,
           "realism": 0.0,
           "romanticism": 0.0
+        },
+        "tnr": {
+          "impressionism": 79.1,
+          "realism": 70.7,
+          "romanticism": 55.5
+        },
+        "fpr": {
+          "impressionism": 20.9,
+          "realism": 29.3,
+          "romanticism": 44.5
+        },
+        "fnr": {
+          "impressionism": 75.7,
+          "realism": 66.2,
+          "romanticism": 47.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 51.7,
+          "realism": 52.2,
+          "romanticism": 54.1
         }
       }
     },
@@ -1908,14 +2419,35 @@
           "romanticism": 87.5
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/03-05-29_191835.",
-          "train_positive_ratio=0.25 | limit_per_category=6."
+          "Run avec un volume de données quasi nul : 6 images/classe (18 au total), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 37.0% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 34.2/37.1/39.7 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.25,
           "realism": 0.75,
           "romanticism": 0.5
+        },
+        "tnr": {
+          "impressionism": 75.7,
+          "realism": 62.1,
+          "romanticism": 67.7
+        },
+        "fpr": {
+          "impressionism": 24.3,
+          "realism": 37.9,
+          "romanticism": 32.3
+        },
+        "fnr": {
+          "impressionism": 65.8,
+          "realism": 62.9,
+          "romanticism": 60.3
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.0,
+          "realism": 49.6,
+          "romanticism": 53.7
         }
       }
     },
@@ -1943,14 +2475,35 @@
           "romanticism": 100.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/13-57-43_156170.",
-          "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
+          "Run avec un volume de données quasi nul : 56/12/32 images par classe (config déséquilibrée), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 38.4% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 41.1/33.3/40.8 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.0,
           "realism": 0.0,
           "romanticism": 0.0
+        },
+        "tnr": {
+          "impressionism": 69.8,
+          "realism": 71.2,
+          "romanticism": 66.5
+        },
+        "fpr": {
+          "impressionism": 30.2,
+          "realism": 28.8,
+          "romanticism": 33.5
+        },
+        "fnr": {
+          "impressionism": 58.9,
+          "realism": 66.7,
+          "romanticism": 59.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.5,
+          "realism": 52.2,
+          "romanticism": 53.7
         }
       }
     },
@@ -1978,14 +2531,35 @@
           "romanticism": 100.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/14-01-07_244955.",
-          "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
+          "Run avec un volume de données quasi nul : 56/12/32 images par classe (config déséquilibrée), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 34.1% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 31.6/27.8/43.2 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.0,
           "realism": 0.0,
           "romanticism": 0.0
+        },
+        "tnr": {
+          "impressionism": 73.9,
+          "realism": 74.0,
+          "romanticism": 53.5
+        },
+        "fpr": {
+          "impressionism": 26.1,
+          "realism": 26.0,
+          "romanticism": 46.5
+        },
+        "fnr": {
+          "impressionism": 68.4,
+          "realism": 72.2,
+          "romanticism": 56.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 52.7,
+          "realism": 50.9,
+          "romanticism": 48.3
         }
       }
     },
@@ -2013,14 +2587,35 @@
           "romanticism": 100.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-12/14-04-04_881138.",
-          "train_positive_ratio=0.25 | limit_per_category={'impressionism': 56, 'realism': 12, 'romanticism': 32}."
+          "Run avec un volume de données quasi nul : 56/12/32 images par classe (config déséquilibrée), contre 1000+ images/classe pour la quasi-totalité des autres runs du rapport.",
+          "Accuracy 36.4% — proche du hasard (33,3%) ou légèrement au-dessus, sans que ce soit interprétable : avec aussi peu d'exemples, le résultat est dominé par le bruit d'échantillonnage, pas par l'architecture ou les hyperparamètres testés.",
+          "Recall 37.0/29.8/42.5 — à ne pas comparer aux runs à volume de données normal ; probablement un run de vérification technique du pipeline (config debug), pas un vrai point d'expérience."
         ],
-        "conclusion": "",
+        "conclusion": "Run non représentatif (volume de données dégénéré) — exclu de toute comparaison sérieuse entre architectures/hyperparamètres dans ce rapport.",
         "train_loss": {
           "impressionism": 0.0,
           "realism": 0.0,
           "romanticism": 0.0
+        },
+        "tnr": {
+          "impressionism": 70.1,
+          "realism": 67.9,
+          "romanticism": 66.6
+        },
+        "fpr": {
+          "impressionism": 29.9,
+          "realism": 32.1,
+          "romanticism": 33.4
+        },
+        "fnr": {
+          "impressionism": 63.0,
+          "realism": 70.2,
+          "romanticism": 57.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 53.6,
+          "realism": 48.9,
+          "romanticism": 54.5
         }
       }
     },
@@ -2048,14 +2643,33 @@
           "romanticism": 83.8
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-14/16-55-39_070407.",
-          "train_positive_ratio=0.25."
+          "[128,64,32] (3 couches en entonnoir) : 45.7%, dans le même groupe que 34/35 (45,3-45,7%), toujours derrière [128,128] à 2 couches (run 30, 47.1%)."
         ],
-        "conclusion": "",
+        "conclusion": "Sur les 4 architectures testées à limit_per_category=6000 (128,128 / 64,64,64 / 128,64,64 / 128,64,32), l'architecture à 2 couches larges [128,128] reste la meilleure (47,1%) ; les 3 variantes à 3 couches se tassent toutes entre 45,3% et 45,7%, quelle que soit leur forme exacte. Le nombre de couches ne semble pas être le levier qui compte le plus ici, contrairement à la largeur — à nuancer cependant : la seed diffère sur les 4 runs (2024/5678/1234/1453555868), donc une partie de l'écart pourrait aussi venir de la variance inter-seed plutôt que de l'architecture seule.",
         "train_loss": {
           "impressionism": 0.368,
           "realism": 0.521,
           "romanticism": 0.476
+        },
+        "tnr": {
+          "impressionism": 78.5,
+          "realism": 68.5,
+          "romanticism": 71.6
+        },
+        "fpr": {
+          "impressionism": 21.5,
+          "realism": 31.5,
+          "romanticism": 28.4
+        },
+        "fnr": {
+          "impressionism": 55.1,
+          "realism": 54.8,
+          "romanticism": 52.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.7,
+          "realism": 56.9,
+          "romanticism": 59.3
         }
       }
     },
@@ -2083,14 +2697,34 @@
           "romanticism": 79.5
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-09/20-15-20_053794.",
-          "train_positive_ratio=None | limit_per_category=500."
+          "Encore l'architecture [16,16], limit=500 (le plus petit volume testé sur cette architecture) : accuracy 38.2%.",
+          "Au total, [16,16] a ete testée 8 fois dans ce rapport (runs 24, 25, 32, 33, 53, 56, 57, 58) avec des seeds/ratios/volumes differents : accuracy comprise entre 35.2% et 40.4% (écart 5.2 pts) — un plafond de performance clairement plus bas que les architectures plus larges comme [128,128] (jusqu'à 47,1%, run 30) ou [256,256] (jusqu'à 49,5%, run 36), quel que soit le réglage fin."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.637,
           "realism": 0.618,
           "romanticism": 0.605
+        },
+        "tnr": {
+          "impressionism": 71.3,
+          "realism": 69.2,
+          "romanticism": 66.9
+        },
+        "fpr": {
+          "impressionism": 28.7,
+          "realism": 30.8,
+          "romanticism": 33.1
+        },
+        "fnr": {
+          "impressionism": 60.0,
+          "realism": 65.4,
+          "romanticism": 59.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.6,
+          "realism": 51.9,
+          "romanticism": 53.5
         }
       }
     },
@@ -2118,14 +2752,33 @@
           "romanticism": 66.7
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-09/20-27-16_613983.",
-          "train_positive_ratio=None | limit_per_category=500."
+          "Architecture [6,6] (la plus petite testée dans tout le rapport), limit=500, 50 epochs : accuracy 37.7% — dans la même plage basse que [16,16], confirme qu'en dessous d'une certaine largeur de couche, la performance plafonne indépendamment des autres réglages."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.804,
           "realism": 0.862,
           "romanticism": 0.85
+        },
+        "tnr": {
+          "impressionism": 74.3,
+          "realism": 59.3,
+          "romanticism": 73.0
+        },
+        "fpr": {
+          "impressionism": 25.7,
+          "realism": 40.7,
+          "romanticism": 27.0
+        },
+        "fnr": {
+          "impressionism": 61.4,
+          "realism": 58.1,
+          "romanticism": 67.7
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.5,
+          "realism": 50.6,
+          "romanticism": 52.6
         }
       }
     },
@@ -2153,14 +2806,33 @@
           "romanticism": 80.2
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-10/17-56-47_468659.",
-          "train_positive_ratio=None | limit_per_category=1000."
+          "Architecture [256,128] (large), mais seulement limit=1000 et 50 epochs : accuracy 41.6% — bien en retrait du record obtenu avec la même famille d'architecture sur plus de données (run 17, [256,256], 6000 img/classe, 46,7%), illustre que la largeur du réseau ne compense pas un volume de données insuffisant."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.531,
           "realism": 0.636,
           "romanticism": 0.716
+        },
+        "tnr": {
+          "impressionism": 71.6,
+          "realism": 69.2,
+          "romanticism": 71.5
+        },
+        "fpr": {
+          "impressionism": 28.4,
+          "realism": 30.8,
+          "romanticism": 28.5
+        },
+        "fnr": {
+          "impressionism": 54.0,
+          "realism": 60.6,
+          "romanticism": 60.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.8,
+          "realism": 54.3,
+          "romanticism": 55.3
         }
       }
     },
@@ -2188,14 +2860,33 @@
           "romanticism": 78.3
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-10/18-14-16_499052.",
-          "train_positive_ratio=None | limit_per_category=500."
+          "[16,16], limit=500, pos_ratio naturel (non précisé) : accuracy 39.4%, dans la fourchette habituelle de cette architecture (35,2-40,4% sur l'ensemble des runs [16,16])."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.567,
           "realism": 0.522,
           "romanticism": 0.604
+        },
+        "tnr": {
+          "impressionism": 71.3,
+          "realism": 68.6,
+          "romanticism": 69.1
+        },
+        "fpr": {
+          "impressionism": 28.7,
+          "realism": 31.4,
+          "romanticism": 30.9
+        },
+        "fnr": {
+          "impressionism": 59.3,
+          "realism": 61.2,
+          "romanticism": 61.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.0,
+          "realism": 53.7,
+          "romanticism": 53.8
         }
       }
     },
@@ -2223,14 +2914,33 @@
           "romanticism": 79.3
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/20-08-33_181855.",
-          "train_positive_ratio=0.5 | limit_per_category=500."
+          "[16,16], limit=500, pos_ratio=0.5 : accuracy 39.6%, quasi identique au run 56 (même limit, ratio naturel, 39.4%) — confirme que sur une architecture aussi étroite, le ratio positif/négatif n'a quasiment pas d'effet mesurable (contrairement au Linear/MLP plus larges où ratio=0.25 fait clairement gagner des points, cf runs 41-44)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.547,
           "realism": 0.591,
           "romanticism": 0.588
+        },
+        "tnr": {
+          "impressionism": 69.4,
+          "realism": 70.4,
+          "romanticism": 69.5
+        },
+        "fpr": {
+          "impressionism": 30.6,
+          "realism": 29.6,
+          "romanticism": 30.5
+        },
+        "fnr": {
+          "impressionism": 57.1,
+          "realism": 63.4,
+          "romanticism": 60.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.2,
+          "realism": 53.5,
+          "romanticism": 54.4
         }
       }
     },
@@ -2258,14 +2968,33 @@
           "romanticism": 77.1
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-11/20-25-36_439699.",
-          "train_positive_ratio=0.5 | limit_per_category=500."
+          "[16,16], limit=500, pos_ratio=0.5, seed=42 : accuracy 38.4%. Sur les 4 runs [16,16] à limit=500 (53:38.2%, 56:39.4%, 57:39.6%, 58:38.4%), l'accuracy varie entre 38.2% et 39.6% (écart 1.4 pt) — la variance inter-seed/ratio à elle seule explique cet écart, sans qu'aucun réglage ne se dégage clairement comme supérieur."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.657,
           "realism": 0.648,
           "romanticism": 0.679
+        },
+        "tnr": {
+          "impressionism": 74.3,
+          "realism": 65.7,
+          "romanticism": 67.7
+        },
+        "fpr": {
+          "impressionism": 25.7,
+          "realism": 34.3,
+          "romanticism": 32.3
+        },
+        "fnr": {
+          "impressionism": 62.6,
+          "realism": 62.5,
+          "romanticism": 59.6
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.8,
+          "realism": 51.6,
+          "romanticism": 54.1
         }
       }
     },
@@ -2293,14 +3022,33 @@
           "romanticism": 92.4
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-09/20-08-04_286040.",
-          "train_positive_ratio=None | limit_per_category=1000."
+          "Linear, limit=1000, 100 epochs : accuracy 40.4%, dans la plage habituelle du Linear à ce volume de données (cf runs 9-13, 41-45.9%)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.213,
           "realism": 0.34,
           "romanticism": 0.305
+        },
+        "tnr": {
+          "impressionism": 70.0,
+          "realism": 69.2,
+          "romanticism": 71.5
+        },
+        "fpr": {
+          "impressionism": 30.0,
+          "realism": 30.8,
+          "romanticism": 28.5
+        },
+        "fnr": {
+          "impressionism": 59.0,
+          "realism": 63.1,
+          "romanticism": 56.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.5,
+          "realism": 53.1,
+          "romanticism": 57.5
         }
       }
     },
@@ -2328,14 +3076,33 @@
           "romanticism": 89.7
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-09/20-24-29_322064.",
-          "train_positive_ratio=None | limit_per_category=500."
+          "Linear, limit=500, seulement 50 epochs : accuracy 39.7%, légèrement en dessous du run 59 (limit=1000, 100 epochs, 40.4%) — moins de données ET moins d'epochs, deux leviers reduits simultanément, cohérent avec un score plus bas sans qu'on puisse isoler lequel des deux domine."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.256,
           "realism": 0.317,
           "romanticism": 0.413
+        },
+        "tnr": {
+          "impressionism": 73.5,
+          "realism": 68.4,
+          "romanticism": 67.6
+        },
+        "fpr": {
+          "impressionism": 26.5,
+          "realism": 31.6,
+          "romanticism": 32.4
+        },
+        "fnr": {
+          "impressionism": 63.5,
+          "realism": 60.9,
+          "romanticism": 56.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.0,
+          "realism": 53.8,
+          "romanticism": 55.5
         }
       }
     },
@@ -2363,14 +3130,33 @@
           "romanticism": 91.9
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-10/16-01-51_195321.",
-          "train_positive_ratio=None | limit_per_category=1000."
+          "Linear, limit=1000, 100 epochs (mêmes paramètres que le run 59 sauf la seed) : accuracy 41.4%, très proche du run 59 (40.4%, écart 1.0 pt) — bonne reproductibilité du Linear à config quasi identique."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.219,
           "realism": 0.348,
           "romanticism": 0.324
+        },
+        "tnr": {
+          "impressionism": 81.0,
+          "realism": 65.5,
+          "romanticism": 65.8
+        },
+        "fpr": {
+          "impressionism": 19.0,
+          "realism": 34.5,
+          "romanticism": 34.2
+        },
+        "fnr": {
+          "impressionism": 66.8,
+          "realism": 58.4,
+          "romanticism": 50.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 57.1,
+          "realism": 53.6,
+          "romanticism": 57.8
         }
       }
     },
@@ -2398,14 +3184,33 @@
           "romanticism": 97.6
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-40-30_864336.",
-          "train_positive_ratio=0.5 | limit_per_category=500."
+          "Linear, limit=500, pos_ratio=0.5 : accuracy 41.0%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.06,
           "realism": 0.068,
           "romanticism": 0.096
+        },
+        "tnr": {
+          "impressionism": 71.2,
+          "realism": 69.8,
+          "romanticism": 70.6
+        },
+        "fpr": {
+          "impressionism": 28.8,
+          "realism": 30.2,
+          "romanticism": 29.4
+        },
+        "fnr": {
+          "impressionism": 58.8,
+          "realism": 62.9,
+          "romanticism": 55.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.2,
+          "realism": 53.4,
+          "romanticism": 57.8
         }
       }
     },
@@ -2433,14 +3238,33 @@
           "romanticism": 96.1
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-11/20-51-33_554804.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=500."
+          "Linear, limit=500, pos_ratio=0.33 : accuracy 40.5%, proche du run 62 (ratio=0.5, 41.0%) — à limit=500 (volume très réduit), le choix du ratio positif/négatif pèse moins que sur les runs à plus grand volume (cf runs 41-44, où le ratio faisait une vraie différence à limit=6000)."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.101,
           "realism": 0.117,
           "romanticism": 0.157
+        },
+        "tnr": {
+          "impressionism": 79.8,
+          "realism": 67.3,
+          "romanticism": 63.7
+        },
+        "fpr": {
+          "impressionism": 20.2,
+          "realism": 32.7,
+          "romanticism": 36.3
+        },
+        "fnr": {
+          "impressionism": 67.1,
+          "realism": 62.2,
+          "romanticism": 48.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.4,
+          "realism": 52.5,
+          "romanticism": 57.4
         }
       }
     },
@@ -2468,14 +3292,34 @@
           "romanticism": 73.5
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-01-36_803290.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Linear sur le dataset COMPLET (limit=-1, ~30000 images train), pos_ratio=0.25, alpha=0.001 — 3 seeds testées ici (64/65/66) pour mesurer la variance à grande échelle.",
+          "Accuracy 46.5% (seed 1337) — c'est le meilleur score Linear de tout ce rapport à ce jour sur cette combinaison de réglages."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.015,
           "realism": 1.114,
           "romanticism": 1.059
+        },
+        "tnr": {
+          "impressionism": 77.1,
+          "realism": 72.2,
+          "romanticism": 70.4
+        },
+        "fpr": {
+          "impressionism": 22.9,
+          "realism": 27.8,
+          "romanticism": 29.6
+        },
+        "fnr": {
+          "impressionism": 55.9,
+          "realism": 57.8,
+          "romanticism": 46.6
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.6,
+          "realism": 57.2,
+          "romanticism": 61.9
         }
       }
     },
@@ -2503,14 +3347,33 @@
           "romanticism": 73.5
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-06-08_575222.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Même config, seed 2024 : accuracy 42.1%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.015,
           "realism": 1.104,
           "romanticism": 1.058
+        },
+        "tnr": {
+          "impressionism": 77.0,
+          "realism": 60.0,
+          "romanticism": 76.2
+        },
+        "fpr": {
+          "impressionism": 23.0,
+          "realism": 40.0,
+          "romanticism": 23.8
+        },
+        "fnr": {
+          "impressionism": 64.8,
+          "realism": 49.7,
+          "romanticism": 59.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.1,
+          "realism": 55.2,
+          "romanticism": 58.6
         }
       }
     },
@@ -2538,14 +3401,33 @@
           "romanticism": 73.9
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-12-03_526758.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Même config, seed 1234 : accuracy 42.4%."
         ],
-        "conclusion": "",
+        "conclusion": "3 seeds à alpha=0.001, dataset complet, ratio=0.25 : 46.5% / 42.1% / 42.4% (moyenne 43.7%, écart 4.4 pts) — variance inter-seed non négligeable même à grande échelle de données.",
         "train_loss": {
           "impressionism": 1.0,
           "realism": 1.119,
           "romanticism": 1.046
+        },
+        "tnr": {
+          "impressionism": 84.0,
+          "realism": 59.3,
+          "romanticism": 70.4
+        },
+        "fpr": {
+          "impressionism": 16.0,
+          "realism": 40.7,
+          "romanticism": 29.6
+        },
+        "fnr": {
+          "impressionism": 66.2,
+          "realism": 52.9,
+          "romanticism": 53.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.9,
+          "realism": 53.2,
+          "romanticism": 58.5
         }
       }
     },
@@ -2573,14 +3455,34 @@
           "romanticism": 73.7
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-17-59_507743.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Même dataset complet, même pos_ratio=0.25, mais alpha=0.01 (10x plus grand qu'aux runs 64-66) — seed 1337.",
+          "Accuracy 46.3% — très proche du meilleur run à alpha=0.001 (run 64, 46.5%), suggère que sur dataset complet, le Linear converge de façon similaire aux deux alphas testés."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.003,
           "realism": 1.124,
           "romanticism": 1.052
+        },
+        "tnr": {
+          "impressionism": 73.6,
+          "realism": 72.6,
+          "romanticism": 73.4
+        },
+        "fpr": {
+          "impressionism": 26.4,
+          "realism": 27.4,
+          "romanticism": 26.6
+        },
+        "fnr": {
+          "impressionism": 51.1,
+          "realism": 58.2,
+          "romanticism": 51.7
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.2,
+          "realism": 57.2,
+          "romanticism": 60.8
         }
       }
     },
@@ -2608,14 +3510,33 @@
           "romanticism": 73.3
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-24-08_060188.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Même config alpha=0.01, seed 2024 : accuracy 42.5%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.009,
           "realism": 1.099,
           "romanticism": 1.067
+        },
+        "tnr": {
+          "impressionism": 74.2,
+          "realism": 67.8,
+          "romanticism": 71.8
+        },
+        "fpr": {
+          "impressionism": 25.8,
+          "realism": 32.2,
+          "romanticism": 28.2
+        },
+        "fnr": {
+          "impressionism": 62.6,
+          "realism": 56.2,
+          "romanticism": 53.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.8,
+          "realism": 55.8,
+          "romanticism": 59.1
         }
       }
     },
@@ -2643,14 +3564,33 @@
           "romanticism": 74.2
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-26-42_812462.",
-          "train_positive_ratio=0.25 | limit_per_category=-1."
+          "Même config alpha=0.01, seed 1234 : accuracy 42.7%."
         ],
-        "conclusion": "",
+        "conclusion": "3 seeds à alpha=0.01, dataset complet, ratio=0.25 : 46.3% / 42.5% / 42.7% (moyenne 43.8%) contre 43.7% de moyenne à alpha=0.001 (runs 64-66) — alpha 10x plus grand ne change quasiment rien sur dataset complet (écart de moyenne de 0.2 pt seulement) : contrairement aux petits volumes de données (où alpha=0.01 dégradait nettement, cf runs 32/33 sur MLP), à grande échelle le Linear semble converger correctement avec les deux valeurs.",
         "train_loss": {
           "impressionism": 0.998,
           "realism": 1.112,
           "romanticism": 1.03
+        },
+        "tnr": {
+          "impressionism": 80.8,
+          "realism": 63.7,
+          "romanticism": 69.6
+        },
+        "fpr": {
+          "impressionism": 19.2,
+          "realism": 36.3,
+          "romanticism": 30.4
+        },
+        "fnr": {
+          "impressionism": 62.4,
+          "realism": 57.8,
+          "romanticism": 51.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.2,
+          "realism": 53.0,
+          "romanticism": 59.0
         }
       }
     },
@@ -2678,14 +3618,34 @@
           "romanticism": 68.9
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-32-07_799606.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=-1."
+          "Dataset complet, mais pos_ratio=0.33 au lieu de 0.25, alpha=0.01 — seed 1337.",
+          "Accuracy 42.3%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.213,
           "realism": 1.352,
           "romanticism": 1.243
+        },
+        "tnr": {
+          "impressionism": 70.8,
+          "realism": 67.6,
+          "romanticism": 74.9
+        },
+        "fpr": {
+          "impressionism": 29.2,
+          "realism": 32.4,
+          "romanticism": 25.1
+        },
+        "fnr": {
+          "impressionism": 54.0,
+          "realism": 56.0,
+          "romanticism": 63.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 58.4,
+          "realism": 55.8,
+          "romanticism": 55.8
         }
       }
     },
@@ -2713,14 +3673,33 @@
           "romanticism": 69.0
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-34-31_374596.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=-1."
+          "Même config ratio=0.33, seed 2024 : accuracy 44.2%."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 1.226,
           "realism": 1.347,
           "romanticism": 1.239
+        },
+        "tnr": {
+          "impressionism": 75.1,
+          "realism": 66.1,
+          "romanticism": 75.2
+        },
+        "fpr": {
+          "impressionism": 24.9,
+          "realism": 33.9,
+          "romanticism": 24.8
+        },
+        "fnr": {
+          "impressionism": 54.8,
+          "realism": 53.0,
+          "romanticism": 59.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.1,
+          "realism": 56.5,
+          "romanticism": 57.8
         }
       }
     },
@@ -2748,14 +3727,33 @@
           "romanticism": 69.3
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/linear/2026-07-14/20-47-40_181637.",
-          "train_positive_ratio=0.3333333333333333 | limit_per_category=-1."
+          "Même config ratio=0.33, seed 1234 : accuracy 43.7%."
         ],
-        "conclusion": "",
+        "conclusion": "3 seeds à ratio=0.33 (runs 70-72) : 42.3% / 44.2% / 43.7% (moyenne 43.4%) — légèrement en dessous de la moyenne à ratio=0.25 (alpha=0.01, runs 67-69, 43.8%). Bilan du bloc 64-72 (9 runs, dataset Linear complet, 3 seeds x 3 configs) : ratio=0.25 reste le meilleur choix (confirmant runs 41-44), alpha n'a quasiment pas d'effet à cette échelle de données, et la variance inter-seed (jusqu'à 4.4 pts sur un seul groupe de 3) reste le facteur le plus important de ce bloc de runs.",
         "train_loss": {
           "impressionism": 1.23,
           "realism": 1.345,
           "romanticism": 1.228
+        },
+        "tnr": {
+          "impressionism": 70.2,
+          "realism": 65.5,
+          "romanticism": 79.6
+        },
+        "fpr": {
+          "impressionism": 29.8,
+          "realism": 34.5,
+          "romanticism": 20.4
+        },
+        "fnr": {
+          "impressionism": 50.9,
+          "realism": 50.7,
+          "romanticism": 67.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.7,
+          "realism": 57.4,
+          "romanticism": 55.9
         }
       }
     },
@@ -2783,14 +3781,34 @@
           "romanticism": 81.4
         },
         "observations": [
-          "Run importe en lot depuis engine/core/output/mlp/2026-07-13/18-03-59_211388.",
-          "train_positive_ratio=0.25 | limit_per_category=2000."
+          "Architecture [128,128,128] (mêmes couches que les runs 22/23 de la série de référence, mais limit=2000 au lieu de 12000 train et pos_ratio=0.25 au lieu du ratio naturel) : accuracy 43.1%.",
+          "Nettement en dessous des runs 22/23 (46,6-46,8% avec ~12000 images train) : confirme, sur cette architecture aussi, que le volume de données pèse plus que le réglage fin du ratio positif/négatif à lui seul."
         ],
         "conclusion": "",
         "train_loss": {
           "impressionism": 0.541,
           "realism": 0.698,
           "romanticism": 0.638
+        },
+        "tnr": {
+          "impressionism": 78.4,
+          "realism": 69.2,
+          "romanticism": 67.3
+        },
+        "fpr": {
+          "impressionism": 21.6,
+          "realism": 30.8,
+          "romanticism": 32.7
+        },
+        "fnr": {
+          "impressionism": 57.4,
+          "realism": 61.9,
+          "romanticism": 51.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.5,
+          "realism": 53.6,
+          "romanticism": 58.1
         }
       }
     },
@@ -2826,6 +3844,26 @@
           "impressionism": 1.6,
           "realism": 1.867,
           "romanticism": 1.84
+        },
+        "tnr": {
+          "impressionism": 87.9,
+          "realism": 36.7,
+          "romanticism": 76.5
+        },
+        "fpr": {
+          "impressionism": 12.1,
+          "realism": 63.3,
+          "romanticism": 23.5
+        },
+        "fnr": {
+          "impressionism": 81.2,
+          "realism": 38.8,
+          "romanticism": 78.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 53.3,
+          "realism": 48.9,
+          "romanticism": 49.2
         }
       }
     },
@@ -2863,6 +3901,26 @@
           "impressionism": 1.544,
           "realism": 1.627,
           "romanticism": 1.6
+        },
+        "tnr": {
+          "impressionism": 88.1,
+          "realism": 65.9,
+          "romanticism": 60.8
+        },
+        "fpr": {
+          "impressionism": 11.9,
+          "realism": 34.1,
+          "romanticism": 39.2
+        },
+        "fnr": {
+          "impressionism": 66.0,
+          "realism": 61.1,
+          "romanticism": 43.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.0,
+          "realism": 52.4,
+          "romanticism": 58.8
         }
       }
     },
@@ -2900,6 +3958,26 @@
           "impressionism": 1.621,
           "realism": 1.728,
           "romanticism": 1.621
+        },
+        "tnr": {
+          "impressionism": 61.7,
+          "realism": 77.4,
+          "romanticism": 70.1
+        },
+        "fpr": {
+          "impressionism": 38.3,
+          "realism": 22.6,
+          "romanticism": 29.9
+        },
+        "fnr": {
+          "impressionism": 46.9,
+          "realism": 73.6,
+          "romanticism": 61.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 57.4,
+          "realism": 51.9,
+          "romanticism": 54.5
         }
       }
     },
@@ -2930,13 +4008,34 @@
           "Troisième point du scan : 256 centres. Accuracy globale = 33,0%, quasiment pile au niveau du hasard (33,3%).",
           "Le détail du recall révèle un effondrement, toujours pas juste une baisse : Impressionism 8,2%, Realism 87,5%, Romanticism 3,0% — le modèle prédit quasiment toujours 'realism' cette fois.",
           "L'accuracy train reste normale (~57% par classe, comparable aux runs 16/64 centres) — cohérent avec le run original : le problème n'est pas un défaut d'apprentissage sur le train, mais une instabilité au moment de la décision argmax en test.",
-          "Run rejoué après perte du dossier source original avec une seed différente (5678 au lieu de 42, changement de config non intentionnel). Résultat clé : L'EFFONDREMENT SE REPRODUIT avec une seed complètement différente — seule la classe vers laquelle le modèle collapse change (Romanticism à 93,3% avant, Realism à 87,5% maintenant). Ça renforce la conclusion : l'instabilité à 256 centres n'est pas un hasard d'initialisation, c'est structurel à cette taille sur ce volume de données."
+          "Run rejoué après perte du dossier source original avec une seed différente (5678 au lieu de 42, changement de config non intentionnel). Résultat clé : L'EFFONDREMENT SE REPRODUIT avec une seed complètement différente — seule la classe vers laquelle le modèle collapse change (Romanticism à 93,3% avant, Realism à 87,5% maintenant). Ça renforce la conclusion : l'instabilité à 256 centres n'est pas un hasard d'initialisation, c'est structurel à cette taille sur ce volume de données.",
+          "CONFIRMATION QUANTITATIVE PAR FPR : Realism a un TPR de 87,5% mais un FPR de 90,2% — c'est-à-dire que 90,2% des images qui NE SONT PAS Realism sont QUAND MÊME étiquetées Realism. Le modèle ne 'reconnaît' pas Realism, il prédit Realism presque indépendamment de l'image. Preuve définitive que le TPR élevé est trompeur ici : la Balanced Accuracy de Realism n'est que 48,7%, EN DESSOUS de 50% (le niveau d'un tirage aléatoire pour une décision binaire) — ce run est donc, sur le plan de la discrimination de Realism, pire qu'une pièce lancée en l'air."
         ],
-        "conclusion": "Scan rbf_num_centers (16→64→256) : tendance opposée au MLP — plus de centres dégrade puis fait carrément s'effondrer le modèle (256 centres ≈ hasard). Avec seulement 1000 images/classe, K-Means sur 256 centres est probablement instable (centres trop proches, gamma auto mal calibré) — confirmé par la reproduction du collapse sur une seed totalement différente (seule la classe cible du collapse change). Meilleur réglage à ce stade : 16 centres (43,0%, seed=42, reproduit à l'identique). Prochain test recommandé : affiner autour de 8-32 centres plutôt que de continuer à augmenter, et vérifier si le comportement se stabilise avec plus de données.",
+        "conclusion": "Scan rbf_num_centers (16→64→256) : tendance opposée au MLP — plus de centres dégrade puis fait carrément s'effondrer le modèle (256 centres ≈ hasard). Avec seulement 1000 images/classe, K-Means sur 256 centres est probablement instable (centres trop proches, gamma auto mal calibré) — confirmé par la reproduction du collapse sur une seed totalement différente (seule la classe cible du collapse change). Les Balanced Accuracy proches de 50% sur les 3 classes (50,1/48,7/50,3) confirment, au-delà du seul TPR, que ce modèle n'a essentiellement aucun pouvoir discriminant réel. Meilleur réglage à ce stade : 16 centres (43,0%, seed=42, reproduit à l'identique). Prochain test recommandé : affiner autour de 8-32 centres plutôt que de continuer à augmenter, et vérifier si le comportement se stabilise avec plus de données.",
         "train_loss": {
           "impressionism": 1.699,
           "realism": 1.728,
           "romanticism": 1.712
+        },
+        "tnr": {
+          "impressionism": 91.9,
+          "realism": 9.8,
+          "romanticism": 97.6
+        },
+        "fpr": {
+          "impressionism": 8.1,
+          "realism": 90.2,
+          "romanticism": 2.4
+        },
+        "fnr": {
+          "impressionism": 91.8,
+          "realism": 12.5,
+          "romanticism": 97.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 50.1,
+          "realism": 48.7,
+          "romanticism": 50.3
         }
       }
     },
@@ -2971,9 +4070,30 @@
         "observations": [
           "Prolonge le scan rbf_num_centers vers le bas (16→8), même config sinon (seed=42, 1000 img/classe).",
           "Accuracy 43,6% — LÉGÈREMENT MEILLEURE que 16 centres (43,0%). La tendance 'moins de centres = mieux' se confirme numériquement.",
-          "Mais le recall révèle le vrai prix payé : Impressionism 49,3%, Romanticism 78,2%, et Realism quasi abandonné à 3,9%. Le modèle a en fait sacrifié une classe entière pour gagner quelques points d'accuracy globale sur les deux autres."
+          "Mais le recall révèle le vrai prix payé : Impressionism 49,3%, Romanticism 78,2%, et Realism quasi abandonné à 3,9%. Le modèle a en fait sacrifié une classe entière pour gagner quelques points d'accuracy globale sur les deux autres.",
+          "CORRECTIF via FPR : le TPR de 78,2% sur Romanticism est en partie un artefact — son FPR est de 60,4% (!), ce qui veut dire que 3 images sur 5 qui ne sont PAS Romanticism sont quand même classées Romanticism. Sa Balanced Accuracy n'est que 58,9%, très en dessous de ce qu'un TPR de 78,2% suggérait isolément. Ce run n'est donc pas 'accuracy correcte avec un compromis' comme décrit initialement — c'est un début de collapse partiel sur Romanticism (Realism, elle, est en collapse quasi total : Balanced Accuracy 50,4%, à peine au-dessus du hasard)."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 79.4,
+          "realism": 96.9,
+          "romanticism": 39.6
+        },
+        "fpr": {
+          "impressionism": 20.6,
+          "realism": 3.1,
+          "romanticism": 60.4
+        },
+        "fnr": {
+          "impressionism": 50.7,
+          "realism": 96.1,
+          "romanticism": 21.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 64.3,
+          "realism": 50.4,
+          "romanticism": 58.9
+        }
       }
     },
     {
@@ -3009,7 +4129,27 @@
           "Accuracy 41,8% — se place bien entre 16 (43,0%) et 64 (39,6%), confirmant une décroissance régulière avec le nombre de centres sur ce volume de données (1000 img/classe).",
           "Recall 59,5/32,2/33,2 : toujours le même schéma qu'aux autres tailles — Impressionism favorisé, Realism et Romanticism à la peine."
         ],
-        "conclusion": ""
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 60.3,
+          "realism": 74.7,
+          "romanticism": 77.5
+        },
+        "fpr": {
+          "impressionism": 39.7,
+          "realism": 25.3,
+          "romanticism": 22.5
+        },
+        "fnr": {
+          "impressionism": 40.5,
+          "realism": 67.8,
+          "romanticism": 66.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.9,
+          "realism": 53.4,
+          "romanticism": 55.3
+        }
       }
     },
     {
@@ -3043,9 +4183,30 @@
         "observations": [
           "16 centres, mais sur le DATASET COMPLET (limit=-1, 30345 images train contre 3000 pour les runs précédents à 1000/classe) au lieu de rester sur un volume réduit — même logique que ce qu'on avait fait pour MLP et Linear (Phase 4-5).",
           "Meilleure accuracy de toute la série RBF : 45,7% (vs 43,0% avec la même architecture sur seulement 1000 img/classe, +2,7 pts). Confirme que le RBF profite lui aussi de plus de données, comme le MLP et le Linear.",
-          "Mais le recall se déséquilibre fortement avec l'échelle : Impressionism 76,6%, Romanticism 37,1%, Realism 22,7% — le gain d'accuracy vient presque entièrement d'un très fort score sur Impressionism, pas d'un vrai progrès généralisé sur les 3 classes."
+          "Mais le recall se déséquilibre fortement avec l'échelle : Impressionism 76,6%, Romanticism 37,1%, Realism 22,7% — le gain d'accuracy vient presque entièrement d'un très fort score sur Impressionism, pas d'un vrai progrès généralisé sur les 3 classes.",
+          "CORRECTIF via FPR : Impressionism a un FPR de 46,0% — proche de la moitié des images qui ne sont PAS Impressionism sont quand même classées comme telles. Ce n'est pas un collapse aussi total que les runs 77/82/107 (où le FPR dépasse 80%), mais c'est un déséquilibre bien réel, pas juste une 'préférence'. Realism, à l'inverse, a un FPR très bas (14,9%) mais un TPR tout aussi bas (22,7%) : le modèle ne prédit quasiment jamais Realism, dans un sens comme dans l'autre — cette classe est simplement absente des décisions du modèle plutôt que confondue avec les autres."
         ],
-        "conclusion": ""
+        "conclusion": "En tenant compte du FPR, le meilleur score RBF de la série (45,7%) doit être relativisé : il est partiellement porté par une sur-prédiction d'Impressionism (FPR 46%), pas uniquement par un vrai gain de capacité discriminante sur les 3 classes. Le run 81 (16 centres + ratio=0,25, 44,5%, FPR 26,0/29,7/27,5% bien plus homogène) reste le run RBF le plus honnêtement équilibré du rapport, même s'il affiche une accuracy légèrement inférieure.",
+        "tnr": {
+          "impressionism": 54.0,
+          "realism": 85.1,
+          "romanticism": 79.3
+        },
+        "fpr": {
+          "impressionism": 46.0,
+          "realism": 14.9,
+          "romanticism": 20.7
+        },
+        "fnr": {
+          "impressionism": 23.4,
+          "realism": 77.3,
+          "romanticism": 62.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 65.3,
+          "realism": 53.9,
+          "romanticism": 58.2
+        }
       }
     },
     {
@@ -3082,7 +4243,27 @@
           "Recall nettement plus équilibré que les autres runs 16 centres : 54,8/44,2/33,9 — Realism à 44,2% est de LOIN le meilleur score Realism obtenu sur RBF (les autres runs oscillent entre 3,9% et 38,9%).",
           "Accuracy train aussi la plus haute de la série (67,4/63,0/64,8%) et loss la plus basse (1,3-1,48) — cohérent : réduire les négatifs par sous-échantillonnage rend le problème plus facile à apprendre pour le modèle."
         ],
-        "conclusion": "Bilan du scan complet RBF (8/16/32/64/256 centres + dataset complet + train_positive_ratio) : (1) moins de centres donne une accuracy globale plus haute, mais en sacrifiant progressivement Realism jusqu'à l'abandon quasi total à 8 centres — ce n'est pas un vrai gain, juste un transfert. (2) Plus de données aide (45,7% sur dataset complet, meilleur score absolu), mais accentue aussi le déséquilibre entre classes. (3) train_positive_ratio=0.25 est le SEUL levier testé qui améliore Realism sans la sacrifier (44,2%, meilleur score Realism de toute la série) tout en gardant une bonne accuracy globale (44,5%) — c'est la piste la plus prometteuse pour la suite, notamment combinée au dataset complet (16 centres + ratio=0.25 + dataset complet, jamais testé ensemble)."
+        "conclusion": "Bilan du scan complet RBF (8/16/32/64/256 centres + dataset complet + train_positive_ratio) : (1) moins de centres donne une accuracy globale plus haute, mais en sacrifiant progressivement Realism jusqu'à l'abandon quasi total à 8 centres — ce n'est pas un vrai gain, juste un transfert. (2) Plus de données aide (45,7% sur dataset complet, meilleur score absolu), mais accentue aussi le déséquilibre entre classes. (3) train_positive_ratio=0.25 est le SEUL levier testé qui améliore Realism sans la sacrifier (44,2%, meilleur score Realism de toute la série) tout en gardant une bonne accuracy globale (44,5%) — c'est la piste la plus prometteuse pour la suite, notamment combinée au dataset complet (16 centres + ratio=0.25 + dataset complet, jamais testé ensemble).",
+        "tnr": {
+          "impressionism": 74.0,
+          "realism": 70.3,
+          "romanticism": 72.5
+        },
+        "fpr": {
+          "impressionism": 26.0,
+          "realism": 29.7,
+          "romanticism": 27.5
+        },
+        "fnr": {
+          "impressionism": 45.2,
+          "realism": 55.8,
+          "romanticism": 66.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 64.4,
+          "realism": 57.2,
+          "romanticism": 53.2
+        }
       }
     },
     {
@@ -3117,9 +4298,1354 @@
           "Test de la combinaison des deux meilleurs leviers identifiés séparément : dataset complet (run 80, 45,7%) + train_positive_ratio=0.25 (run 81, 44,5%). Hypothèse : cumuler les deux devrait dépasser 45,7% tout en gardant un bon Realism.",
           "Résultat : ÉCHEC net. 36,8% — plus bas que les deux leviers pris séparément, et même plus bas que la config de base (16 centres, 1000 img/classe, ratio naturel, 43,0%).",
           "Le recall révèle un collapse sévère : Impressionism 19,3%, Realism 5,1% (pire que TOUS les autres runs 16 centres, y compris celui sans ratio), Romanticism 87,6%. Le modèle prédit quasiment toujours 'romanticism'.",
-          "Pourtant l'accuracy train est la meilleure de toute la série RBF (66,1/63,4/64,2%, loss 1,36-1,46) — comme pour le collapse à 256 centres, le problème n'est pas un défaut d'apprentissage, c'est une instabilité qui apparaît uniquement à la décision finale (argmax one-vs-rest)."
+          "Pourtant l'accuracy train est la meilleure de toute la série RBF (66,1/63,4/64,2%, loss 1,36-1,46) — comme pour le collapse à 256 centres, le problème n'est pas un défaut d'apprentissage, c'est une instabilité qui apparaît uniquement à la décision finale (argmax one-vs-rest).",
+          "FPR Romanticism = 82,8% (TNR seulement 17,2%) : plus de 4 images sur 5 qui ne sont PAS Romanticism sont quand même prédites Romanticism. Balanced Accuracy Romanticism = 52,4% — à peine au-dessus du hasard malgré un TPR de 87,6% qui, isolé, aurait pu sembler excellent."
         ],
-        "conclusion": "Les leviers ne s'additionnent pas : combiner dataset complet et train_positive_ratio=0.25 recrée le même type de collapse qu'on avait observé à 256 centres, alors qu'aucun des deux leviers pris seul ne posait ce problème à 16 centres. Hypothèse : avec ratio=0.25 appliqué APRÈS un dataset complet (au lieu de 1000 img/classe), le sous-échantillonnage des négatifs change radicalement la distribution vue par le K-Means à seulement 16 centres — les centres trouvés ne représentent plus correctement la frontière de décision, et gamma (calculé automatiquement) devient mal calibré. Conclusion pratique : sur ce projet, train_positive_ratio et limit_per_category ne sont PAS indépendants pour le RBF à ce nombre de centres — il faudrait re-scanner num_centers spécifiquement dans la configuration 'dataset complet + ratio=0.25' plutôt que de réutiliser la valeur optimale trouvée à 1000 images/classe."
+        "conclusion": "Les leviers ne s'additionnent pas : combiner dataset complet et train_positive_ratio=0.25 recrée le même type de collapse qu'on avait observé à 256 centres, alors qu'aucun des deux leviers pris seul ne posait ce problème à 16 centres. Hypothèse : avec ratio=0.25 appliqué APRÈS un dataset complet (au lieu de 1000 img/classe), le sous-échantillonnage des négatifs change radicalement la distribution vue par le K-Means à seulement 16 centres — les centres trouvés ne représentent plus correctement la frontière de décision, et gamma (calculé automatiquement) devient mal calibré. Conclusion pratique : sur ce projet, train_positive_ratio et limit_per_category ne sont PAS indépendants pour le RBF à ce nombre de centres — il faudrait re-scanner num_centers spécifiquement dans la configuration 'dataset complet + ratio=0.25' plutôt que de réutiliser la valeur optimale trouvée à 1000 images/classe.",
+        "tnr": {
+          "impressionism": 91.5,
+          "realism": 97.4,
+          "romanticism": 17.2
+        },
+        "fpr": {
+          "impressionism": 8.5,
+          "realism": 2.6,
+          "romanticism": 82.8
+        },
+        "fnr": {
+          "impressionism": 80.7,
+          "realism": 94.9,
+          "romanticism": 12.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 55.4,
+          "realism": 51.3,
+          "romanticism": 52.4
+        }
+      }
+    },
+    {
+      "id": 83,
+      "title": "MLP [256, 256] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[256, 256]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "per_column",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 46.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 50.5,
+          "realism": 33.3,
+          "romanticism": 56.3
+        },
+        "train_accuracy": {
+          "impressionism": 80.3,
+          "realism": 77.1,
+          "romanticism": 78.1
+        },
+        "train_loss": {
+          "impressionism": 0.744,
+          "realism": 0.87,
+          "romanticism": 0.81
+        },
+        "observations": [
+          "Toujours sur le même pipeline 64×64 couleur (12288 dimensions) que le reste de la série MLP one-vs-rest — dataset complet + train_positive_ratio=0.25 combinés, comme le meilleur réglage identifié précédemment.",
+          "46,6% à seulement 40 epochs (vs 100 pour le run 17 comparable à 46,7%) — confirme que ce combo converge vite et reste stable avec un budget d'epochs réduit."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 75.8,
+          "realism": 78.9,
+          "romanticism": 65.4
+        },
+        "fpr": {
+          "impressionism": 24.2,
+          "realism": 21.1,
+          "romanticism": 34.6
+        },
+        "fnr": {
+          "impressionism": 49.5,
+          "realism": 66.7,
+          "romanticism": 43.7
+        },
+        "balanced_accuracy": {
+          "impressionism": 63.2,
+          "realism": 56.1,
+          "romanticism": 60.8
+        }
+      }
+    },
+    {
+      "id": 84,
+      "title": "MLP [64, 32] — seed 42, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 35,
+      "normalization": "per_column",
+      "train": 30344,
+      "test": 13004,
+      "accuracy": 44.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 43.5,
+          "realism": 39.7,
+          "romanticism": 51.5
+        },
+        "train_accuracy": {
+          "impressionism": 85.3,
+          "realism": 81.2,
+          "romanticism": 80.1
+        },
+        "train_loss": {
+          "impressionism": 0.49,
+          "realism": 0.581,
+          "romanticism": 0.607
+        },
+        "observations": [
+          "PIVOT DE PIPELINE : ce run (et les 16 suivants jusqu'au run 100) utilise des images 32×32 EN NIVEAUX DE GRIS (1024 dimensions en entrée) au lieu des 64×64 couleur (12288 dim) utilisées partout ailleurs dans ce rapport — dossier dataset/images/32x32_gray. Ce n'est pas juste un autre hyperparamètre : c'est un prétraitement entièrement différent (perte de la couleur + résolution divisée par 4), donc ces runs ne sont PAS directement comparables aux runs 1-83 sur la même échelle.",
+          "44,8% avec seulement 1024 dimensions d'entrée (12x moins que le pipeline couleur) — déjà proche de nos scores MLP habituels malgré une perte d'information massive."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 76.6,
+          "realism": 72.5,
+          "romanticism": 68.2
+        },
+        "fpr": {
+          "impressionism": 23.4,
+          "realism": 27.5,
+          "romanticism": 31.8
+        },
+        "fnr": {
+          "impressionism": 56.5,
+          "realism": 60.3,
+          "romanticism": 48.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.1,
+          "realism": 56.1,
+          "romanticism": 59.8
+        }
+      }
+    },
+    {
+      "id": 85,
+      "title": "MLP [128, 64] — seed 42, limit=-1, pos_ratio=0.5 (batch import)",
+      "model": "mlp",
+      "architecture": "[128, 64]",
+      "seed": 42,
+      "alpha": 0.0005,
+      "epochs": 150,
+      "normalization": "per_column",
+      "train": 30344,
+      "test": 13004,
+      "accuracy": 45.5,
+      "analysis": {
+        "recall": {
+          "impressionism": 44.8,
+          "realism": 43.6,
+          "romanticism": 48.2
+        },
+        "train_accuracy": {
+          "impressionism": 93.4,
+          "realism": 94.4,
+          "romanticism": 93.6
+        },
+        "train_loss": {
+          "impressionism": 0.268,
+          "realism": 0.228,
+          "romanticism": 0.261
+        },
+        "observations": [
+          "Lot 32x32 niveaux de gris (voir run 84 pour le contexte du pivot de pipeline) : architecture [128,64], alpha=0.0005 (plus bas que la normale), 150 epochs, dataset complet.",
+          "Accuracy 45.5% — déjà dans la plage haute du lot gris malgré un alpha réduit, compense par un nombre d'epochs élevé."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 74.9,
+          "realism": 70.3,
+          "romanticism": 73.1
+        },
+        "fpr": {
+          "impressionism": 25.1,
+          "realism": 29.7,
+          "romanticism": 26.9
+        },
+        "fnr": {
+          "impressionism": 55.2,
+          "realism": 56.4,
+          "romanticism": 51.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.8,
+          "realism": 56.9,
+          "romanticism": 60.7
+        }
+      }
+    },
+    {
+      "id": 86,
+      "title": "MLP [32, 16] — seed 42, limit=-1, pos_ratio=0.5 (batch import)",
+      "model": "mlp",
+      "architecture": "[32, 16]",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "per_column",
+      "train": 30344,
+      "test": 13004,
+      "accuracy": 46.0,
+      "analysis": {
+        "recall": {
+          "impressionism": 53.0,
+          "realism": 42.4,
+          "romanticism": 42.3
+        },
+        "train_accuracy": {
+          "impressionism": 71.7,
+          "realism": 65.5,
+          "romanticism": 70.1
+        },
+        "train_loss": {
+          "impressionism": 0.774,
+          "realism": 0.871,
+          "romanticism": 0.788
+        },
+        "observations": [
+          "Architecture [32,16] (petite), seulement 40 epochs : accuracy 46.0%, pourtant l'un des meilleurs scores du lot gris à ce stade — confirme l'observation faite sur le pipeline couleur (runs 27/34/35/52) : au-delà d'une certaine taille, l'architecture pèse moins que le volume de données (ici le dataset complet pour tous les runs du lot gris)."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 72.2,
+          "realism": 71.1,
+          "romanticism": 75.7
+        },
+        "fpr": {
+          "impressionism": 27.8,
+          "realism": 28.9,
+          "romanticism": 24.3
+        },
+        "fnr": {
+          "impressionism": 47.0,
+          "realism": 57.6,
+          "romanticism": 57.7
+        },
+        "balanced_accuracy": {
+          "impressionism": 62.6,
+          "realism": 56.7,
+          "romanticism": 59.0
+        }
+      }
+    },
+    {
+      "id": 87,
+      "title": "MLP [256, 128] — seed 42, limit=9884, pos_ratio=0.5 (batch import)",
+      "model": "mlp",
+      "architecture": "[256, 128]",
+      "seed": 42,
+      "alpha": 0.0005,
+      "epochs": 150,
+      "normalization": "per_column",
+      "train": 29652,
+      "test": 13004,
+      "accuracy": 45.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 44.6,
+          "realism": 44.1,
+          "romanticism": 48.7
+        },
+        "train_accuracy": {
+          "impressionism": 88.4,
+          "realism": 90.3,
+          "romanticism": 90.4
+        },
+        "train_loss": {
+          "impressionism": 0.464,
+          "realism": 0.389,
+          "romanticism": 0.384
+        },
+        "observations": [
+          "[256,128], alpha=0.0005, 150 epochs (comme le run 85 mais architecture plus large) : accuracy 45.8%, très proche du run 85 (45.5%) malgré une architecture bien plus grande — encore un signe que ce lot de runs est proche d'un plafond de performance autour de 44-47%, quelle que soit l'architecture ou le nombre d'epochs au-delà d'un certain point."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 75.3,
+          "realism": 70.0,
+          "romanticism": 73.3
+        },
+        "fpr": {
+          "impressionism": 24.7,
+          "realism": 30.0,
+          "romanticism": 26.7
+        },
+        "fnr": {
+          "impressionism": 55.4,
+          "realism": 55.9,
+          "romanticism": 51.3
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.0,
+          "realism": 57.1,
+          "romanticism": 61.0
+        }
+      }
+    },
+    {
+      "id": 88,
+      "title": "MLP [256, 128] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[256, 128]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.8,
+      "analysis": {
+        "recall": {
+          "impressionism": 38.7,
+          "realism": 48.2,
+          "romanticism": 50.8
+        },
+        "train_accuracy": {
+          "impressionism": 87.7,
+          "realism": 88.5,
+          "romanticism": 90.1
+        },
+        "train_loss": {
+          "impressionism": 0.487,
+          "realism": 0.445,
+          "romanticism": 0.389
+        },
+        "observations": [
+          "Premier run du lot gris à passer en normalisation 'standard' (au lieu de per_column) — cohérent, un canal unique en niveaux de gris n'a pas vraiment de sens à normaliser par canal séparément.",
+          "Même architecture [256,128] que le run 87, mais seed, alpha ET epochs diffèrent aussi (40 ici contre 150 au run 87) — plusieurs leviers changent en même temps, donc pas une comparaison isolée. Accuracy 45.8%, quasi identique au run 87 (45.8%) malgré ces différences : plutôt un signe que ce lot converge vers un plateau similaire (44-47%) quel que soit le détail des réglages, que la preuve d'un effet précis d'un seul paramètre."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 81.0,
+          "realism": 67.1,
+          "romanticism": 70.8
+        },
+        "fpr": {
+          "impressionism": 19.0,
+          "realism": 32.9,
+          "romanticism": 29.2
+        },
+        "fnr": {
+          "impressionism": 61.3,
+          "realism": 51.8,
+          "romanticism": 49.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.8,
+          "realism": 57.7,
+          "romanticism": 60.8
+        }
+      }
+    },
+    {
+      "id": 89,
+      "title": "MLP [256, 256] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[256, 256]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 46.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 46.7,
+          "realism": 43.5,
+          "romanticism": 49.8
+        },
+        "train_accuracy": {
+          "impressionism": 84.9,
+          "realism": 82.5,
+          "romanticism": 84.7
+        },
+        "train_loss": {
+          "impressionism": 0.587,
+          "realism": 0.669,
+          "romanticism": 0.583
+        },
+        "observations": [
+          "[256,256] (la plus grande architecture testée sur ce lot), 40 epochs, normalisation standard : accuracy 46.6%.",
+          "Même config exacte que le run 90 (seed=1337, même architecture, même dataset) sauf le nombre d'epochs (40 ici contre 100 au run 90) : accuracy 46.6% vs 47.1%, seulement -0.5 pt malgré 60 epochs de moins — confirme la convergence rapide déjà observée sur ce pipeline (comme run 88 vs run 87)."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 76.9,
+          "realism": 71.5,
+          "romanticism": 71.6
+        },
+        "fpr": {
+          "impressionism": 23.1,
+          "realism": 28.5,
+          "romanticism": 28.4
+        },
+        "fnr": {
+          "impressionism": 53.3,
+          "realism": 56.5,
+          "romanticism": 50.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.8,
+          "realism": 57.5,
+          "romanticism": 60.7
+        }
+      }
+    },
+    {
+      "id": 90,
+      "title": "MLP [256, 256] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[256, 256]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 47.1,
+      "analysis": {
+        "recall": {
+          "impressionism": 41.2,
+          "realism": 48.2,
+          "romanticism": 52.1
+        },
+        "train_accuracy": {
+          "impressionism": 89.0,
+          "realism": 90.7,
+          "romanticism": 91.8
+        },
+        "train_loss": {
+          "impressionism": 0.439,
+          "realism": 0.357,
+          "romanticism": 0.327
+        },
+        "observations": [
+          "MEILLEUR RÉSULTAT de tout le lot 32×32 niveaux de gris (17 runs, ids 84-100) : 47,1% — comparable voire légèrement supérieur à nos meilleurs runs MLP en couleur 64×64 (46,7-46,8% à architecture équivalente).",
+          "Résultat notable : avec 12x moins de dimensions d'entrée (1024 vs 12288) et sans aucune information de couleur, ce modèle égale nos meilleurs runs couleur. Suggère que la classification de mouvement artistique dans ce dataset repose autant sur la texture/forme (préservée en niveaux de gris) que sur la palette de couleurs — à nuancer avec les runs Linear où per_column (qui exploite spécifiquement le signal couleur par canal) avait un avantage net.",
+          "Normalisation 'standard' (pas per_column, cohérent — un seul canal en niveaux de gris n'a pas de sens à normaliser par canal)."
+        ],
+        "conclusion": "Bilan du lot 32×32 gris (17 runs, epochs 15 à 150, architectures de [32,16] à [256,256]) : accuracy entre 43,6% et 47,1%, donc dans la même plage que le pipeline couleur 64×64 malgré une réduction drastique de l'information d'entrée. Piste à creuser : la couleur ne semble pas être le signal dominant pour ce problème, contrairement à l'hypothèse initiale issue de l'analyse Linear (normalisation per_column).",
+        "tnr": {
+          "impressionism": 81.0,
+          "realism": 68.3,
+          "romanticism": 71.5
+        },
+        "fpr": {
+          "impressionism": 19.0,
+          "realism": 31.7,
+          "romanticism": 28.5
+        },
+        "fnr": {
+          "impressionism": 58.8,
+          "realism": 51.8,
+          "romanticism": 47.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.1,
+          "realism": 58.3,
+          "romanticism": 61.8
+        }
+      }
+    },
+    {
+      "id": 91,
+      "title": "MLP [64, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 50,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 46.0,
+      "analysis": {
+        "recall": {
+          "impressionism": 45.2,
+          "realism": 46.6,
+          "romanticism": 46.1
+        },
+        "train_accuracy": {
+          "impressionism": 89.3,
+          "realism": 84.3,
+          "romanticism": 85.6
+        },
+        "train_loss": {
+          "impressionism": 0.378,
+          "realism": 0.501,
+          "romanticism": 0.465
+        },
+        "observations": [
+          "Début d'un second sous-scan sur le lot gris : architectures moyennes (64,32 / 32,16 / 128,32 / 64,16), toutes à seed=1337, normalisation standard, dataset complet.",
+          "[64,32], 50 epochs : accuracy 46.0%."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 76.5,
+          "realism": 67.6,
+          "romanticism": 74.9
+        },
+        "fpr": {
+          "impressionism": 23.5,
+          "realism": 32.4,
+          "romanticism": 25.1
+        },
+        "fnr": {
+          "impressionism": 54.8,
+          "realism": 53.4,
+          "romanticism": 53.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.9,
+          "realism": 57.1,
+          "romanticism": 60.5
+        }
+      }
+    },
+    {
+      "id": 92,
+      "title": "MLP [32, 16] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[32, 16]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 50,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.2,
+      "analysis": {
+        "recall": {
+          "impressionism": 45.8,
+          "realism": 42.5,
+          "romanticism": 47.2
+        },
+        "train_accuracy": {
+          "impressionism": 81.6,
+          "realism": 78.0,
+          "romanticism": 78.8
+        },
+        "train_loss": {
+          "impressionism": 0.564,
+          "realism": 0.647,
+          "romanticism": 0.618
+        },
+        "observations": [
+          "[32,16], 50 epochs : accuracy 45.2%, très proche du run 91 ([64,32], 46.0%) — encore une fois, doubler la largeur des couches ne change presque rien une fois qu'on est sur le dataset complet."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 75.2,
+          "realism": 70.7,
+          "romanticism": 71.9
+        },
+        "fpr": {
+          "impressionism": 24.8,
+          "realism": 29.3,
+          "romanticism": 28.1
+        },
+        "fnr": {
+          "impressionism": 54.2,
+          "realism": 57.5,
+          "romanticism": 52.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.5,
+          "realism": 56.6,
+          "romanticism": 59.5
+        }
+      }
+    },
+    {
+      "id": 93,
+      "title": "MLP [128, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[128, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 50,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.9,
+      "analysis": {
+        "recall": {
+          "impressionism": 43.3,
+          "realism": 47.5,
+          "romanticism": 46.9
+        },
+        "train_accuracy": {
+          "impressionism": 92.4,
+          "realism": 89.7,
+          "romanticism": 92.0
+        },
+        "train_loss": {
+          "impressionism": 0.295,
+          "realism": 0.364,
+          "romanticism": 0.299
+        },
+        "observations": [
+          "[128,32], 50 epochs : accuracy 45.9%, dans la même plage que 91/92 (45,2-46,0%)."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 77.5,
+          "realism": 67.7,
+          "romanticism": 73.7
+        },
+        "fpr": {
+          "impressionism": 22.5,
+          "realism": 32.3,
+          "romanticism": 26.3
+        },
+        "fnr": {
+          "impressionism": 56.7,
+          "realism": 52.5,
+          "romanticism": 53.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.4,
+          "realism": 57.6,
+          "romanticism": 60.3
+        }
+      }
+    },
+    {
+      "id": 94,
+      "title": "MLP [128, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[128, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 44.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 42.8,
+          "realism": 45.3,
+          "romanticism": 45.8
+        },
+        "train_accuracy": {
+          "impressionism": 90.1,
+          "realism": 87.3,
+          "romanticism": 88.7
+        },
+        "train_loss": {
+          "impressionism": 0.358,
+          "realism": 0.428,
+          "romanticism": 0.393
+        },
+        "observations": [
+          "[128,32] (même architecture que le run 93), mais seulement 40 epochs : accuracy 44.6%, -1.3 pt vs run 93 (50 epochs) — léger effet des epochs, mais faible."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 75.6,
+          "realism": 69.0,
+          "romanticism": 72.4
+        },
+        "fpr": {
+          "impressionism": 24.4,
+          "realism": 31.0,
+          "romanticism": 27.6
+        },
+        "fnr": {
+          "impressionism": 57.2,
+          "realism": 54.7,
+          "romanticism": 54.2
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.2,
+          "realism": 57.1,
+          "romanticism": 59.1
+        }
+      }
+    },
+    {
+      "id": 95,
+      "title": "MLP [64, 16] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 16]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 44.9,
+      "analysis": {
+        "recall": {
+          "impressionism": 46.4,
+          "realism": 43.1,
+          "romanticism": 45.2
+        },
+        "train_accuracy": {
+          "impressionism": 83.2,
+          "realism": 80.0,
+          "romanticism": 80.9
+        },
+        "train_loss": {
+          "impressionism": 0.528,
+          "realism": 0.593,
+          "romanticism": 0.581
+        },
+        "observations": [
+          "[64,16], 40 epochs : accuracy 44.9%."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 75.2,
+          "realism": 70.1,
+          "romanticism": 72.1
+        },
+        "fpr": {
+          "impressionism": 24.8,
+          "realism": 29.9,
+          "romanticism": 27.9
+        },
+        "fnr": {
+          "impressionism": 53.6,
+          "realism": 56.9,
+          "romanticism": 54.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.8,
+          "realism": 56.6,
+          "romanticism": 58.7
+        }
+      }
+    },
+    {
+      "id": 96,
+      "title": "MLP [64, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 25,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 43.6,
+      "analysis": {
+        "recall": {
+          "impressionism": 41.7,
+          "realism": 43.6,
+          "romanticism": 45.6
+        },
+        "train_accuracy": {
+          "impressionism": 81.4,
+          "realism": 77.8,
+          "romanticism": 79.3
+        },
+        "train_loss": {
+          "impressionism": 0.565,
+          "realism": 0.653,
+          "romanticism": 0.616
+        },
+        "observations": [
+          "Début d'un scan d'epochs à architecture fixe [64,32], seed=1337 : ce run utilise seulement 25 epochs.",
+          "Accuracy 43.6% — le plus bas de ce mini-scan d'epochs (voir runs 97/98/99/100 pour la suite)."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 77.3,
+          "realism": 66.9,
+          "romanticism": 71.3
+        },
+        "fpr": {
+          "impressionism": 22.7,
+          "realism": 33.1,
+          "romanticism": 28.7
+        },
+        "fnr": {
+          "impressionism": 58.3,
+          "realism": 56.4,
+          "romanticism": 54.4
+        },
+        "balanced_accuracy": {
+          "impressionism": 59.5,
+          "realism": 55.3,
+          "romanticism": 58.5
+        }
+      }
+    },
+    {
+      "id": 97,
+      "title": "MLP [64, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 30,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.1,
+      "analysis": {
+        "recall": {
+          "impressionism": 44.2,
+          "realism": 44.1,
+          "romanticism": 47.0
+        },
+        "train_accuracy": {
+          "impressionism": 83.2,
+          "realism": 79.9,
+          "romanticism": 81.6
+        },
+        "train_loss": {
+          "impressionism": 0.523,
+          "realism": 0.604,
+          "romanticism": 0.561
+        },
+        "observations": [
+          "[64,32], 30 epochs (5 de plus que le run 96) : accuracy 45.1% (+1.5 pt vs run 96)."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 76.3,
+          "realism": 69.4,
+          "romanticism": 72.0
+        },
+        "fpr": {
+          "impressionism": 23.7,
+          "realism": 30.6,
+          "romanticism": 28.0
+        },
+        "fnr": {
+          "impressionism": 55.8,
+          "realism": 55.9,
+          "romanticism": 53.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.3,
+          "realism": 56.7,
+          "romanticism": 59.5
+        }
+      }
+    },
+    {
+      "id": 98,
+      "title": "MLP [64, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 20,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 44.5,
+      "analysis": {
+        "recall": {
+          "impressionism": 48.2,
+          "realism": 44.7,
+          "romanticism": 40.5
+        },
+        "train_accuracy": {
+          "impressionism": 79.6,
+          "realism": 77.0,
+          "romanticism": 79.8
+        },
+        "train_loss": {
+          "impressionism": 0.617,
+          "realism": 0.667,
+          "romanticism": 0.61
+        },
+        "observations": [
+          "[64,32], 20 epochs (moins que les runs 96/97) : accuracy 44.5% — pas de tendance monotone claire avec le nombre d'epochs sur ce petit écart (15 à 40 epochs), la variance semble dominer l'effet du nombre d'epochs à ce stade de convergence."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 72.7,
+          "realism": 68.5,
+          "romanticism": 75.6
+        },
+        "fpr": {
+          "impressionism": 27.3,
+          "realism": 31.5,
+          "romanticism": 24.4
+        },
+        "fnr": {
+          "impressionism": 51.8,
+          "realism": 55.3,
+          "romanticism": 59.5
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.4,
+          "realism": 56.6,
+          "romanticism": 58.0
+        }
+      }
+    },
+    {
+      "id": 99,
+      "title": "MLP [64, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 45.3,
+      "analysis": {
+        "recall": {
+          "impressionism": 46.1,
+          "realism": 41.8,
+          "romanticism": 47.9
+        },
+        "train_accuracy": {
+          "impressionism": 86.2,
+          "realism": 84.3,
+          "romanticism": 85.6
+        },
+        "train_loss": {
+          "impressionism": 0.453,
+          "realism": 0.5,
+          "romanticism": 0.465
+        },
+        "observations": [
+          "[64,32], 40 epochs : accuracy 45.3%, le meilleur de ce mini-scan d'epochs (15-40) sur cette architecture."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 74.0,
+          "realism": 70.7,
+          "romanticism": 73.2
+        },
+        "fpr": {
+          "impressionism": 26.0,
+          "realism": 29.3,
+          "romanticism": 26.8
+        },
+        "fnr": {
+          "impressionism": 53.9,
+          "realism": 58.2,
+          "romanticism": 52.1
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.0,
+          "realism": 56.3,
+          "romanticism": 60.6
+        }
+      }
+    },
+    {
+      "id": 100,
+      "title": "MLP [64, 32] — seed 1337, limit=-1, pos_ratio=0.25 (batch import)",
+      "model": "mlp",
+      "architecture": "[64, 32]",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 15,
+      "normalization": "standard",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 44.3,
+      "analysis": {
+        "recall": {
+          "impressionism": 47.3,
+          "realism": 42.5,
+          "romanticism": 43.0
+        },
+        "train_accuracy": {
+          "impressionism": 77.9,
+          "realism": 76.0,
+          "romanticism": 77.3
+        },
+        "train_loss": {
+          "impressionism": 0.648,
+          "realism": 0.691,
+          "romanticism": 0.669
+        },
+        "observations": [
+          "[64,32], seulement 15 epochs (le minimum testé) : accuracy 44.3%."
+        ],
+        "conclusion": "Mini-scan d'epochs sur [64,32] (runs 96-100, 15 à 40 epochs, même seed/architecture/dataset) : accuracy entre 43.6% et 45.3%, sans progression monotone nette avec le nombre d'epochs — sur ce pipeline gris avec le dataset complet, le modèle semble converger très vite (des 15-20 epochs), et le reste de la variance observée est plus probablement du bruit d'entraînement que du sous-apprentissage.",
+        "tnr": {
+          "impressionism": 73.9,
+          "realism": 70.1,
+          "romanticism": 72.5
+        },
+        "fpr": {
+          "impressionism": 26.1,
+          "realism": 29.9,
+          "romanticism": 27.5
+        },
+        "fnr": {
+          "impressionism": 52.7,
+          "realism": 57.5,
+          "romanticism": 57.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.6,
+          "realism": 56.3,
+          "romanticism": 57.7
+        }
+      }
+    },
+    {
+      "id": 101,
+      "title": "MLP multiclasse [64, 32] — seed 5678, limit=6000, pos_ratio=0.25 (batch import)",
+      "model": "mlp_multiclass",
+      "architecture": "[64, 32] (multiclasse, 1 modele partage, argmax)",
+      "seed": 5678,
+      "alpha": 0.001,
+      "epochs": 30,
+      "normalization": "per_column",
+      "train": 18000,
+      "test": 13004,
+      "accuracy": 44.5,
+      "analysis": {
+        "recall": {
+          "impressionism": 48.1,
+          "realism": 39.9,
+          "romanticism": 45.4
+        },
+        "train_accuracy": {},
+        "train_loss": {},
+        "observations": [
+          "Premier test du nouveau type de modèle 'mlp_multiclass' : UN SEUL MLP partagé avec 3 sorties (une par catégorie) et décision finale par argmax, au lieu de 3 MLP séparés en one-vs-rest comme partout ailleurs dans ce rapport.",
+          "Accuracy train (globale, une seule valeur puisqu'il n'y a qu'un seul modèle) : 60,8%. Accuracy test : 44,5%, avec un recall assez équilibré (48,1/39,9/45,4).",
+          "Note technique : train_positive_ratio ne s'applique pas à ce type de modèle (voir docstring build_multiclass_train_arrays()) — le champ apparaît dans la config mais n'a aucun effet sur l'entraînement, toutes les images sont utilisées une seule fois chacune."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 73.7,
+          "realism": 71.1,
+          "romanticism": 72.0
+        },
+        "fpr": {
+          "impressionism": 26.3,
+          "realism": 28.9,
+          "romanticism": 28.0
+        },
+        "fnr": {
+          "impressionism": 51.9,
+          "realism": 60.1,
+          "romanticism": 54.6
+        },
+        "balanced_accuracy": {
+          "impressionism": 60.9,
+          "realism": 55.5,
+          "romanticism": 58.7
+        }
+      }
+    },
+    {
+      "id": 102,
+      "title": "MLP multiclasse [16, 8] — seed 2024, limit=3000, pos_ratio=0.25 (batch import)",
+      "model": "mlp_multiclass",
+      "architecture": "[16, 8] (multiclasse, 1 modele partage, argmax)",
+      "seed": 2024,
+      "alpha": 0.001,
+      "epochs": 30,
+      "normalization": "per_column",
+      "train": 9000,
+      "test": 13004,
+      "accuracy": 43.4,
+      "analysis": {
+        "recall": {
+          "impressionism": 57.2,
+          "realism": 34.0,
+          "romanticism": 38.7
+        },
+        "train_accuracy": {},
+        "train_loss": {},
+        "observations": [
+          "Petite architecture [16,8], peu de données (3000/classe) : accuracy train 50,1%, test 43,4% — architecture probablement trop petite pour ce problème, écart train/test faible (pas de surapprentissage marqué), signe plutôt de sous-apprentissage."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 65.1,
+          "realism": 76.5,
+          "romanticism": 73.5
+        },
+        "fpr": {
+          "impressionism": 34.9,
+          "realism": 23.5,
+          "romanticism": 26.5
+        },
+        "fnr": {
+          "impressionism": 42.8,
+          "realism": 66.0,
+          "romanticism": 61.3
+        },
+        "balanced_accuracy": {
+          "impressionism": 61.1,
+          "realism": 55.2,
+          "romanticism": 56.1
+        }
+      }
+    },
+    {
+      "id": 103,
+      "title": "MLP multiclasse [256, 256] — seed 42, limit=9884, pos_ratio=0.25 (batch import)",
+      "model": "mlp_multiclass",
+      "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 29652,
+      "test": 13004,
+      "accuracy": 47.7,
+      "analysis": {
+        "recall": {
+          "impressionism": 46.3,
+          "realism": 49.5,
+          "romanticism": 47.3
+        },
+        "train_accuracy": {},
+        "train_loss": {},
+        "observations": [
+          "Architecture [256,256] (la même que le meilleur MLP one-vs-rest, run 36), sur dataset quasi complet (9884/classe), 100 epochs, seed=42.",
+          "47,7% — déjà proche du record one-vs-rest (49,5%), avec un recall remarquablement équilibré (46,3/49,5/47,3, écart de seulement 3,2 pts entre classes) — nettement mieux équilibré que la plupart des MLP one-vs-rest à architecture équivalente."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 78.5,
+          "realism": 69.3,
+          "romanticism": 73.7
+        },
+        "fpr": {
+          "impressionism": 21.5,
+          "realism": 30.7,
+          "romanticism": 26.3
+        },
+        "fnr": {
+          "impressionism": 53.7,
+          "realism": 50.5,
+          "romanticism": 52.7
+        },
+        "balanced_accuracy": {
+          "impressionism": 62.4,
+          "realism": 59.4,
+          "romanticism": 60.5
+        }
+      }
+    },
+    {
+      "id": 104,
+      "title": "MLP multiclasse [256, 256] — NOUVEAU RECORD ABSOLU DU PROJET",
+      "model": "mlp_multiclass",
+      "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 29652,
+      "test": 13004,
+      "accuracy": 50.0,
+      "analysis": {
+        "recall": {
+          "impressionism": 51.9,
+          "realism": 44.0,
+          "romanticism": 54.1
+        },
+        "train_accuracy": {},
+        "train_loss": {},
+        "observations": [
+          "Identique au run 103 sauf la seed (42→1337) : accuracy train 78,8%, accuracy test 50,0% — MEILLEUR RÉSULTAT DE TOUT LE PROJET (dépasse le run 36, MLP one-vs-rest [256,256] dataset complet, qui tenait le record à 49,5%).",
+          "Recall équilibré : 51,9/44,0/54,1 (écart de 10,1 pts entre classes).",
+          "Comparaison directe avec le run 36 via FPR/Balanced Accuracy (données rétro-complétées) : run 36 → FPR 22,2/31,8/21,7%, Balanced Accuracy 64,1/60,3/62,0% ; run 104 → FPR 22,5/25,3/27,1%, Balanced Accuracy 64,7/59,3/63,5%. Les deux profils sont très proches et également sains (aucun signe de collapse).",
+          "Écart train/test de 28,8 pts (78,8% → 50,0%) : du surapprentissage existe toujours, mais dans une proportion comparable à nos meilleurs runs one-vs-rest — rien d'anormal.",
+          "Comparé au run 103 (même config, seed=42, 47,7%) : +2,3 pts uniquement dus au changement de seed — rappel que la variance inter-seed reste significative même sur ce nouveau type de modèle.",
+          "CORRECTIF (après vérification systématique sur les 6 runs multiclasses + comparaison avec les runs one-vs-rest [256,256]) : l'affirmation initiale 'le multiclasse est plus équilibré' reposait sur l'écart de recall (TPR) brut, une métrique trompeuse identifiée depuis dans la section méthodologique de ce rapport. En comparant plutôt l'écart de Balanced Accuracy entre classes — la mesure rigoureuse — les deux groupes sont en réalité comparables (multiclasse : 3,0 à 6,8 pts d'écart sur 6 runs ; one-vs-rest [256,256] pipeline couleur 64×64 : 3,7 à 7,1 pts sur 4 runs — runs 17/18/36/83 uniquement ; les runs 89/90 partagent la même étiquette d'architecture mais viennent du lot 32×32 niveaux de gris (voir run 84), donc exclus car non comparables). Voir la conclusion complète et corrigée au run 106."
+        ],
+        "conclusion": "Le MLP multiclasse (un seul modèle partagé à 3 sorties + argmax) atteint le meilleur score absolu du projet (50,0% vs 49,5% pour le meilleur one-vs-rest), mais PAS parce qu'il serait structurellement plus équilibré entre classes — cette hypothèse initiale ne résiste pas à une vérification par Balanced Accuracy sur l'ensemble des runs (voir run 106). Le gain de +0,5 pt vs le record one-vs-rest reste dans la plage de variance inter-seed déjà observée (+2,3 pts entre les runs 103 et 104, seed identique par ailleurs). Conclusion révisée : rien ne permet à ce stade d'affirmer que l'architecture multiclasse est supérieure au one-vs-rest sur ce projet — les deux approches donnent des résultats statistiquement comparables.",
+        "tnr": {
+          "impressionism": 77.5,
+          "realism": 74.7,
+          "romanticism": 72.9
+        },
+        "fpr": {
+          "impressionism": 22.5,
+          "realism": 25.3,
+          "romanticism": 27.1
+        },
+        "fnr": {
+          "impressionism": 48.1,
+          "realism": 56.0,
+          "romanticism": 45.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 64.7,
+          "realism": 59.3,
+          "romanticism": 63.5
+        }
+      }
+    },
+    {
+      "id": 105,
+      "title": "MLP multiclasse [256, 256] — seed 1337, limit=9884, pos_ratio=0.25 (batch import)",
+      "model": "mlp_multiclass",
+      "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+      "seed": 1337,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "per_column",
+      "train": 29652,
+      "test": 13004,
+      "accuracy": 46.4,
+      "analysis": {
+        "recall": {
+          "impressionism": 42.9,
+          "realism": 32.6,
+          "romanticism": 64.1
+        },
+        "train_accuracy": {},
+        "train_loss": {},
+        "observations": [
+          "Même config que le run 104 (record) mais epochs=40 au lieu de 100 : accuracy train 54,0%, test 46,4% (-3,6 pts vs record) — moins d'epochs, moins bon résultat, cohérent.",
+          "Recall très déséquilibré cette fois : 42,9/32,6/64,1 — à seulement 40 epochs, le modèle n'a pas encore convergé vers une solution équilibrée entre les 3 classes."
+        ],
+        "conclusion": "",
+        "tnr": {
+          "impressionism": 83.3,
+          "realism": 80.1,
+          "romanticism": 56.5
+        },
+        "fpr": {
+          "impressionism": 16.7,
+          "realism": 19.9,
+          "romanticism": 43.5
+        },
+        "fnr": {
+          "impressionism": 57.1,
+          "realism": 67.4,
+          "romanticism": 35.9
+        },
+        "balanced_accuracy": {
+          "impressionism": 63.1,
+          "realism": 56.3,
+          "romanticism": 60.3
+        }
+      }
+    },
+    {
+      "id": 106,
+      "title": "MLP multiclasse [256, 256] — seed 42, limit=9884, pos_ratio=0.25 (batch import)",
+      "model": "mlp_multiclass",
+      "architecture": "[256, 256] (multiclasse, 1 modele partage, argmax)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 40,
+      "normalization": "per_column",
+      "train": 29652,
+      "test": 13004,
+      "accuracy": 47.3,
+      "analysis": {
+        "recall": {
+          "impressionism": 47.7,
+          "realism": 46.8,
+          "romanticism": 47.2
+        },
+        "train_accuracy": {},
+        "train_loss": {},
+        "observations": [
+          "Même config que le run 103 (seed=42, 47,7%) mais epochs=40 : accuracy train 53,0%, test 47,3% — quasi identique au run 103 malgré 60 epochs de moins ! Suggère une convergence rapide pour cette architecture/seed.",
+          "Recall très équilibré en apparence : 47,7/46,8/47,2 (écart de seulement 0,9 pt). MAIS l'écart de Balanced Accuracy pour ce même run est de 6,1 pts (63,4/57,3/60,6) — PLUS élevé que celui du run 36 one-vs-rest (3,8 pts). Le recall quasi-identique entre les 3 classes ici est en partie un artefact (TPR et TNR peuvent compenser différemment par classe) : ce run n'est PAS le plus équilibré du rapport une fois qu'on regarde la métrique rigoureuse."
+        ],
+        "conclusion": "CONCLUSION CORRIGÉE après vérification systématique par Balanced Accuracy (voir aussi le correctif au run 104) : l'affirmation initiale de ce rapport ('le multiclasse est plus équilibré que le one-vs-rest, piste à privilégier') était basée sur l'écart de recall (TPR) brut, une métrique dont ce rapport explique maintenant en introduction qu'elle peut être trompeuse. En comparant les écarts de Balanced Accuracy entre classes sur les 6 runs multiclasses (3,0 à 6,8 pts) et sur les runs one-vs-rest [256,256] du pipeline couleur 64×64 (3,7 à 7,1 pts sur 4 runs : 17/18/36/83 — les runs 89 et 90 partagent la même étiquette d'architecture mais appartiennent au lot 32×32 niveaux de gris, donc exclus de cette comparaison, voir run 84), les deux groupes sont statistiquement dans la même plage — aucun des deux n'est systématiquement plus équilibré que l'autre. Ce qui reste vrai : le multiclasse atteint le meilleur score absolu du projet (50,0%, run 104) et reste une architecture valide à explorer, mais sans l'avantage de 'meilleur équilibre inter-classes' qu'on lui avait attribué à tort. Ceci illustre concrètement l'intérêt d'avoir ajouté TNR/FPR/FNR/Balanced Accuracy au rapport : une conclusion tirée sur la seule accuracy/recall peut être incomplète, voire fausse.",
+        "tnr": {
+          "impressionism": 79.1,
+          "realism": 67.8,
+          "romanticism": 74.0
+        },
+        "fpr": {
+          "impressionism": 20.9,
+          "realism": 32.2,
+          "romanticism": 26.0
+        },
+        "fnr": {
+          "impressionism": 52.3,
+          "realism": 53.2,
+          "romanticism": 52.8
+        },
+        "balanced_accuracy": {
+          "impressionism": 63.4,
+          "realism": 57.3,
+          "romanticism": 60.6
+        }
+      }
+    },
+    {
+      "id": 107,
+      "title": "RBF (64 centres) — seed 42, limit=-1, pos_ratio=-1 (batch import)",
+      "model": "rbf",
+      "architecture": "RBF, 64 centres (gamma auto)",
+      "seed": 42,
+      "alpha": 0.001,
+      "epochs": 100,
+      "normalization": "per_column",
+      "train": 30345,
+      "test": 13004,
+      "accuracy": 39.1,
+      "analysis": {
+        "recall": {
+          "impressionism": 23.3,
+          "realism": 88.5,
+          "romanticism": 5.0
+        },
+        "train_accuracy": {
+          "impressionism": 58.2,
+          "realism": 57.2,
+          "romanticism": 59.6
+        },
+        "train_loss": {
+          "impressionism": 1.672,
+          "realism": 1.713,
+          "romanticism": 1.618
+        },
+        "observations": [
+          "Test direct de l'hypothèse 'sous-paramétrage' proposée après le run 80 (16 centres, dataset complet, 45,7%) : est-ce que passer à 64 centres sur le dataset complet couvre mieux l'espace d'entrée et améliore le résultat ?",
+          "Réponse : NON, au contraire. Accuracy 39,1% — nettement EN DESSOUS du run 80 (45,7%, -6,6 pts). Le passage 16→64 centres dégrade le résultat sur dataset complet, exactement comme on l'avait observé sur 1000 images/classe (16→64→256, tendance décroissante).",
+          "Nouveau collapse détecté, sur une classe différente cette fois : Impressionism 23,3%, Realism 88,5%, Romanticism 5,0% — le modèle prédit massivement 'realism'. C'est le 3ème collapse RBF observé (après 256 centres/1000img sur 2 seeds différentes, et 16 centres+ratio=0.25+dataset complet) : à chaque fois un classifieur one-vs-rest domine, mais la classe cible varie.",
+          "FPR Realism = 80,8% : confirme le collapse indépendamment du TPR — 4 images sur 5 qui ne sont pas Realism sont quand même classées Realism. Balanced Accuracy des 3 classes (56,7/53,8/52,1) à peine au-dessus de 50%, signe d'un modèle avec très peu de pouvoir discriminant réel malgré une accuracy globale (39,1%) qui semble 'raisonnable' au premier regard."
+        ],
+        "conclusion": "Cette hypothèse externe ('16 centres sous-paramétrés pour couvrir le dataset complet, augmenter K') est RÉFUTÉE par ce test : plus de centres continue de dégrader le résultat même à grande échelle de données, confirmant que le nombre optimal de centres RBF pour ce projet reste bas (16, voire moins) quel que soit le volume de données. Le vrai facteur limitant du RBF n'est probablement pas le nombre de centres mais gamma (non réglable dans l'implémentation actuelle, toujours auto-calculé par heuristique) — cohérent avec la suggestion #2 de l'analyse externe, qui nécessiterait une modification du code C pour être testée.",
+        "tnr": {
+          "impressionism": 90.1,
+          "realism": 19.2,
+          "romanticism": 99.2
+        },
+        "fpr": {
+          "impressionism": 9.9,
+          "realism": 80.8,
+          "romanticism": 0.8
+        },
+        "fnr": {
+          "impressionism": 76.7,
+          "realism": 11.5,
+          "romanticism": 95.0
+        },
+        "balanced_accuracy": {
+          "impressionism": 56.7,
+          "realism": 53.8,
+          "romanticism": 52.1
+        }
       }
     }
   ]

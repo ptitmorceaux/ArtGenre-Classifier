@@ -112,6 +112,45 @@ function recallTable(recall) {
   });
 }
 
+function confusionMetricsTable(cats, metrics) {
+  // metrics: [{ label, values: {cat: pct} }, ...] -> tableau label en ligne, categories en colonne
+  const labelColWidth = 2160;
+  const catColWidth = Math.floor((CONTENT_WIDTH - labelColWidth) / cats.length);
+  const cols = [labelColWidth, ...cats.map(() => catColWidth)];
+
+  const header = new TableRow({
+    children: ["", ...cats].map((label, i) => new TableCell({
+      borders,
+      width: { size: cols[i], type: WidthType.DXA },
+      shading: { fill: HEADER_FILL, type: ShadingType.CLEAR },
+      margins: { top: 50, bottom: 50, left: 100, right: 100 },
+      children: [new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: label, bold: true, size: 18, color: "FFFFFF" })],
+      })],
+    })),
+  });
+
+  const rows = metrics.map((m, ri) => new TableRow({
+    children: [m.label, ...cats.map(c => m.values[c] !== undefined && m.values[c] !== null ? `${m.values[c]}%` : "—")].map((cell, i) => new TableCell({
+      borders,
+      width: { size: cols[i], type: WidthType.DXA },
+      shading: { fill: ri % 2 === 0 ? "F2F7FB" : "FFFFFF", type: ShadingType.CLEAR },
+      margins: { top: 50, bottom: 50, left: 100, right: 100 },
+      children: [new Paragraph({
+        alignment: i === 0 ? AlignmentType.LEFT : AlignmentType.CENTER,
+        children: [new TextRun({ text: String(cell), size: 18, bold: i === 0 })],
+      })],
+    })),
+  }));
+
+  return new Table({
+    width: { size: CONTENT_WIDTH, type: WidthType.DXA },
+    columnWidths: cols,
+    rows: [header, ...rows],
+  });
+}
+
 function bulletList(items) {
   return items.map(text => new Paragraph({
     numbering: { reference: "bullets", level: 0 },
@@ -136,7 +175,7 @@ function buildRunSection(run) {
   }));
 
   const paramRows = [
-    ["Modèle", run.model === "mlp" ? `MLP ${run.architecture}` : run.model === "rbf" ? `RBF (${run.architecture})` : run.architecture],
+    ["Modèle", run.model === "mlp" ? `MLP ${run.architecture}` : run.model === "mlp_multiclass" ? `MLP multiclasse ${run.architecture}` : run.model === "rbf" ? `RBF (${run.architecture})` : run.architecture],
     ["Seed", run.seed],
     ["Alpha (learning rate)", run.alpha],
     ["Epochs", run.epochs],
@@ -163,6 +202,23 @@ function buildRunSection(run) {
   }));
   children.push(recallTable(run.analysis.recall));
   children.push(new Paragraph({ spacing: { after: 120 } }));
+
+  const hasDetailedMetrics = run.analysis.tnr && Object.keys(run.analysis.tnr).length > 0;
+  if (hasDetailedMetrics) {
+    const cats = Object.keys(run.analysis.recall);
+    children.push(new Paragraph({
+      heading: HeadingLevel.HEADING_3,
+      children: [new TextRun("Métriques détaillées par classe (test)")],
+    }));
+    children.push(confusionMetricsTable(cats, [
+      { label: "TPR (recall)", values: run.analysis.recall },
+      { label: "TNR (spécificité)", values: run.analysis.tnr },
+      { label: "FPR (fausses alertes)", values: run.analysis.fpr },
+      { label: "FNR (ratés)", values: run.analysis.fnr },
+      { label: "Balanced Accuracy", values: run.analysis.balanced_accuracy },
+    ]));
+    children.push(new Paragraph({ spacing: { after: 120 } }));
+  }
 
   if (run.analysis.train_accuracy) {
     children.push(new Paragraph({
@@ -227,7 +283,7 @@ function summaryTable(runs) {
     const cellsData = [
       String(run.id),
       run.title,
-      run.model === "mlp" ? `MLP ${run.architecture}` : run.model === "rbf" ? "RBF" : "Linear",
+      run.model === "mlp" ? `MLP ${run.architecture}` : run.model === "mlp_multiclass" ? "MLP multiclasse" : run.model === "rbf" ? "RBF" : "Linear",
       String(run.epochs),
       `${run.accuracy}%`,
     ];
@@ -248,6 +304,7 @@ function summaryTable(runs) {
 const mlpRuns = data.runs.filter(r => r.model === "mlp");
 const linearRuns = data.runs.filter(r => r.model === "linear");
 const rbfRuns = data.runs.filter(r => r.model === "rbf");
+const mlpMulticlassRuns = data.runs.filter(r => r.model === "mlp_multiclass");
 
 const now = new Date();
 const dateStr = now.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
@@ -311,6 +368,34 @@ const doc = new Document({
         children: [new TextRun({ text: `Classification de styles artistiques (Impressionism / Realism / Romanticism) — mis à jour le ${dateStr}`, italics: true, size: 22, color: "555555" })],
       }),
 
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Comprendre les métriques par classe (TPR / TNR / FPR / FNR)")] }),
+      new Paragraph({
+        spacing: { after: 160 },
+        children: [new TextRun({ text: "L'accuracy globale (un seul chiffre) peut cacher des problèmes qui n'apparaissent qu'en regardant chaque classe séparément. Ces 4 métriques, calculées par catégorie (raisonnement \"cette classe vs les 2 autres\"), permettent de voir précisément où et comment un modèle se trompe — pas juste combien.", size: 20 })],
+      }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_3,
+        children: [new TextRun("Définitions (pour une classe donnée, ex. Realism)")],
+      }),
+      ...bulletList([
+        "TPR (True Positive Rate, = recall) : parmi les images qui SONT vraiment Realism, quelle proportion le modèle a correctement identifiée comme Realism. Un TPR bas veut dire que le modèle \"rate\" cette classe — il la confond avec les autres.",
+        "TNR (True Negative Rate, = spécificité) : parmi les images qui NE SONT PAS Realism, quelle proportion le modèle a correctement écartée (n'a pas prédit Realism). Un TNR bas veut dire que le modèle prédit Realism \"trop souvent\", y compris sur des images d'autres styles.",
+        "FPR (False Positive Rate = 1 − TNR) : le taux de \"fausses alertes\" — proportion d'images d'autres classes que le modèle étiquette à tort comme Realism. Un FPR élevé signifie que cette classe \"aspire\" des prédictions qui ne lui reviennent pas.",
+        "FNR (False Negative Rate = 1 − TPR) : le taux de \"ratés\" — proportion d'images vraiment Realism que le modèle n'a pas su reconnaître. Un FNR élevé signifie que cette classe est systématiquement ignorée au profit des autres.",
+        "Balanced Accuracy : moyenne de TPR et TNR pour cette classe. Contrairement à l'accuracy globale, elle n'est pas biaisée par le déséquilibre naturel (dans une décision one-vs-rest à 3 classes, il y a 2x plus d'exemples \"négatifs\" que \"positifs\" pour chaque catégorie)."
+      ]),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_3,
+        children: [new TextRun("Comment les lire dans ce projet")],
+      }),
+      ...bulletList([
+        "TPR bas + FNR haut sur une classe = elle est \"boudée\" par le modèle (cas classique de Realism sur beaucoup de runs Linear et RBF de ce rapport — TPR souvent sous 40%).",
+        "FPR très haut sur une classe (proche de 100%, TNR proche de 0%) = signe d'un EFFONDREMENT (\"collapse\") : le modèle prédit presque toujours cette classe, quelle que soit l'image réelle. On l'observe nettement sur plusieurs runs RBF de ce rapport (ex. runs 77, 82, 107) où une classe capte artificiellement l'essentiel des prédictions pendant que les 2 autres s'effondrent en TPR.",
+        "Un bon run \"sain\" a des Balanced Accuracy proches les unes des autres entre les 3 classes (écart faible) — c'est le signal le plus fiable d'un modèle réellement équilibré, plus fiable que l'accuracy globale seule qui peut masquer un déséquilibre compensé entre classes.",
+        "TNR est structurellement plus facile à obtenir haut que TPR dans ce contexte one-vs-rest (2 négatifs pour 1 positif) : un TNR élevé n'est pas forcément un signe de bonne performance, c'est en partie mécanique. C'est pour ça que FPR (qui capture la même information mais normalisée différemment) et surtout la Balanced Accuracy sont plus informatifs que le TNR brut pour comparer des runs entre eux."
+      ]),
+      new Paragraph({ children: [new PageBreak()] }),
+
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Synthèse des runs")] }),
       summaryTable(data.runs),
       new Paragraph({ children: [new PageBreak()] }),
@@ -326,6 +411,12 @@ const doc = new Document({
         new Paragraph({ children: [new PageBreak()] }),
         new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Résultats — RBF")] }),
         ...rbfRuns.flatMap(buildRunSection),
+      ] : []),
+
+      ...(mlpMulticlassRuns.length > 0 ? [
+        new Paragraph({ children: [new PageBreak()] }),
+        new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Résultats — MLP multiclasse")] }),
+        ...mlpMulticlassRuns.flatMap(buildRunSection),
       ] : []),
     ],
   }],
