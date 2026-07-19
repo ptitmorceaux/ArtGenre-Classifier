@@ -125,6 +125,7 @@ const submitPrediction = async () => {
           <select v-model="selectedType">
             <option value="linear">Modèle Linéaire (Linear)</option>
             <option value="mlp">Perceptron Multicouches (MLP)</option>
+            <option value="mlp_multiclass">Perceptron Multicouches (MLP-MC)</option>
             <option value="rbf">Réseau RBF</option>
           </select>
         </div>
