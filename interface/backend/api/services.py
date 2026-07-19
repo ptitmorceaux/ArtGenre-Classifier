@@ -4,6 +4,7 @@ import glob
 import base64
 import json
 import numpy as np
+
 from PIL import Image
 import matplotlib
 import matplotlib.pyplot as plt
@@ -16,10 +17,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.pa
 class ArtClassifierService:
 
     @staticmethod
-    def process_image(image_file):
-        img = Image.open(image_file).convert('RGB')
+    def process_image(image_file, config_data):
+        resolution = 64
+        channels = 3
+        if "32x32" in str(config_data.get("dataset", {})):
+            resolution = 32
+            channels = 1
+        mode = 'L' if channels == 1 else 'RGB'
+        img = Image.open(image_file).convert(mode)
+        
         resample = getattr(Image, "Resampling", Image).LANCZOS
-        img = img.resize((64, 64), resample)
+        img = img.resize((resolution, resolution), resample)
         
         img_array = np.array(img).flatten().astype(np.float32)
         return img_array.tolist()
@@ -62,7 +70,7 @@ class ArtClassifierService:
         
         is_classification = (model_type == "mlp")
         
-        input_data = ArtClassifierService.process_image(image_file)
+        input_data = ArtClassifierService.process_image(image_file, config_data)
         input_size = len(input_data)
         predictions = {}
         
@@ -92,7 +100,6 @@ class ArtClassifierService:
                 model.close()
                 
         best_category = max(predictions, key=predictions.get)
-        
         chart_base64 = ArtClassifierService.generate_matplotlib_chart(
             predictions, f"Cheminement de décision - {model_type.upper()}"
         )

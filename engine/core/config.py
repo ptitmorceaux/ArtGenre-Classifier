@@ -31,9 +31,14 @@ def get_config_documentation() -> dict:
         "test": os.path.join("dataset", "test"),
         "train": os.path.join("dataset", "train"),
     }
+    # default_dataset_data_folder_path = {
+    #     "test": os.path.join("dataset", "images", "64x64"),
+    #     "train": os.path.join("dataset", "images", "64x64"),
+    # }
+
     default_dataset_data_folder_path = {
-        "test": os.path.join("dataset", "images", "64x64"),
-        "train": os.path.join("dataset", "images", "64x64"),
+        "test": os.path.join("dataset", "images", "32x32_gray"),
+        "train": os.path.join("dataset", "images", "32x32_gray"),
     }
     return {
         "lib": {
@@ -76,6 +81,18 @@ def get_config_documentation() -> dict:
                 "docs": "Graine pour l'initialisation aléatoire. Si None, une graine est choisie aléatoirement parmi seeds_choice.",
                 "type": (int, type(None)),
                 "default": None,
+            },
+        },
+        "input_format": {
+            "resolution": {
+                "docs": "Taille de l'image (ex: 32 pour 32x32)",
+                "type": (int,),
+                "default": 32,
+            },
+            "channels": {
+                "docs": "Nombre de canaux (1 pour gris, 3 pour RGB)",
+                "type": (int,),
+                "default": 1,
             },
         },
         "dataset": {

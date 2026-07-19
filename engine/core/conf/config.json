@@ -5,14 +5,14 @@
         "seed": 42
     },
     "dataset": {
-        "train_positive_ratio": 0.25,
+        "train_positive_ratio": 0.5,
         "limit_per_category": 9884,
-        "normalization_method": "per_column"
+        "normalization_method": "standard"
     },
     "model": {
-        "type": "mlp_multiclass",
-        "alpha": 0.001,
-        "epochs": 40,
-        "mlp_hidden_layers": [256, 256]
+        "type": "mlp",
+        "alpha": 0.0005,
+        "epochs": 150,
+        "mlp_hidden_layers": [1024, 1024]
     }
 }

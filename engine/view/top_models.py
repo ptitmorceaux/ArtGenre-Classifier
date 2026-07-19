@@ -16,6 +16,7 @@ Usage:
 import argparse
 import glob
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -56,6 +57,15 @@ def parse_args() -> argparse.Namespace:
              "Adds a 'Global Rank' column: the rank is computed BEFORE filtering, across "
              "ALL model types, so it reflects standing in the whole pool, not just within "
              "the filtered subset.",
+    )
+    parser.add_argument(
+        "-r", "--resolution",
+        dest="resolution",
+        type=str,
+        default=None,
+        help="Filter runs by resolution (e.g. '64x64', '32x32_gray'). "
+             "Pass an empty string (-r \"\") to show runs where no resolution could be detected. "
+             "Case-insensitive.",
     )
     parser.add_argument(
         "-a", "--ago",
@@ -103,6 +113,42 @@ def extract_extra_info(config: dict) -> str:
     return ""
 
 
+RESOLUTION_PATTERN = re.compile(r"(\d+x\d+(?:_[A-Za-z0-9]+)?)")
+
+
+def extract_resolution(config: dict) -> str:
+    """
+    Extracts the image resolution (e.g. '64x64', '32x32_gray') from the dataset's
+    folder paths. Looks in dataset.data_folder_path.{train,test} first, then falls
+    back to each category's data_folder_path. Returns UNKNOWN if nothing matches.
+    """
+    dataset = config.get("dataset", {})
+    candidates = []
+
+    data_folder_path = dataset.get("data_folder_path", {})
+    if isinstance(data_folder_path, dict):
+        candidates.append(data_folder_path.get("train"))
+        candidates.append(data_folder_path.get("test"))
+
+    categories = dataset.get("categories", {})
+    if isinstance(categories, dict):
+        for split in ("train", "test"):
+            split_categories = categories.get(split, {})
+            if isinstance(split_categories, dict):
+                for cat_info in split_categories.values():
+                    if isinstance(cat_info, dict):
+                        candidates.append(cat_info.get("data_folder_path"))
+
+    for candidate in candidates:
+        if not candidate:
+            continue
+        match = RESOLUTION_PATTERN.search(str(candidate))
+        if match:
+            return match.group(1)
+
+    return UNKNOWN
+
+
 def extract_run_info(config: dict) -> dict:
     """Extracts a few useful fields to identify/compare runs in the display."""
     model = config.get("model", {})
@@ -118,6 +164,7 @@ def extract_run_info(config: dict) -> dict:
         "seed": lib.get("seed", UNKNOWN),
         "limit_per_category": dataset.get("limit_per_category", UNKNOWN),
         "ratio": dataset.get("train_positive_ratio", UNKNOWN),
+        "resolution": extract_resolution(config),
         "path": output.get("logs", UNKNOWN)
     }
 
@@ -193,9 +240,9 @@ def collect_runs(pattern: str) -> list[dict]:
         }
         run.update(extract_run_info(config))
         run["info"] = extract_extra_info(config)
-
         run["run_dt"] = parse_run_datetime(run["path"])
         run["elapsed"] = format_time_ago(run["run_dt"])
+        
         runs.append(run)
 
     return runs
@@ -209,6 +256,16 @@ def filter_runs_by_model(runs: list[dict], model_filter: str | None) -> list[dic
     return [r for r in runs if str(r["model_type"]).lower().strip() == normalized_filter]
 
 
+def filter_runs_by_resolution(runs: list[dict], resolution_filter: str | None) -> list[dict]:
+    """Filtre par résolution, APRÈS le calcul du rang global."""
+    if resolution_filter is None:
+        return runs
+    normalized_filter = resolution_filter.lower().strip()
+    if normalized_filter == "":
+        return [r for r in runs if str(r["resolution"]).lower().strip() == UNKNOWN.lower()]
+    return [r for r in runs if str(r["resolution"]).lower().strip() == normalized_filter]
+
+
 def assign_accuracy_ranks(runs: list[dict]) -> None:
     # Ignore les runs sans précision finale pour le classement
     valid_runs = [r for r in runs if r["top1_accuracy"] != -1.0]
@@ -216,22 +273,22 @@ def assign_accuracy_ranks(runs: list[dict]) -> None:
         run["rank"] = rank
 
 
-def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_filter_active: bool = False) -> None:
+def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, filter_active: bool = False) -> None:
     """
     Affiche les runs. Suppose que assign_accuracy_ranks() a déjà été appelé par
-    l'appelant, sur l'ensemble COMPLET des runs (avant tout filtre -m) — cette
+    l'appelant, sur l'ensemble COMPLET des runs (avant tout filtre) — cette
     fonction ne fait que trier/tronquer/afficher, jamais recalculer les rangs
     (sinon on retombe dans le bug du rang "local" au sous-ensemble filtré).
 
     La colonne "Global Rank" n'est utile que quand la position affichée (`#`) peut
-    différer du rang réel : avec `-m` (le sous-ensemble affiché n'est pas la
+    différer du rang réel : avec des filtres (le sous-ensemble affiché n'est pas la
     totalité classée) ou `-a` (l'ordre d'affichage n'est plus le classement Top-1).
     """
     if not runs:
         print("No valid run to display.")
         return
 
-    show_global_rank = sort_by_ago or model_filter_active
+    show_global_rank = sort_by_ago or filter_active
 
     if sort_by_ago:
         oldest_possible = datetime.min.replace(tzinfo=RUN_TIMEZONE)
@@ -245,7 +302,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_fi
     headers = ["#"]
     if show_global_rank:
         headers.append("Global Rank")
-    headers += ["Top-1 Acc", "Train Acc", "Model", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
+    headers += ["Top-1 Acc", "Train Acc", "Model", "Resolution", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
     for i, run in enumerate(display_runs):
@@ -261,6 +318,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_fi
             top1_str,
             train_str,
             str(run["model_type"]),
+            str(run["resolution"]),
             str(run["norm"]),
             str(run["alpha"]),
             str(run["epochs"]),
@@ -293,9 +351,13 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_fi
 def main() -> None:
     args = parse_args()
     runs = collect_runs(args.pattern)
-    assign_accuracy_ranks(runs)  # rang GLOBAL : calculé sur TOUS les runs, avant le filtre -m
+    assign_accuracy_ranks(runs)
+    
     runs = filter_runs_by_model(runs, args.model)
-    print_top_runs(runs, args.n, sort_by_ago=args.ago, model_filter_active=args.model is not None)
+    runs = filter_runs_by_resolution(runs, args.resolution)
+    
+    is_filtered = (args.model is not None) or (args.resolution is not None)
+    print_top_runs(runs, args.n, sort_by_ago=args.ago, filter_active=is_filtered)
 
 
 if __name__ == "__main__":
