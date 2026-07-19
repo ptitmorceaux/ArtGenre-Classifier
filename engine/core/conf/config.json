@@ -2,17 +2,16 @@
     "lib": {
         "compile": false,
         "seeds_choice": [42, 1337, 2024, 1234, 5678],
-        "seed": 2024
+        "seed": 42
     },
     "dataset": {
-        "train_positive_ratio": 0.50,
+        "train_positive_ratio": 0.25,
         "limit_per_category": 9884,
         "normalization_method": "standard"
     },
     "model": {
-        "type": "rbf",
+        "type": "linear",
         "alpha": 0.0001,
-        "epochs": 70,
-        "rbf_num_centers": 16
+        "epochs": 150
     }
 }
