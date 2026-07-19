@@ -219,7 +219,7 @@ def collect_runs(pattern: str) -> list[dict]:
 
     if not filepaths:
         print(f"[!] No file found for pattern '{pattern}'.", file=sys.stderr)
-        return all_runs
+        return runs
 
     for filepath in filepaths:
         try:
@@ -242,15 +242,7 @@ def collect_runs(pattern: str) -> list[dict]:
         run["info"] = extract_extra_info(config)
         run["run_dt"] = parse_run_datetime(run["path"])
         run["elapsed"] = format_time_ago(run["run_dt"])
-
-        all_runs.append(run)
-
-    # Le rank doit refléter la position de chaque run parmi TOUS les runs trouvés
-    # (avant filtrage par modèle/résolution), pas seulement parmi le sous-ensemble affiché.
-    assign_accuracy_ranks(all_runs)
-
-        run["run_dt"] = parse_run_datetime(run["path"])
-        run["elapsed"] = format_time_ago(run["run_dt"])
+        
         runs.append(run)
 
     return runs
@@ -264,6 +256,16 @@ def filter_runs_by_model(runs: list[dict], model_filter: str | None) -> list[dic
     return [r for r in runs if str(r["model_type"]).lower().strip() == normalized_filter]
 
 
+def filter_runs_by_resolution(runs: list[dict], resolution_filter: str | None) -> list[dict]:
+    """Filtre par résolution, APRÈS le calcul du rang global."""
+    if resolution_filter is None:
+        return runs
+    normalized_filter = resolution_filter.lower().strip()
+    if normalized_filter == "":
+        return [r for r in runs if str(r["resolution"]).lower().strip() == UNKNOWN.lower()]
+    return [r for r in runs if str(r["resolution"]).lower().strip() == normalized_filter]
+
+
 def assign_accuracy_ranks(runs: list[dict]) -> None:
     # Ignore les runs sans précision finale pour le classement
     valid_runs = [r for r in runs if r["top1_accuracy"] != -1.0]
@@ -271,22 +273,22 @@ def assign_accuracy_ranks(runs: list[dict]) -> None:
         run["rank"] = rank
 
 
-def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_filter_active: bool = False) -> None:
+def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, filter_active: bool = False) -> None:
     """
     Affiche les runs. Suppose que assign_accuracy_ranks() a déjà été appelé par
-    l'appelant, sur l'ensemble COMPLET des runs (avant tout filtre -m) — cette
+    l'appelant, sur l'ensemble COMPLET des runs (avant tout filtre) — cette
     fonction ne fait que trier/tronquer/afficher, jamais recalculer les rangs
     (sinon on retombe dans le bug du rang "local" au sous-ensemble filtré).
 
     La colonne "Global Rank" n'est utile que quand la position affichée (`#`) peut
-    différer du rang réel : avec `-m` (le sous-ensemble affiché n'est pas la
+    différer du rang réel : avec des filtres (le sous-ensemble affiché n'est pas la
     totalité classée) ou `-a` (l'ordre d'affichage n'est plus le classement Top-1).
     """
     if not runs:
         print("No valid run to display.")
         return
 
-    show_global_rank = sort_by_ago or model_filter_active
+    show_global_rank = sort_by_ago or filter_active
 
     if sort_by_ago:
         oldest_possible = datetime.min.replace(tzinfo=RUN_TIMEZONE)
@@ -300,7 +302,7 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_fi
     headers = ["#"]
     if show_global_rank:
         headers.append("Global Rank")
-    headers += ["Top-1 Acc", "Train Acc", "Model", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
+    headers += ["Top-1 Acc", "Train Acc", "Model", "Resolution", "Norm", "Alpha", "Epochs", "Seed", "Limit", "Ratio", "Ago", "Info", "Path"]
 
     rows = []
     for i, run in enumerate(display_runs):
@@ -349,9 +351,13 @@ def print_top_runs(runs: list[dict], n: int, sort_by_ago: bool = False, model_fi
 def main() -> None:
     args = parse_args()
     runs = collect_runs(args.pattern)
-    assign_accuracy_ranks(runs)  # rang GLOBAL : calculé sur TOUS les runs, avant le filtre -m
+    assign_accuracy_ranks(runs)
+    
     runs = filter_runs_by_model(runs, args.model)
-    print_top_runs(runs, args.n, sort_by_ago=args.ago, model_filter_active=args.model is not None)
+    runs = filter_runs_by_resolution(runs, args.resolution)
+    
+    is_filtered = (args.model is not None) or (args.resolution is not None)
+    print_top_runs(runs, args.n, sort_by_ago=args.ago, filter_active=is_filtered)
 
 
 if __name__ == "__main__":
