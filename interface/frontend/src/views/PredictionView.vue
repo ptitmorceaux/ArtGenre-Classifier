@@ -3,7 +3,8 @@ import { ref, onMounted, computed, watch } from 'vue'
 import PredictionResult from '../components/PredictionResult.vue'
 
 const allModels = ref([])
-const selectedType = ref('linear') // Par défaut
+const selectedType = ref('linear')
+const selectedResolution = ref(32) // Par défaut on affiche les modèles 32x32
 const selectedSessionId = ref('')
 const currentMetrics = ref(null)
 
@@ -13,20 +14,23 @@ const isLoading = ref(false)
 const result = ref(null)
 const error = ref(null)
 
-// 1. Calcul dynamique des modèles filtrés par type
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
+// 1. Filtrage combiné : Type + Résolution
 const filteredModels = computed(() => {
-  return allModels.value.filter(m => m.type === selectedType.value)
+  return allModels.value.filter(m => 
+    m.type === selectedType.value && 
+    m.resolution === selectedResolution.value
+  )
 })
 
-// 2. Calcul dynamique des détails du modèle sélectionné
 const selectedModelDetails = computed(() => {
   return allModels.value.find(m => m.id === selectedSessionId.value)
 })
 
-// Appel API pour récupérer tous les modèles au démarrage
 onMounted(async () => {
   try {
-    const res = await fetch('http://127.0.0.1:8000/api/models/')
+    const res = await fetch(`${API_URL}/api/models/`)
     const data = await res.json()
     if (data.status === 'success') {
       allModels.value = data.models
@@ -37,8 +41,8 @@ onMounted(async () => {
   }
 })
 
-// Quand on change de type de modèle (Linear -> MLP -> RBF)
-watch(selectedType, () => {
+// Relance le focus dès qu'on change de type ou de résolution
+watch([selectedType, selectedResolution], () => {
   setDefaultSession()
 })
 
@@ -58,7 +62,7 @@ const fetchMetrics = async () => {
   currentMetrics.value = null
   result.value = null
   try {
-    const res = await fetch(`http://127.0.0.1:8000/api/models/${selectedSessionId.value}/metrics/`)
+    const res = await fetch(`${API_URL}/api/models/${selectedSessionId.value}/metrics/`)
     const data = await res.json()
     if (data.status === 'success') {
       currentMetrics.value = data
@@ -89,7 +93,7 @@ const submitPrediction = async () => {
   formData.append('session_id', selectedSessionId.value)
 
   try {
-    const res = await fetch('http://127.0.0.1:8000/api/predict/', {
+    const res = await fetch(`${API_URL}/api/predict/`, {
       method: 'POST',
       body: formData,
     })
@@ -117,7 +121,7 @@ const submitPrediction = async () => {
         
         <!-- Sélection du type de modèle -->
         <div class="form-group">
-          <label>1. Famille de l'algorithme :</label>
+          <label>1. Algorithme :</label>
           <select v-model="selectedType">
             <option value="linear">Modèle Linéaire (Linear)</option>
             <option value="mlp">Perceptron Multicouches (MLP)</option>
@@ -125,9 +129,18 @@ const submitPrediction = async () => {
           </select>
         </div>
 
+        <!-- Sélection de la Résolution -->
+        <div class="form-group">
+          <label>2. Résolution :</label>
+          <select v-model="selectedResolution">
+            <option :value="32">Basse définition (32x32 Gris)</option>
+            <option :value="64">Haute définition (64x64 RGB)</option>
+          </select>
+        </div>
+
         <!-- Sélection de la session -->
         <div class="form-group">
-          <label>2. Modèle entraîné (Classé par performance) :</label>
+          <label>3. Modèle entraîné (Classé par performance) :</label>
           <select v-model="selectedSessionId" @change="fetchMetrics">
             <option v-if="filteredModels.length === 0" disabled value="">Aucun modèle de ce type trouvé...</option>
             <option v-for="model in filteredModels" :key="model.id" :value="model.id">
@@ -189,10 +202,34 @@ const submitPrediction = async () => {
       <!-- Résultat d'inférence (composant enfant) -->
       <PredictionResult v-if="result" :data="result" />
 
-      <!-- Matrice de Confusion -->
+      <!-- Matrice de Confusion & Métriques -->
       <div v-if="currentMetrics && currentMetrics.confusion_matrix" class="card metrics-card">
         <h3 class="metrics-title">Matrice de Confusion (Validation)</h3>
         <img :src="'data:image/png;base64,' + currentMetrics.confusion_matrix" alt="Matrice de Confusion" class="metric-img" />
+        
+        <!-- Tableau des Métriques TPR/TNR -->
+        <div v-if="currentMetrics.metrics && Object.keys(currentMetrics.metrics).length > 0" class="table-responsive">
+          <table class="metrics-table">
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th title="Vrais Positifs">TPR</th>
+                <th title="Vrais Négatifs">TNR</th>
+                <th title="Faux Positifs">FPR</th>
+                <th title="Faux Négatifs">FNR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(stats, cat) in currentMetrics.metrics" :key="cat">
+                <td class="cat-name">{{ cat }}</td>
+                <td class="tpr">{{ (stats.TPR * 100).toFixed(1) }}%</td>
+                <td class="tnr">{{ (stats.TNR * 100).toFixed(1) }}%</td>
+                <td class="fpr">{{ (stats.FPR * 100).toFixed(1) }}%</td>
+                <td class="fnr">{{ (stats.FNR * 100).toFixed(1) }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -234,10 +271,7 @@ h2, h3 {
 h2 { margin-bottom: 1.5rem; }
 h3 { margin-bottom: 1rem; border-bottom: 1px solid #f1f2f6; padding-bottom: 0.8rem; }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
+.form-group { margin-bottom: 1.5rem; }
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
@@ -354,5 +388,14 @@ select:focus { border-color: #3498db; }
 }
 
 .metrics-title { text-align: center; }
-.metric-img { width: 100%; border-radius: 8px; border: 1px solid #eee; }
+.metric-img { width: 100%; border-radius: 8px; border: 1px solid #eee; margin-bottom: 1.5rem; }
+
+/* Table Styles */
+.table-responsive { overflow-x: auto; }
+.metrics-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.85rem; }
+.metrics-table th, .metrics-table td { padding: 10px; text-align: center; border-bottom: 1px solid #f1f2f6; }
+.metrics-table th { background-color: #f8fafc; color: #576574; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+.metrics-table .cat-name { text-align: left; text-transform: capitalize; font-weight: 600; color: #2c3e50; }
+.tpr, .tnr { color: #10ac84; font-weight: bold; }
+.fpr, .fnr { color: #ee5253; font-weight: bold; }
 </style>

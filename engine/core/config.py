@@ -83,6 +83,18 @@ def get_config_documentation() -> dict:
                 "default": None,
             },
         },
+        "input_format": {
+            "resolution": {
+                "docs": "Taille de l'image (ex: 32 pour 32x32)",
+                "type": (int,),
+                "default": 32,
+            },
+            "channels": {
+                "docs": "Nombre de canaux (1 pour gris, 3 pour RGB)",
+                "type": (int,),
+                "default": 1,
+            },
+        },
         "dataset": {
             "csv_path": {
                 "docs": "Chemin vers le fichier CSV du dataset.",
