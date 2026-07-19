@@ -68,7 +68,7 @@ class ArtClassifierService:
         model_type = config_data.get("model", {}).get("type", "unknown")
         saved_models = config_data.get("model", {}).get("saved_models", {})
         
-        is_classification = (model_type == "mlp")
+        is_classification = (model_type in ["mlp", "mlp_multiclass"])
         
         input_data = ArtClassifierService.process_image(image_file, config_data)
         input_size = len(input_data)
@@ -76,7 +76,13 @@ class ArtClassifierService:
         
         models_dir = os.path.join(session_dir, "models")
         
-        for category, rel_model_path in saved_models.items():
+        if model_type == "mlp_multiclass":
+            # -- LOGIQUE MULTICLASSE NATIVE --
+            if not saved_models:
+                return {'error': "Aucun modèle sauvegardé trouvé dans la configuration."}
+                
+            # Il n'y a qu'un seul modèle pour toutes les catégories
+            rel_model_path = list(saved_models.values())[0]
             normalized_path = rel_model_path.replace('\\', '/')
             model_filename = os.path.basename(normalized_path)
             model_path = os.path.join(models_dir, model_filename)
@@ -87,18 +93,49 @@ class ArtClassifierService:
             model, scaler = Storage["load"](model_path)
             normalized_data = scaler.transform(input_data)
             
+            # raw_pred contiendra une liste des scores pour chaque neurone de sortie
             raw_pred = model.predict(normalized_data, is_classification=is_classification)
             
-            if isinstance(raw_pred, list):
-                predictions[category] = float(raw_pred[0])
-            else:
-                predictions[category] = float(raw_pred)
-                
+            # On récupère l'ordre exact des catégories tel que défini lors de l'entraînement
+            expected_categories = list(config_data.get("dataset", {}).get("categories", {}).get("train", {}).keys())
+            
+            # On associe chaque score à la catégorie correspondante
+            for i, category in enumerate(expected_categories):
+                if i < len(raw_pred):
+                    predictions[category] = float(raw_pred[i])
+                else:
+                    predictions[category] = 0.0
+                    
             if hasattr(model, '_free'):
                 model._free()
             elif hasattr(model, 'close'):
                 model.close()
                 
+        else:
+            # -- LOGIQUE ONE-VS-ALL EXISTANTE (linear, mlp, rbf) --
+            for category, rel_model_path in saved_models.items():
+                normalized_path = rel_model_path.replace('\\', '/')
+                model_filename = os.path.basename(normalized_path)
+                model_path = os.path.join(models_dir, model_filename)
+                
+                if not os.path.exists(model_path):
+                    return {'error': f"Fichier .bin introuvable: {model_path}"}
+                    
+                model, scaler = Storage["load"](model_path)
+                normalized_data = scaler.transform(input_data)
+                
+                raw_pred = model.predict(normalized_data, is_classification=is_classification)
+                
+                if isinstance(raw_pred, list):
+                    predictions[category] = float(raw_pred[0])
+                else:
+                    predictions[category] = float(raw_pred)
+                    
+                if hasattr(model, '_free'):
+                    model._free()
+                elif hasattr(model, 'close'):
+                    model.close()
+                    
         best_category = max(predictions, key=predictions.get)
         chart_base64 = ArtClassifierService.generate_matplotlib_chart(
             predictions, f"Cheminement de décision - {model_type.upper()}"
