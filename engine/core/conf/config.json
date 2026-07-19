@@ -10,9 +10,9 @@
         "normalization_method": "standard"
     },
     "model": {
-        "type": "mlp",
+        "type": "mlp_multiclass",
         "alpha": 0.0005,
         "epochs": 150,
-        "mlp_hidden_layers": [1024, 1024]
+        "mlp_hidden_layers": [1024, 512]
     }
 }
