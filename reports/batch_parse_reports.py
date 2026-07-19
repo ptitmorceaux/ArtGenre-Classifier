@@ -24,6 +24,7 @@ def parse_run(folder: str) -> dict:
         result["epochs"] = config.get("model", {}).get("epochs")
         result["npl"] = config.get("model", {}).get("npl")
         result["mlp_hidden_layers"] = config.get("model", {}).get("mlp_hidden_layers")
+        result["rbf_num_centers"] = config.get("model", {}).get("rbf_num_centers")
         result["limit_per_category"] = config.get("dataset", {}).get("limit_per_category")
         result["train_positive_ratio"] = config.get("dataset", {}).get("train_positive_ratio")
         result["normalization"] = config.get("dataset", {}).get("normalization_method")
@@ -32,13 +33,19 @@ def parse_run(folder: str) -> dict:
         result["top1_accuracy"] = test_acc.get("global", {}).get("top1_accuracy")
         cats = test_acc.get("categories", {})
         result["recall"] = {c: cats.get(c, {}).get("TPR") for c in CATS}
+        result["tnr"] = {c: cats.get(c, {}).get("TNR") for c in CATS}
+        result["fpr"] = {c: cats.get(c, {}).get("FPR") for c in CATS}
+        result["fnr"] = {c: cats.get(c, {}).get("FNR") for c in CATS}
         result["balanced_accuracy"] = {c: cats.get(c, {}).get("balanced_accuracy") for c in CATS}
 
         train_acc = config.get("model", {}).get("train_last_accuracy_per_category", {})
         result["train_accuracy"] = {c: train_acc.get(c) for c in CATS}
 
         count = config.get("dataset", {}).get("count_total_dataset", {})
-        if count:
+        if "loaded" in count:  # nouveau schema (feat/dataset-repartition-mem)
+            result["train_total"] = count["loaded"].get("train", {}).get("total")
+            result["test_total"] = count["loaded"].get("test", {}).get("total")
+        elif count:  # ancien schema (plat)
             result["train_total"] = count.get("train", {}).get("total")
             result["test_total"] = count.get("test", {}).get("total")
     else:

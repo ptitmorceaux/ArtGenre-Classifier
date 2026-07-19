@@ -251,6 +251,65 @@ def build_one_vs_all_train_arrays(data: dict, category: str) -> tuple[np.ndarray
     return X.flatten(), Y
 
 
+def build_multiclass_train_arrays(data: dict) -> tuple[np.ndarray, list[float], list[str]]:
+    """
+    Construit (X, Y, categories_order) pour le TRAIN d'un MLP multiclasse PARTAGÉ
+    (une seule sortie par catégorie, décision finale par argmax — pas de One-vs-All).
+
+    Contrairement à build_one_vs_all_train_arrays() :
+    - Il n'y a plus de notion positifs/négatifs, donc pas de rééquilibrage
+      ('train_positive_ratio' ne s'applique pas ici) : TOUTES les images de train
+      sont utilisées, une seule fois chacune.
+    - Y est un one-hot par échantillon (1.0 pour la bonne catégorie, -1.0 pour les
+      autres), cohérent avec le seuil 0.5 déjà utilisé côté C pour retrouver l'index
+      attendu (mlp.c: `y_k[j] > 0.5f`).
+
+    `categories_order` fixe l'ordre catégorie -> index de sortie (ex: index 0 =
+    sortie 0 du MLP). Cet ordre DOIT être réutilisé tel quel à l'évaluation et à
+    l'inférence pour décoder correctement l'argmax — il vient de l'ordre d'insertion
+    de `data["train"]["img"]`, lui-même dérivé de `cf.CONFIG["dataset"]["categories"]["train"]`.
+
+    X et Y sont renvoyés APLATIS (1D, row-major) pour alimenter directement model.train().
+    """
+    categories_order = list(data["train"]["img"].keys())
+    n_categories = len(categories_order)
+
+    if n_categories < 2:
+        raise ValueError("build_multiclass_train_arrays(): il faut au moins 2 catégories.")
+
+    X_parts, Y_parts = [], []
+    counts_used = {"total": 0, "categories": dict()}
+
+    for idx, category in enumerate(categories_order):
+        imgs = data["train"]["img"][category]
+        n = len(imgs)
+
+        X_parts.append(imgs)
+
+        one_hot = [-1.0] * n_categories
+        one_hot[idx] = 1.0
+        Y_parts.extend([one_hot] * n)
+
+        counts_used["categories"][category] = n
+        counts_used["total"] += n
+
+    print(f"    [INFO] multiclasse : {counts_used['total']} images au total "
+          f"({', '.join(f'{cat}={n}' for cat, n in counts_used['categories'].items())})")
+
+    cf.CONFIG["dataset"]["count_total_dataset"]["used_during_train"]["model_multiclass"] = counts_used
+
+    X = np.concatenate(X_parts, axis=0)
+
+    rng = np.random.default_rng(cf.CONFIG["lib"]["seed"])
+    perm = rng.permutation(len(Y_parts))
+    X = X[perm]
+    Y_parts = [Y_parts[i] for i in perm]
+
+    Y_flat = [value for one_hot in Y_parts for value in one_hot]
+
+    return X.flatten(), Y_flat, categories_order
+
+
 def build_multiclass_test_arrays(data: dict) -> tuple[np.ndarray, list[str]]:
     """
     Construit le tableau de test 2D combiné (toutes catégories, une image par

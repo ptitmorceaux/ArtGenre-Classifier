@@ -18,7 +18,7 @@ def get_model_md() -> str:
 | Epochs | `{model["epochs"]}` |
 """
 
-    if model["type"] == "mlp":
+    if model["type"] in ("mlp", "mlp_multiclass"):
         summary += (
             f"| NPL | `{model['npl']}` |\n"
         )
@@ -31,14 +31,22 @@ def get_dataset_md() -> str:
 
     dataset = cf.CONFIG["dataset"]
     categories = list(dataset["categories"]["train"].keys())
+    model_type = cf.CONFIG["model"]["type"]
 
     loaded = dataset["count_total_dataset"]["loaded"]
     train_counts = dataset["count_total_dataset"]["used_during_train"]
 
-    # Diagonale (train_counts["model_<cat>"]["categories"][cat]) = nb d'images
+    # En One-vs-All (mlp/linear/rbf), chaque catégorie a son propre dataset
+    # ("model_<cat>"). En multiclasse, un seul dataset partagé ("model_multiclass")
+    # couvre toutes les catégories -> on indirige la clé de lookup selon le type.
+    def _count_key(category: str) -> str:
+        return "model_multiclass" if model_type == "mlp_multiclass" else f"model_{category}"
+
+    # Diagonale (train_counts[_count_key(cat)]["categories"][cat]) = nb d'images
     # CHARGÉES par catégorie, jamais affecté par le ratio (seuls les négatifs
-    # sont sous-échantillonnés) -> total d'images en RAM reconstruit à partir de ça.
-    total_train_loaded = sum(train_counts[f"model_{cat}"]["categories"][cat] for cat in categories)
+    # sont sous-échantillonnés, et le multiclasse n'en a pas) -> total d'images en
+    # RAM reconstruit à partir de ça.
+    total_train_loaded = sum(train_counts[_count_key(cat)]["categories"][cat] for cat in categories)
     total_test = loaded["test"]["total"]
 
     ratio = dataset.get("train_positive_ratio", -1)
@@ -62,9 +70,15 @@ def get_dataset_md() -> str:
 """
 
     for category in categories:
-        count_train = train_counts[f"model_{category}"]["categories"][category]
+        count_train = train_counts[_count_key(category)]["categories"][category]
         count_test = loaded["test"]["categories"][category]
         summary += f"| {category} | {count_train} | {count_test} |\n"
+
+    if model_type == "mlp_multiclass":
+        # Un seul dataset partagé, utilisé une seule fois par toutes les catégories :
+        # la matrice de répartition One-vs-All ci-dessous n'a pas de sens ici (déjà
+        # entièrement résumée par le tableau ci-dessus).
+        return summary
 
     # Matrice de répartition One-vs-All : pour chaque modèle, combien d'images
     # de chaque catégorie ont réellement été utilisées (utile pour vérifier

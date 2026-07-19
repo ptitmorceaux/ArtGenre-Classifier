@@ -170,9 +170,13 @@ def get_config_documentation() -> dict:
         },
         "model": {
             "type": {
-                "docs": "Type de modèle à utiliser.",
+                "docs": (
+                    "Type de modèle à utiliser. 'mlp' = One-vs-All (un MLP à 1 sortie par "
+                    "catégorie). 'mlp_multiclass' = un seul MLP partagé, avec une sortie par "
+                    "catégorie et décision finale par argmax. 'rbf' = One-vs-All par RBF."
+                ),
                 "type": (str,),
-                "options": ["linear", "mlp", "rbf"],
+                "options": ["linear", "mlp", "mlp_multiclass", "rbf"],
             },
             "alpha": {
                 "docs": "Paramètre de régularisation pour le modèle linéaire.",
@@ -183,7 +187,7 @@ def get_config_documentation() -> dict:
                 "type": (int,),
             },
             "mlp_hidden_layers": {
-                "docs": "Nombre de neurones dans les couches **cachées** du MLP. Utiliser seulement si le type de modèle est 'mlp'.",
+                "docs": "Nombre de neurones dans les couches **cachées** du MLP. Utiliser seulement si le type de modèle est 'mlp' ou 'mlp_multiclass'.",
                 "type": (list, type(None)),
                 "default": None,
             },
@@ -264,12 +268,19 @@ def finalize_mlp_config(config: dict) -> dict:
     """
     Construit (ou vérifie) l'architecture 'npl' du MLP. À appeler APRÈS le chargement
     des images, une fois que 'dataset.W_length' est connu.
+
+    La taille de la couche de sortie dépend du type de modèle :
+    - 'mlp'            -> 1 seule sortie (One-vs-All : un modèle par catégorie).
+    - 'mlp_multiclass' -> 1 sortie par catégorie (un seul modèle partagé, décision par argmax).
     """
-    if config["model"]["type"] != "mlp":
+    if config["model"]["type"] not in ("mlp", "mlp_multiclass"):
         return config
 
+    n_categories = len(config["dataset"]["categories"]["train"])
+    output_dim = 1 if config["model"]["type"] == "mlp" else n_categories
+
     if "npl" not in config["model"]:
-        config["model"]["npl"] = [config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], 1]
+        config["model"]["npl"] = [config["dataset"]["W_length"], *config["model"]["mlp_hidden_layers"], output_dim]
     else:
         W_length = config["model"]["npl"][0]
         if W_length != config["dataset"]["W_length"]:
@@ -280,6 +291,11 @@ def finalize_mlp_config(config: dict) -> dict:
         if npl != config["model"]["mlp_hidden_layers"]:
             raise ValueError(f"finalize_mlp_config(): mlp_hidden_layers incohérent. "
                             f"Obtenu: {npl}, Attendu: {config['model']['mlp_hidden_layers']}")
+
+        if config["model"]["npl"][-1] != output_dim:
+            raise ValueError(f"finalize_mlp_config(): dernière couche ('npl[-1]') incohérente pour "
+                            f"le type '{config['model']['type']}'. Obtenu: {config['model']['npl'][-1]}, "
+                            f"Attendu: {output_dim}")
 
     return config
 
